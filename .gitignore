@@ -19,6 +19,7 @@ data/tracks/
 outputs/
 logs/
 *.log
+*.out
 
 # Experiments
 experiments/*/results/
@@ -78,6 +79,7 @@ env/
 .pytest_cache/
 .coverage
 htmlcov/
+sbatch_example.sh
 
 # MuJoCo models
 *.xml~
