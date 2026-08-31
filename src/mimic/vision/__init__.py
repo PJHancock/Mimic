@@ -1,14 +1,5 @@
-"""Vision module: V-JEPA embeddings and temporal action classification."""
+"""Vision module: video feature extraction and action classification."""
 
-# Export main interfaces here
-# from .vjepa_encoder import VJEPAEncoder
-# from .temporal_model import TemporalActionModel
-# from .training import train_temporal_model
-# from .inference import infer_actions
+from mimic.vision.vjepa_encoder import VJepaEncoder
 
-__all__ = [
-    # "VJEPAEncoder",
-    # "TemporalActionModel",
-    # "train_temporal_model",
-    # "infer_actions",
-]
+__all__ = ["VJepaEncoder"]

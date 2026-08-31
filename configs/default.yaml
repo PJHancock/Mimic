@@ -30,6 +30,10 @@ temporal_model:
 
 # Tracking
 tracking:
+  # Table dimensions (in meters) - measured from physical setup
+  table_width_m: 0.508   # 20 inches
+  table_height_m: 0.762  # 30 inches
+
   hand_confidence_threshold: 0.5
   object_confidence_threshold: 0.5
   use_mediapipe: true
