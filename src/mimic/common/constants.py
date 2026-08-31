@@ -33,3 +33,9 @@ CACHE_EMBEDDINGS = True
 CACHE_TRACKS = True
 EMBEDDING_CACHE_DIR = "data/embeddings"
 TRACK_CACHE_DIR = "data/tracks"
+
+# Calibration: table dimensions (in meters)
+# These should be measured from your physical setup
+# Placeholder values below — update after measuring your table
+TABLE_WIDTH_M = 0.6   # Width of the table in meters
+TABLE_HEIGHT_M = 0.4  # Depth/height of the table in meters
