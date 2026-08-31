@@ -62,6 +62,8 @@ data/
 
 4. **Run tests before committing**
    ```bash
+   uv run pytest tests/test_vision/
+   # or if venv is activated:
    pytest tests/test_vision/
    ```
 
@@ -109,7 +111,7 @@ def test_vision_to_robot_pipeline():
 1. **Create a config file** in `configs/experiment_name.yaml`
 2. **Run the experiment** via script:
    ```bash
-   python scripts/train_temporal_model.py --config configs/experiment_name.yaml
+   uv run python scripts/train_temporal_model.py --config configs/experiment_name.yaml
    ```
 3. **Save results** in `experiments/experiment_name/`
    - Model weights
@@ -119,12 +121,32 @@ def test_vision_to_robot_pipeline():
 
 ## Adding Dependencies
 
-Only add to `requirements.txt` if:
-- Essential for your subsystem
-- No redundant alternatives exist
-- Lightweight or already used elsewhere
+We use `uv` and `pyproject.toml` for dependency management. To add a dependency:
 
-Run `pip freeze > requirements_frozen.txt` after changes so others can reproduce exactly.
+1. Edit `pyproject.toml`:
+   ```toml
+   [project]
+   dependencies = [
+       # ... existing ...
+       "new-package>=1.0.0",
+   ]
+   ```
+
+2. Or for dev-only dependencies:
+   ```toml
+   [project.optional-dependencies]
+   dev = [
+       # ... existing ...
+       "new-dev-tool>=1.0.0",
+   ]
+   ```
+
+3. Sync dependencies:
+   ```bash
+   uv sync
+   ```
+
+4. Commit both `pyproject.toml` and `uv.lock` so everyone gets exact versions.
 
 ## Common Pitfalls
 

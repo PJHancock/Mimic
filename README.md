@@ -34,11 +34,14 @@ mimic/
 
 ### Setup
 ```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # Run tests
-pytest tests/
+uv run pytest tests/
 ```
 
 ### Recording a Demonstration

@@ -2,6 +2,16 @@
 
 Entry points for running different parts of the Mimic pipeline.
 
+**Note**: All scripts can be run with `uv run` or from an activated `.venv`:
+```bash
+# Option 1: Using uv run (recommended)
+uv run python scripts/train_temporal_model.py --config configs/default.yaml
+
+# Option 2: Activate venv first
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+python scripts/train_temporal_model.py --config configs/default.yaml
+```
+
 ## Data Pipeline
 
 ### record_demo.py

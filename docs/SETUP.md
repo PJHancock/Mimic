@@ -1,35 +1,77 @@
 # Setup and Installation
 
-Guide for setting up the Mimic project on different systems.
+Guide for setting up the Mimic project on different systems using `uv`.
 
 ## Prerequisites
 
 - Python 3.9+
 - Git
-- CUDA 11.8+ (for GPU acceleration on RTX 3090)
+- CUDA 11.8+ (for GPU acceleration on RTX 3090, optional)
 - 16GB+ RAM (for development)
 
 ## Installation
 
-### 1. Clone Repository
+### 1. Install uv
+
+`uv` is a blazingly fast Python package manager written in Rust. Install it first:
+
+**macOS / Linux:**
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+**Windows (PowerShell):**
+```powershell
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+**Or via your package manager:**
+```bash
+# macOS
+brew install uv
+
+# Ubuntu/Debian
+sudo apt install uv  # if available in your distro
+
+# Arch
+pacman -S uv
+```
+
+Verify installation:
+```bash
+uv --version
+```
+
+### 2. Clone Repository
 ```bash
 git clone https://github.com/yourusername/Mimic.git
 cd Mimic
 ```
 
-### 2. Create Virtual Environment
+### 3. Sync Dependencies
+`uv` automatically creates and manages a virtual environment:
+
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Sync all dependencies (creates venv automatically)
+uv sync
 ```
 
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
+This command:
+- Creates `.venv/` directory (automatically managed by uv)
+- Installs all dependencies
+- Creates `uv.lock` for reproducible builds
+- Activates the environment automatically for subsequent `uv` commands
 
 ### 4. Verify Installation
 ```bash
+# Test imports
+uv run python -c "import mimic; print(mimic.__version__)"
+
+# Run tests
+uv run pytest tests/
+
+# Alternative: activate the venv and use normally
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 python -c "import mimic; print(mimic.__version__)"
 pytest tests/
 ```
@@ -47,48 +89,55 @@ pytest tests/
    # Download from https://developer.nvidia.com/cudnn
    ```
 
-3. Install PyTorch with CUDA support:
+3. Sync with GPU-specific PyTorch (uv handles this):
    ```bash
-   pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+   uv sync
+   # uv automatically installs CPU PyTorch by default
+   # For CUDA support, modify pyproject.toml to specify GPU wheels
    ```
 
 4. Verify GPU availability:
    ```bash
-   python -c "import torch; print(torch.cuda.is_available())"
+   uv run python -c "import torch; print(torch.cuda.is_available())"
    ```
+
+   If CUDA is not available, update `pyproject.toml` to use GPU wheels and resync.
 
 ### M4 Pro MacBook (Data & simulation)
-1. Create environment with ARM support:
+1. Just use uv (handles ARM automatically):
    ```bash
-   conda create -n mimic python=3.10
-   conda activate mimic
+   uv sync
+   # uv automatically selects compatible wheels for Apple Silicon
    ```
 
-2. Install PyTorch for Apple Silicon:
+2. Verify Metal acceleration:
    ```bash
-   pip install torch torchvision torchaudio
-   ```
-
-3. Verify Metal acceleration:
-   ```bash
-   python -c "import torch; print(torch.backends.mps.is_available())"
+   uv run python -c "import torch; print(torch.backends.mps.is_available())"
    ```
 
 ## Special Dependencies
 
-### V-JEPA 2
-```bash
-pip install git+https://github.com/facebookresearch/vjepa.git
+### V-JEPA 2, SAM2, and Other Git Repos
+
+Add git dependencies to `pyproject.toml`:
+
+```toml
+dependencies = [
+    # ... existing deps ...
+    "vjepa @ git+https://github.com/facebookresearch/vjepa.git",
+    "sam2 @ git+https://github.com/facebookresearch/sam2.git",
+]
 ```
 
-### SAM2
+Then resync:
 ```bash
-pip install git+https://github.com/facebookresearch/sam2.git
+uv sync
 ```
 
-### MuJoCo
+### MuJoCo (already in pyproject.toml)
+Already included in the base dependencies. Verify with:
 ```bash
-pip install mujoco>=3.0.0
+uv run python -c "import mujoco; print(mujoco.__version__)"
 ```
 
 ## Configuration
@@ -122,16 +171,23 @@ pip install mujoco>=3.0.0
 
 ```bash
 # 1. Test imports
-python -c "from mimic import common, vision, tracking, robot, integration"
+uv run python -c "from mimic import common, vision, tracking, robot, integration"
 
 # 2. Test configuration
-python -c "from mimic.config import get_config; cfg = get_config(); print(cfg.to_dict())"
+uv run python -c "from mimic.config import get_config; cfg = get_config(); print(cfg.to_dict())"
 
 # 3. Run tests
-pytest tests/ -v
+uv run pytest tests/ -v
 
 # 4. Check data paths
-python -c "from mimic.config import get_data_dir; print(get_data_dir())"
+uv run python -c "from mimic.config import get_data_dir; print(get_data_dir())"
+```
+
+Or activate the virtual environment first:
+```bash
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
+python -c "from mimic import *"
+pytest tests/ -v
 ```
 
 ## Troubleshooting
@@ -139,10 +195,11 @@ python -c "from mimic.config import get_data_dir; print(get_data_dir())"
 ### CUDA/GPU Issues
 ```bash
 # Check CUDA availability
-python -c "import torch; print(torch.cuda.device_count())"
+uv run python -c "import torch; print(torch.cuda.device_count())"
 
 # Force CPU mode
 export CUDA_VISIBLE_DEVICES=""
+uv run python ...
 ```
 
 ### Memory Issues
@@ -150,9 +207,24 @@ export CUDA_VISIBLE_DEVICES=""
 - Use smaller model (`hidden_size: 128` instead of 256)
 - Enable `cache_embeddings: true`
 
-### Import Errors
+### Virtual Environment Issues
 ```bash
-# Reinstall package in development mode
+# Recreate the venv from scratch
+rm -rf .venv
+uv sync
+
+# Or if uv doesn't auto-create, explicitly create it
+uv venv
+uv sync
+```
+
+### Module Import Errors
+```bash
+# Reinstall the package in development mode
+uv sync --reinstall
+
+# Or use pip in the venv
+source .venv/bin/activate
 pip install -e .
 ```
 
@@ -161,21 +233,44 @@ pip install -e .
 For contributing to the codebase:
 
 ```bash
-# Install development dependencies
-pip install -r requirements.txt
+# Sync with dev dependencies (automatically included)
+uv sync
+
+# Format code with black and isort (configured in pyproject.toml)
+uv run black src/ scripts/
+uv run isort src/ scripts/
+
+# Type checking with mypy
+uv run mypy src/mimic/
+
+# Linting with flake8
+uv run flake8 src/ scripts/
 
 # Install pre-commit hooks
-pre-commit install
+uv run pre-commit install
 
-# Format code
-black src/ scripts/
-isort src/ scripts/
+# Run pre-commit on all files
+uv run pre-commit run --all-files
+```
 
-# Type checking
-mypy src/mimic/
+### Working with the Virtual Environment
 
-# Linting
-flake8 src/ scripts/
+You have two options:
+
+**Option 1: Use `uv run` (recommended)**
+```bash
+uv run pytest tests/
+uv run black src/
+uv run python scripts/train_temporal_model.py
+```
+
+**Option 2: Activate `.venv` and work normally**
+```bash
+source .venv/bin/activate  # .venv\Scripts\activate on Windows
+pytest tests/
+black src/
+python scripts/train_temporal_model.py
+deactivate  # Exit venv when done
 ```
 
 ---
