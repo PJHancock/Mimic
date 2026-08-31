@@ -296,6 +296,15 @@ This section contains the durable project-specific contract for the hackathon sy
 ### Canonical Subsystem Interfaces
 These are logical contracts. Concrete Python classes, dataclasses, dictionaries, or serialization formats may vary, but the semantics must remain stable unless explicitly changed.
 
+#### User-approved offline task-definition contract (robot environment branch)
+- Steps 2 and 3 now use `ActionPrediction` and `ObjectTrack` sequences aligned by the same one-based source-video `frame_idx`. Predictions need not exist at every tracking frame. Seconds are optional metadata, never inferred from a default FPS or replaced with frame counts.
+- `ObjectTrack.table_xy_cm` replaces the old image-coordinate `center_2d`: inputs are already calibrated table coordinates in centimeters, top-left origin, +X right, +Y down. Image calibration remains upstream.
+- For one complete single-object demonstration, `ExtractedTask` uses the first GRASP and first RELEASE frames as endpoints. Require exact tracking observations at both; reject missing endpoints, invalid ordering, and mixed object identities. No state post-processing or interpolation happens in extraction.
+- Preserve all available tracking samples from GRASP onset through RELEASE onset inclusive, with frames, phase labels, and confidence. Keep the MOVE-only subset separately identifiable. `DIRECT` returns the endpoints by default; `FOLLOW` selects the retained geometry without overwriting it. Neither selects robot timing.
+- `CoordinateRetargeter` requires explicit, robot-independent mapping configuration: named frames, target XY origin in meters, and perpendicular unit source-axis directions in target XY. Convert centimeters to meters exactly once; never infer mapping, normalize axes, resize, shear, or clamp positions. Deployment mapping values remain unset.
+- Source and target tasks are separate immutable records. Existing normalized `TaskRepresentation` semantics are unchanged; these new tasks must not be passed directly to the tool-pose executor.
+- This approved contract supersedes the earlier normalized-coordinate and required-seconds assumptions below for steps 2 and 3. See `docs/TASK_EXTRACTION_AND_RETARGETING.md` for the concrete API and numerical validation rules. Robot execution and safety constraints remain unchanged.
+
 #### `TemporalPrediction` — upstream temporal model -> robot harness
 - `timestamp_s: float` — synchronized video time in seconds.
 - `state_scores: {APPROACH, GRASP, MOVE, RELEASE}` — probabilities or comparable confidence scores.
@@ -419,6 +428,8 @@ At minimum, log:
 Any success tolerance is a design parameter. If none exists yet, surface the missing decision rather than choosing a convenient value silently.
 
 ### Relevant Documentation
+- `docs/ROBOT_EXECUTION.md` defines the implemented IK/gripper boundary: world-meter `ToolPose` with explicit `wxyz` quaternions and body-to-tool offset, named joint/actuator profiles, Python >=3.10 robot dependency group, and required execution criteria. `configs/robots/panda.yaml` intentionally leaves unresolved experiment settings null. The user authorized a separate measured-gripper limit tolerance; the configured allowance is 10 micrometers per named finger slide joint. Preserve raw observations and all commanded/model limits; do not apply this allowance to arm joints. Production calibration and task-success criteria remain unresolved.
+- `docs/TASK_EXTRACTION_AND_RETARGETING.md` defines the user-approved frame-based, centimeter-space contract for offline steps 2 and 3, including the required mapping configuration and deferred downstream behavior.
 - This `AGENTS.md` Project Contract is authoritative for agent behavior on `main` until superseded by explicit project documentation.
 - Prefer existing repository `README`, architecture notes, configuration files, MuJoCo model documentation, and upstream interface definitions when present.
 - If implementation introduces a durable coordinate convention, message schema, or configuration contract, document it in the repository and update this section rather than leaving the convention implicit in code.

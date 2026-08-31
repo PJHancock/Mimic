@@ -61,8 +61,16 @@ python scripts/run_inference.py --video data/raw/demo_test.mp4 --visualize
 
 ### Robot Simulation
 ```bash
-python scripts/simulate_robot.py --task-file outputs/task.pkl
+uv sync --group robot
+uv run python scripts/fetch_panda_model.py
+uv run --group robot python scripts/simulate_robot.py \
+  --config path/to/experiment.yaml --waypoints path/to/world_waypoints.json \
+  --log outputs/robot_attempt.jsonl
 ```
+
+Requires explicit scene/tool geometry and acceptance criteria; the Panda config is
+an unconfigured template. See [Robot Execution](docs/ROBOT_EXECUTION.md) for setup,
+interfaces, tests, and the retained simulation limit-check failure.
 
 ## Team Workspace
 
@@ -83,6 +91,18 @@ All modules use common types in `src/mimic/common/types.py`:
 - `ActionPhase`, `TaskRepresentation`, `RobotCommand`
 
 Configuration is centralized in `src/mimic/config.py`. Experiment parameters go in `configs/`.
+
+### Offline Task Definition
+
+The Task Extractor and NumPy-backed Coordinate Retargeter accept already labeled
+predictions and table-space object tracks keyed by shared source-video frame IDs.
+Tracking coordinates are centimeters (top-left origin, +X right, +Y down).
+Tasks preserve the demonstration path while defaulting to direct endpoint-to-endpoint
+geometry. Retargeting requires explicit mapping values; `configs/retargeting.yaml`
+intentionally leaves deployment values unset.
+
+See [Task Extraction and Retargeting](docs/TASK_EXTRACTION_AND_RETARGETING.md)
+for the input contract, usage, failure behavior, and `DIRECT`/`FOLLOW` selection.
 
 ## Hardware
 

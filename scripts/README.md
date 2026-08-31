@@ -75,10 +75,18 @@ python scripts/run_inference.py --video data/raw/demo_test.mp4 --model outputs/m
 ```
 
 ### simulate_robot.py
-Execute task in MuJoCo simulation.
+Execute explicitly configured, processed world-space waypoints in headless MuJoCo.
 ```bash
-python scripts/simulate_robot.py --task-file outputs/task.pkl --visualize
+uv run --group robot python scripts/simulate_robot.py \
+  --config path/to/experiment.yaml --waypoints path/to/world_waypoints.json \
+  --log outputs/robot_attempt.jsonl
 ```
+
+Use `fetch_panda_model.py` for the one-time pinned asset download. Use
+`verify_panda.py --output outputs/robot_verification/new_attempt` with `uv run --group robot`
+for the fixed diagnostic fixture. These entry points require explicit arguments,
+not the general default config. See [Robot Execution](../docs/ROBOT_EXECUTION.md)
+for unresolved settings and the observed physical limit-check failure.
 
 ## Utilities
 
