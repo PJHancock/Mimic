@@ -1,0 +1,51 @@
+# Default configuration for Mimic project
+# Override specific values in experiment-specific configs
+
+# Paths
+data_dir: data
+output_dir: outputs
+
+# Video processing
+fps: 30
+video_extension: ".mp4"
+
+# Caching
+cache_embeddings: true
+cache_tracks: true
+
+# Compute
+device: cuda  # or "cpu" for testing
+random_seed: 42
+
+# Temporal model
+temporal_model:
+  type: gru  # "gru", "transformer", "mlp"
+  hidden_size: 256
+  num_layers: 2
+  dropout: 0.1
+  learning_rate: 1.0e-3
+  batch_size: 32
+  num_epochs: 50
+  val_split: 0.2
+
+# Tracking
+tracking:
+  hand_confidence_threshold: 0.5
+  object_confidence_threshold: 0.5
+  use_mediapipe: true
+  use_sam2: true
+  smooth_trajectories: true
+
+# Robot control
+robot:
+  arm_control_hz: 100
+  gripper_control_hz: 10
+  approach_height: 0.15
+  grasp_height: 0.0
+  transport_height: 0.15
+  release_height: 0.0
+
+# Logging & visualization
+logging_level: INFO
+tensorboard_log_dir: outputs/logs
+visualize_predictions: false

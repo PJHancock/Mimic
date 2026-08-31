@@ -1,0 +1,181 @@
+Mimic Project Structure
+======================
+
+mimic/
+├── README.md                          # Project overview
+├── CONTRIBUTING.md                    # Development guidelines
+├── requirements.txt                   # Python dependencies
+├── .gitignore                         # Git ignore rules
+├── PROJECT_STRUCTURE.txt              # This file
+│
+├── data/                              # Dataset organization
+│   ├── README.md                      # Data guidelines
+│   ├── raw/                           # Raw videos (gitignored)
+│   ├── processed/                     # Preprocessed frames
+│   ├── embeddings/                    # V-JEPA cached embeddings (gitignored)
+│   ├── annotations/                   # Labels & speech transcripts
+│   └── splits/                        # Train/val/test indices
+│
+├── src/mimic/                         # Main Python package
+│   ├── __init__.py
+│   ├── config.py                      # Central configuration
+│   │
+│   ├── common/                        # Shared utilities
+│   │   ├── __init__.py
+│   │   ├── types.py                   # Data classes (ActionPhase, ObjectTrack, etc.)
+│   │   └── constants.py               # Shared constants
+│   │
+│   ├── data_pipeline/                 # Data collection & preparation
+│   │   ├── __init__.py
+│   │   ├── recording.py               # Video recording utilities
+│   │   ├── transcription.py           # Speech-to-text (Whisper)
+│   │   └── annotation.py              # Label generation from speech
+│   │
+│   ├── vision/                        # Visual understanding (V-JEPA + classifier)
+│   │   ├── __init__.py
+│   │   ├── vjepa_encoder.py           # V-JEPA 2 inference & caching
+│   │   ├── temporal_model.py          # Temporal action classifier
+│   │   ├── training.py                # Training loop
+│   │   └── inference.py               # Prediction interface
+│   │
+│   ├── tracking/                      # Hand & object tracking + geometry
+│   │   ├── __init__.py
+│   │   ├── hand_tracker.py            # MediaPipe hand detection
+│   │   ├── object_tracker.py          # SAM2 object tracking
+│   │   ├── coordinate_mapping.py      # Camera ↔ table ↔ robot coords
+│   │   └── trajectory.py              # Smoothing & resampling
+│   │
+│   ├── robot/                         # Robot control & planning
+│   │   ├── __init__.py
+│   │   ├── task.py                    # Task representation
+│   │   ├── state_machine.py           # APPROACH/GRASP/MOVE/RELEASE logic
+│   │   ├── trajectory_gen.py          # Waypoint generation
+│   │   ├── inverse_kinematics.py      # IK solving
+│   │   ├── controller.py              # Arm & gripper control
+│   │   └── simulation.py              # MuJoCo interface
+│   │
+│   └── integration/                   # End-to-end pipeline
+│       ├── __init__.py
+│       ├── pipeline.py                # Orchestrates all modules
+│       └── visualization.py           # Debugging & results
+│
+├── scripts/                           # Executable entry points
+│   ├── README.md                      # Script documentation
+│   ├── record_demo.py                 # Record demonstrations
+│   ├── transcribe_audio.py            # Speech-to-text
+│   ├── extract_embeddings.py          # V-JEPA inference
+│   ├── train_temporal_model.py        # Train action classifier
+│   ├── extract_tracks.py              # Hand/object tracking
+│   ├── run_inference.py               # Full inference pipeline
+│   └── simulate_robot.py              # MuJoCo execution
+│
+├── notebooks/                         # Exploratory notebooks
+│   ├── README.md
+│   ├── 01_data_exploration.ipynb
+│   ├── 02_embedding_analysis.ipynb
+│   ├── 03_tracking_debug.ipynb
+│   └── 04_robot_simulation.ipynb
+│
+├── configs/                           # Configuration files
+│   ├── default.yaml                   # Default configuration
+│   ├── experiment_1.yaml              # Experiment overrides
+│   └── tracking_params.yaml           # Tracking-specific params
+│
+├── tests/                             # Test suite
+│   ├── __init__.py
+│   ├── test_integration.py            # End-to-end tests
+│   ├── test_vision/
+│   │   ├── __init__.py
+│   │   └── test_temporal_model.py
+│   ├── test_tracking/
+│   │   ├── __init__.py
+│   │   └── test_coordinate_mapping.py
+│   ├── test_robot/
+│   │   ├── __init__.py
+│   │   └── test_state_machine.py
+│   └── test_data_pipeline/
+│       └── __init__.py
+│
+├── experiments/                       # Results & logs
+│   ├── README.md
+│   ├── exp_01_baseline/
+│   │   ├── config.yaml
+│   │   ├── model.pth
+│   │   ├── metrics.json
+│   │   ├── notes.md
+│   │   └── results/
+│   └── exp_02_vjepa_temporal/
+│       └── ...
+│
+└── docs/                              # Documentation
+    ├── README.md                      # Docs index
+    ├── PROJECT_OVERVIEW.md            # Technical specification
+    ├── ARCHITECTURE.md                # System design
+    ├── SETUP.md                       # Installation guide
+    └── DATA_FORMAT.md                 # Data specifications
+
+Key Design Principles
+====================
+
+1. INDEPENDENT DEVELOPMENT
+   - Each subsystem (vision, tracking, robot) in its own folder
+   - Minimal cross-module dependencies
+   - Clean interfaces via __init__.py exports
+
+2. SHARED INTERFACES
+   - Common data types in src/mimic/common/types.py
+   - Central config in src/mimic/config.py
+   - Experiment configs in configs/
+
+3. MODULARITY
+   - Vision module outputs ActionPrediction → feeds into robot
+   - Tracking module outputs HandTrack/ObjectTrack → feeds into robot
+   - Robot module orchestrates action execution
+
+4. REPRODUCIBILITY
+   - Cached embeddings for fast iteration
+   - Config-driven experiments
+   - Dataset splits prevent leakage
+   - Results stored with configs
+
+5. TESTING
+   - Unit tests per module
+   - Integration tests verify module boundaries
+   - Tests mirror src/mimic structure
+
+Development Workflow
+===================
+
+1. Pick a subsystem (vision, tracking, robot, etc.)
+2. Create your feature branch: git checkout -b feature/your-feature
+3. Work in your subsystem folder with minimal interference
+4. Write tests in tests/test_<module>/
+5. Run: pytest tests/test_<module>/
+6. Commit with clear messages
+7. Create PR with explanation
+
+Getting Started
+==============
+
+1. Read: README.md (overview) → docs/PROJECT_OVERVIEW.md (specification)
+2. Setup: Follow docs/SETUP.md
+3. Explore: Check notebooks/ and scripts/
+4. Contribute: Follow CONTRIBUTING.md
+
+Quick Commands
+==============
+
+pytest tests/                      # Run all tests
+python scripts/train_temporal_model.py --config configs/default.yaml
+python scripts/run_inference.py --video data/raw/demo.mp4
+python scripts/simulate_robot.py --task-file outputs/task.pkl
+
+Shared Code Locations
+====================
+
+All shared code should live in:
+- src/mimic/common/types.py      → Add new data types here
+- src/mimic/common/constants.py   → Add shared constants here
+- src/mimic/config.py             → Central configuration
+
+Cross-module code that doesn't fit above → src/mimic/utils.py (if needed)
