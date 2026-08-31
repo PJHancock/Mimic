@@ -6,6 +6,7 @@ data/tracks/
 *.mp4
 *.avi
 *.mov
+*.MOV
 
 # Cache & embeddings
 *.pt
