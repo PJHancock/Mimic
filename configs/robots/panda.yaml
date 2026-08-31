@@ -1,0 +1,42 @@
+# Contract template, not a calibrated pick/place experiment. Nulls deliberately fail fast.
+# Paths are relative to this file. Use a scene containing the unmodified standard Panda,
+# a named object, and an explicit reset keyframe before running a manipulation task.
+robot_execution:
+  model_path: null
+  home_keyframe: home
+  object_body: null
+  gripper_driver: panda_standard_tendon
+  # Authorized observation allowance per finger, in meters; not a command/model limit.
+  measured_gripper_joint_tolerance_m: 0.00001
+  arm_control_hz: 100  # Existing configs/default.yaml value, unchanged.
+  gripper_control_hz: 10
+  profile:
+    arm_joints: [joint1, joint2, joint3, joint4, joint5, joint6, joint7]
+    arm_actuators: [actuator1, actuator2, actuator3, actuator4, actuator5, actuator6, actuator7]
+    tool_body: hand
+    tool_offset: null  # body-relative position in m and quaternion_wxyz
+    velocity_limits: null  # one rad/s value per arm joint, with documented source
+    workspace_min: [0.2, -0.4, 0.0]  # Existing common/constants.py bounds.
+    workspace_max: [0.8, 0.4, 0.5]
+  ik:
+    position_tolerance_m: null
+    orientation_tolerance_rad: null
+    position_cost: null
+    orientation_cost: null
+    posture_cost: null  # 0 disables posture objective; nonzero uses reset arm posture
+    damping: null
+    task_gain: null
+  gripper:
+    width_tolerance_m: null
+    empty_width_m: null
+    contact_force_n: null
+    contact_duration_s: null
+    movement_timeout_s: null
+  execution:
+    step_timeout_s: null
+    minimum_lift_m: null
+    maximum_slip_m: null
+    contact_loss_timeout_s: null
+    settle_time_s: null
+    settled_speed_m_s: null
+    placement_tolerance_m: null

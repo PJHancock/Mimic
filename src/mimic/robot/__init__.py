@@ -1,16 +1,44 @@
-"""Robot module: task representation, state machine, and control."""
+"""Robot task geometry and execution, with backend-independent imports.
 
-# Export main interfaces here
-# from .task import TaskRepresentation
-# from .state_machine import ManipulationStateMachine
-# from .inverse_kinematics import IKSolver
-# from .controller import PandaController
-# from .simulation import MuJoCoSimulation
+Exports are loaded on demand so extraction/retargeting does not import MuJoCo
+or an IK backend. Existing execution exports keep their public names.
+"""
 
-__all__ = [
-    # "TaskRepresentation",
-    # "ManipulationStateMachine",
-    # "IKSolver",
-    # "PandaController",
-    # "MuJoCoSimulation",
-]
+from importlib import import_module
+
+_EXPORT_MODULES = {
+    "TaskExtractor": "task_extractor",
+    "TaskExtractionError": "task_extractor",
+    "extract_task": "task_extractor",
+    "CoordinateRetargeter": "coordinate_retargeter",
+    "MappingConfig": "coordinate_retargeter",
+    "retarget_task": "coordinate_retargeter",
+    "command_target": "commands",
+    "RobotController": "controller",
+    "GripperAction": "gripper",
+    "GripperDriver": "gripper",
+    "GripperLogic": "gripper",
+    "GripperSettings": "gripper",
+    "IKSettings": "inverse_kinematics",
+    "IKSolver": "inverse_kinematics",
+    "ModelBindings": "model",
+    "RobotProfile": "model",
+    "MuJoCoAdapter": "simulation",
+    "RobotIO": "simulation",
+    "ExecutionSettings": "state_machine",
+    "SkillExecutor": "state_machine",
+}
+
+__all__ = list(_EXPORT_MODULES)
+
+
+def __getattr__(name):
+    if name not in _EXPORT_MODULES:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    value = getattr(import_module(f".{_EXPORT_MODULES[name]}", __name__), name)
+    globals()[name] = value
+    return value
+
+
+def __dir__():
+    return sorted(set(globals()) | set(__all__))
