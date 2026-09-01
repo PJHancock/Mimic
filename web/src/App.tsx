@@ -92,7 +92,7 @@ function Trajectory({ detail }: { detail: Detail }) {
 type FlowboxInfo = { title: string; technical: string; desc: string; skills: string[]; image?: string; video?: string }
 
 const flowboxData: Record<string, FlowboxInfo> = {
-  video: { title: '📹 VIDEO INPUT', technical: 'Raw video frames from human demonstrations', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['RGB-D data', 'Dataset inspection', 'Sensory inputs'] },
+  video: { title: '📹 VIDEO INPUT', technical: 'Raw video frames from human demonstrations', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['RGB-D data', 'Dataset inspection', 'Sensory inputs'], video: '/input-demo.webm' },
   tracking: { title: '👁️ OBJECT TRACKING', technical: 'OpenCV HSV color detection to track red solo cup position', desc: '"Familiarity with ROS, ROS2, robot logs, RGB-D data, point clouds, or robot kinematics."', skills: ['Computer vision', 'Object detection', 'RGB-D data'] },
   coords: { title: '📍 COORDINATES', technical: 'Extract and normalize 2D/3D object position for retargeting', desc: '"Build data pipelines, training scripts, evaluation metrics, and experiment reports."', skills: ['Position estimation', 'Data validation', 'Metric design'] },
   embeddings: { title: '🧠 EMBEDDINGS', technical: 'V-JEPA self-supervised visual feature extraction from frames', desc: '"Design, implement, and deliver approaches that bridge exploration and production readiness with imitation learning, diffusion policy, VLA models, or representation learning."', skills: ['Representation learning', 'VLA models', 'PyTorch/JAX'] },
