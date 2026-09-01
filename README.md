@@ -66,16 +66,16 @@ mimic/
 - **Robot**: Franka Panda (configurable profiles in `configs/robots/panda/`)
 - **Inference**: Supports CPU, MPS (Apple Silicon), and CUDA
 
-## 🔗 Documentation
+## 🔗 Documentation & Links
 
 - [Architecture](docs/ARCHITECTURE.md)
 - [Task Extraction & Retargeting](docs/TASK_EXTRACTION_AND_RETARGETING.md)
 - [Robot Execution](docs/ROBOT_EXECUTION.md)
 - [Contributing](CONTRIBUTING.md)
 
-## 👥 Contributors
+**Repository:** [github.com/PJHancock/Mimic](https://github.com/PJHancock/Mimic)
 
-Preston Hancock, Josh McConkie, Peter Bickel
+**Contributors:** Preston Hancock, Josh McConkie, Peter Bickel
 
 ---
 
