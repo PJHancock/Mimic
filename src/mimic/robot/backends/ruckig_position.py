@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass, replace
 from time import perf_counter
-from typing import Optional
+from typing import Mapping, Optional
 
 import numpy as np
 import ruckig
@@ -227,5 +227,125 @@ class RuckigPositionIK:
             measured,
             status=IKStatus.VALID_STEP,
             joint_targets=dict(zip(self.bindings.profile.arm_joints, map(float, command))),
+            solve_time_s=perf_counter() - started,
+        )
+
+    def solve_joint_target(
+        self,
+        target: Mapping[str, float],
+        tolerances: Mapping[str, float],
+        state: RobotState,
+        dt_s: float,
+    ) -> IKResult:
+        """Generate a persistent reference to an explicit saved arm configuration.
+
+        This path deliberately bypasses Cartesian IK while retaining the same Ruckig
+        limits, measured-velocity checks, reference tracking bound, and joint limits.
+        """
+        started = perf_counter()
+        names = self.bindings.profile.arm_joints
+        if set(target) != set(names) or set(tolerances) != set(names):
+            return IKResult(
+                IKStatus.INVALID_INPUT,
+                {},
+                None,
+                None,
+                perf_counter() - started,
+                "Joint target and tolerances must exactly match the configured arm joints",
+            )
+        goal = np.array([target[name] for name in names], dtype=float)
+        tolerance = np.array([tolerances[name] for name in names], dtype=float)
+        if (
+            not np.all(np.isfinite(goal))
+            or not np.all(np.isfinite(tolerance))
+            or np.any(tolerance <= 0)
+        ):
+            return IKResult(
+                IKStatus.INVALID_INPUT,
+                {},
+                None,
+                None,
+                perf_counter() - started,
+                "Joint targets must be finite and tolerances must be finite and positive",
+            )
+        try:
+            self.bindings.validate_arm(goal)
+        except ValueError as exc:
+            return IKResult(
+                IKStatus.LIMIT_VIOLATION,
+                {},
+                None,
+                None,
+                perf_counter() - started,
+                str(exc),
+            )
+
+        measured_q = self._arm(state)
+        arrived = bool(np.all(np.abs(goal - measured_q) <= tolerance))
+        measured = IKResult(
+            IKStatus.AT_TARGET if arrived else IKStatus.VALID_STEP,
+            {},
+            None,
+            None,
+            0,
+        )
+        velocity_error = self._check_measured_velocity(state, measured_q)
+        if velocity_error:
+            return self._result(measured, IKStatus.LIMIT_VIOLATION, started, velocity_error)
+        try:
+            self._initialize(measured_q, dt_s)
+        except ValueError as exc:
+            return self._result(measured, IKStatus.INVALID_INPUT, started, str(exc))
+
+        reference = np.asarray(self._input.current_position)
+        if np.any(
+            np.abs(reference - measured_q) > np.asarray(self.settings.maximum_tracking_errors)
+        ):
+            return self._result(
+                measured,
+                IKStatus.LIMIT_VIOLATION,
+                started,
+                "Position reference exceeds the configured tracking-error bound",
+            )
+        signature = ("joint", *map(float, goal))
+        if arrived and self._trajectory_finished and self._target == signature:
+            return replace(
+                measured,
+                joint_targets=dict(zip(names, map(float, reference))),
+                solve_time_s=perf_counter() - started,
+            )
+        if self._target != signature or self._trajectory_finished:
+            self._input.target_position = goal.tolist()
+            self._input.target_velocity = [0.0] * len(goal)
+            self._input.target_acceleration = [0.0] * len(goal)
+            self._trajectory_finished = False
+            self._target = signature
+
+        trajectory_result = self._ruckig.update(self._input, self._output)
+        if int(trajectory_result) < 0:
+            return self._result(
+                measured,
+                IKStatus.SOLVER_FAILED,
+                started,
+                f"Ruckig failed with {trajectory_result}",
+            )
+        command = np.asarray(self._output.new_position)
+        try:
+            self.bindings.validate_arm(command)
+        except ValueError as exc:
+            return self._result(measured, IKStatus.LIMIT_VIOLATION, started, str(exc))
+        if np.any(np.abs(command - measured_q) > np.asarray(self.settings.maximum_tracking_errors)):
+            return self._result(
+                measured,
+                IKStatus.LIMIT_VIOLATION,
+                started,
+                "New position reference exceeds the configured tracking-error bound",
+            )
+        self._output.pass_to_input(self._input)
+        self._trajectory_finished = trajectory_result == ruckig.Result.Finished
+        return replace(
+            measured,
+            status=IKStatus.VALID_STEP,
+            joint_targets=dict(zip(names, map(float, command))),
             solve_time_s=perf_counter() - started,
         )

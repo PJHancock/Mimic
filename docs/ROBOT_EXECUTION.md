@@ -69,8 +69,10 @@ remain upstream responsibilities.
 
 `configs/robots/panda.yaml` is a contract template, **not a calibrated runnable
 experiment**. Required but unresolved fields are null and fail before execution.
-Supply the scene, named object, home keyframe, physical tool offset, solver
-settings, and grasp/placement acceptance criteria.
+Supply the scene, named object, reset keyframe, saved home preset, physical tool
+offset, solver settings, and grasp/placement acceptance criteria. A home preset
+uses either a MuJoCo keyframe or an explicit full mapping of named arm joints;
+its measured per-joint arrival tolerances are also required.
 The template retains existing 100 Hz arm / 10 Hz gripper settings and existing
 workspace bounds. No conflicting height defaults are selected.
 
@@ -106,6 +108,12 @@ limits to the command reference. The per-joint tracking-error bounds stop a
 stalled or poorly tracking servo before reference wind-up. These arrays are
 ordered by `profile.arm_joints`, so a different robot can provide its own count,
 names, units, and sourced limits without changing the controller.
+
+Contextual `HOVER` return-home actions bypass Cartesian IK and send the saved
+joint configuration through the same persistent Ruckig reference, measured-speed
+checks, tracking-error bound, and model limits. Only named arm joints are read
+from a keyframe; gripper and object coordinates are never part of the preset.
+Normal return-home does not reset or teleport simulation and uses gripper HOLD.
 
 To execute an explicitly configured scene and processed task:
 
@@ -230,6 +238,8 @@ planning, or any physical robot. Simulation success is not hardware evidence.
 | Critical | Deployment scene, object body/home state, physical tool center, downward yaw, and world/table mapping | These define the task geometry. The standard robot model supplies link geometry, but it cannot choose application frames or the intended grasp point. The general factory deliberately fails while they are null. |
 | Critical | IK objectives and acceptance criteria in the deployment configuration | Pose costs/tolerances, contact evidence, lift/slip/loss/settling checks, and placement tolerance define success for the intended object set. Fixture values only validate one cube. |
 | Critical | Bridge from retargeted 2D task geometry to the configured world-space tool waypoints | Robot execution accepts processed poses; exact scripted z heights, sampling, and deployed mapping must be fixed before a held-out demonstration can run end to end. |
+| Critical | State post-processing thresholds | Confidence, transition margin, runner-up gap, persistence, and missing-detection timeout determine which predicted skills execute. The template intentionally leaves them null pending validation data. |
+| Tunable later | Home-preset measured joint-arrival tolerances | The target joint configuration is explicit, but arrival tolerances should be selected for the active robot model and servo tracking behavior. |
 | Tunable later | 0.5 rad/s operating envelope, 0.1 rad tracking bound, and 2000-step private planning bound | They are explicit, bounded, and successful in the fixed fixture. Broader workspace trials can optimize them without changing subsystem semantics. |
 | Tunable later | 0.0799 m OPEN target, 10-micrometer measured-finger allowance, and 15 mm fixture slip bound | They are measured simulation policies rather than manufacturer constants. Recheck them when the gripper model or intended object set changes. |
 | Tunable later | Collision-aware/global planning | The project contract leaves it optional for the constrained tabletop MVP. It becomes critical if obstacles or wider workspaces are introduced. |

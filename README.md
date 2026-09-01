@@ -19,6 +19,7 @@ mimic/
 │   ├── data_pipeline/       # Recording, transcription, annotation
 │   ├── vision/              # V-JEPA & temporal action model
 │   ├── tracking/            # Hand/object tracking & coordinate mapping
+│   ├── skills/              # Versioned labels, relationship graph, state resolver
 │   ├── robot/               # Task representation & robot control
 │   ├── integration/         # End-to-end pipeline
 │   └── common/              # Shared types & utilities
@@ -116,7 +117,8 @@ for the input contract, mapping, path-processing behavior, and failure handling.
 ### Visual Understanding
 - **Encoder**: Frozen V-JEPA 2 for spatiotemporal embeddings
 - **Classifier**: Learned temporal model (GRU or transformer) for action phases
-- **Output**: APPROACH, GRASP, MOVE, RELEASE predictions
+- **Output**: Configured composite-skill probabilities. The default preset is
+  IDLE, HOVER, GRASP, CARRY, RELEASE.
 
 ### Geometric Tracking
 - **Hand**: MediaPipe landmarks
@@ -124,8 +126,8 @@ for the input contract, mapping, path-processing behavior, and failure handling.
 - **Mapping**: Camera → table coordinates → robot workspace
 
 ### Robot Execution
-- **Task Representation**: Symbolic (GRASP, MOVE, RELEASE) independent of embodiment
-- **State Machine**: Phase-based control logic
+- **Task Representation**: Composite skills and separately tracked path geometry
+- **State Machine**: Versioned skill catalog plus an explicit relationship graph
 - **IK & Control**: Convert Cartesian waypoints to Panda joint targets
 - **Simulation**: MuJoCo Franka Panda with gripper
 
@@ -133,7 +135,7 @@ for the input contract, mapping, path-processing behavior, and failure handling.
 
 1. Record unseen human demonstration
 2. Extract V-JEPA embeddings
-3. Classify action phases (APPROACH, GRASP, MOVE, RELEASE)
+3. Classify composite skills (IDLE, HOVER, GRASP, CARRY, RELEASE by default)
 4. Track object trajectory
 5. Map to robot workspace
 6. Solve IK and execute in MuJoCo

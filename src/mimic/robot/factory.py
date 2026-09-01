@@ -15,6 +15,7 @@ from mimic.robot.controller import RobotController
 from mimic.robot.gripper import GripperLogic, GripperSettings
 from mimic.robot.inverse_kinematics import IKSettings
 from mimic.robot.model import ModelBindings, RobotProfile
+from mimic.robot.presets import resolve_joint_preset
 from mimic.robot.simulation import MuJoCoAdapter
 from mimic.robot.state_machine import ExecutionSettings, SkillExecutor
 
@@ -113,4 +114,23 @@ def build_executor(
     interval = controller.dt_s / model.opt.timestep
     if abs(interval - round(interval)) > 1e-8 or interval < 1:
         raise ValueError("Configured arm interval is not an integer number of simulation steps")
-    return SkillExecutor(controller, ExecutionSettings(**cfg["execution"]), record)
+    home_spec = cfg["presets"]["home"]
+    source = home_spec.get("source")
+    if source == "keyframe":
+        home = resolve_joint_preset(bindings, "home", keyframe=home_spec.get("keyframe"))
+    elif source == "joint_positions":
+        home = resolve_joint_preset(
+            bindings, "home", joint_positions=home_spec.get("joint_positions")
+        )
+    else:
+        raise ValueError("Home preset source must be keyframe or joint_positions")
+    tolerances = cfg["preset_position_tolerances"]
+    if len(tolerances) != len(profile.arm_joints):
+        raise ValueError("Preset position tolerances must match the arm joint count")
+    return SkillExecutor(
+        controller,
+        ExecutionSettings(**cfg["execution"]),
+        record,
+        home,
+        dict(zip(profile.arm_joints, tolerances)),
+    )

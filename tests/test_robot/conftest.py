@@ -11,13 +11,16 @@ def task_predictions():
     return [
         ActionPrediction(frame, phase, 0.9)
         for frame, phase in (
-            (1, ActionPhase.APPROACH),
+            (1, ActionPhase.IDLE),
+            (2, ActionPhase.HOVER),
             (3, ActionPhase.GRASP),
             (5, ActionPhase.GRASP),
-            (7, ActionPhase.MOVE),
-            (9, ActionPhase.MOVE),
+            (7, ActionPhase.CARRY),
+            (9, ActionPhase.CARRY),
             (11, ActionPhase.RELEASE),
             (13, ActionPhase.RELEASE),
+            (14, ActionPhase.HOVER),
+            (15, ActionPhase.IDLE),
         )
     ]
 

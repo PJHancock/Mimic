@@ -16,8 +16,9 @@ from mimic.common.types import (
 )
 from mimic.robot.commands import command_target
 from mimic.robot.controller import ExecutionFailure, RobotController
+from mimic.robot.action_primitives import CartesianMotion
 from mimic.robot.factory import build_executor
-from mimic.robot.gripper import GripperLogic, GripperSettings
+from mimic.robot.gripper import GripperAction, GripperLogic, GripperSettings
 from mimic.robot.state_machine import ExecutionSettings, SkillExecutor
 
 
@@ -116,7 +117,7 @@ def test_all_phases_have_feedback_gated_subskills():
         "RETREAT",
     ]
     assert {e["phase"] for e in events if e["event"] == "transition"} == {
-        p.value for p in ActionPhase
+        p.value for p in ActionPhase if p != ActionPhase.IDLE
     }
 
 
@@ -203,12 +204,18 @@ def test_invalid_pose_and_orientation_changes_rejected():
 def test_control_sample_cannot_be_reused():
     runner, _ = executor(ScriptedIO())
     controller = runner.controller
-    from mimic.robot.gripper import GripperAction
 
     sample = controller.prepare(pose(z=0.1), GripperAction.OPEN)
     controller.commit(sample)
     with pytest.raises(ExecutionFailure, match="stale"):
         controller.commit(sample)
+
+
+def test_controller_dispatches_registry_cartesian_action():
+    runner, _ = executor(ScriptedIO())
+    action = CartesianMotion("TEST", pose(z=0.1), GripperAction.OPEN)
+    sample = runner.controller.prepare_action(action)
+    assert sample.ik.status == IKStatus.AT_TARGET
 
 
 def test_dropped_object_fails_transport_without_releasing():

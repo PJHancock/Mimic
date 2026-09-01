@@ -6,7 +6,7 @@ coordinates and mandatory second-based timing at these two boundaries.
 
 ## Scope
 
-- Input: one complete, already labeled, single-object demonstration.
+- Input: one or more complete, already resolved, single-object episodes.
 - Step 2: `TaskExtractor` recovers task geometry and phase boundaries.
 - Step 3: `CoordinateRetargeter` maps source geometry into a named target frame.
 - Step 4: `PathProcessor` explicitly selects or interpolates mapped XY geometry.
@@ -22,9 +22,13 @@ Frame IDs must be positive integers, unique and strictly increasing within
 each stream. Predictions and tracks may have different sampling rates.
 
 `ActionPrediction.phase` supplies a resolved label. After collapsing adjacent
-repeats, the input must contain exactly:
+repeats, each episode must contain exactly:
 
-`APPROACH -> GRASP -> MOVE -> RELEASE`
+`IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> HOVER -> IDLE`
+
+Adjacent episodes share their boundary `IDLE`. `extract_task` requires exactly
+one episode; `extract_tasks` returns every complete episode in the timeline.
+The extractor does not apply the relationship graph or repair incomplete input.
 
 `ActionPrediction.timestamp` is optional. If supplied, it remains nonnegative,
 finite video time in seconds. Extraction uses frames; it never substitutes frame
@@ -54,10 +58,13 @@ from mimic.common import ActionPhase, ActionPrediction, ObjectTrack
 from mimic.robot import extract_task
 
 predictions = [
-    ActionPrediction(1, ActionPhase.APPROACH, 0.9),
+    ActionPrediction(1, ActionPhase.IDLE, 0.9),
+    ActionPrediction(5, ActionPhase.HOVER, 0.9),
     ActionPrediction(10, ActionPhase.GRASP, 0.9),
-    ActionPrediction(20, ActionPhase.MOVE, 0.9),
+    ActionPrediction(20, ActionPhase.CARRY, 0.9),
     ActionPrediction(40, ActionPhase.RELEASE, 0.9),
+    ActionPrediction(45, ActionPhase.HOVER, 0.9),
+    ActionPrediction(50, ActionPhase.IDLE, 0.9),
 ]
 tracks = [
     ObjectTrack(10, table_xy_cm=(10, 20)),
@@ -88,10 +95,10 @@ confidence, and phase. Phase intervals are `[onset, next_onset)`; a tracking fra
 between predictions inherits the supplied segment label. This is not a new
 classification or a claim that missing observations were reconstructed.
 
-`move_trajectory_xy_cm` exposes only MOVE-phase observations, maintaining the
-distinction between the canonical MOVE trajectory and the full handled interval.
+`carry_trajectory_xy_cm` exposes only CARRY-phase observations, maintaining the
+distinction between the canonical CARRY trajectory and the full handled interval.
 Interior tracking gaps remain visible in frame IDs. No gaps are filled; the
-MOVE-only subset can be empty. Downstream path processing must decide whether
+CARRY-only subset can be empty. Downstream path processing must decide whether
 the available geometry is sufficient before generating a safe trajectory.
 
 The legacy `TaskRepresentation` type still describes normalized workspace

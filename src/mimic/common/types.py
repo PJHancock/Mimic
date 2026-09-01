@@ -9,11 +9,12 @@ import numpy as np
 
 
 class ActionPhase(str, Enum):
-    """Manipulation action phases."""
+    """Deployment-default composite skill labels."""
 
-    APPROACH = "APPROACH"
+    IDLE = "IDLE"
+    HOVER = "HOVER"
     GRASP = "GRASP"
-    MOVE = "MOVE"
+    CARRY = "CARRY"
     RELEASE = "RELEASE"
 
 
@@ -144,16 +145,28 @@ class ExtractedTask:
     def __post_init__(self):
         boundaries = tuple(self.phase_boundaries)
         samples = tuple(self.demonstrated_path)
-        if tuple(b.phase for b in boundaries) != tuple(ActionPhase):
-            raise ValueError("Task requires APPROACH -> GRASP -> MOVE -> RELEASE boundaries")
+        expected = (
+            ActionPhase.IDLE,
+            ActionPhase.HOVER,
+            ActionPhase.GRASP,
+            ActionPhase.CARRY,
+            ActionPhase.RELEASE,
+            ActionPhase.HOVER,
+            ActionPhase.IDLE,
+        )
+        if tuple(b.phase for b in boundaries) != expected:
+            raise ValueError(
+                "Task requires IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> HOVER -> IDLE "
+                "boundaries"
+            )
         if any(a.frame_idx >= b.frame_idx for a, b in zip(boundaries, boundaries[1:])):
             raise ValueError("Phase boundaries must have strictly increasing frame IDs")
         if len(samples) < 2 or any(
             a.frame_idx >= b.frame_idx for a, b in zip(samples, samples[1:])
         ):
             raise ValueError("Path requires strictly increasing frames and both endpoint samples")
-        if samples[0].frame_idx != boundaries[1].frame_idx or (
-            samples[-1].frame_idx != boundaries[3].frame_idx
+        if samples[0].frame_idx != boundaries[2].frame_idx or (
+            samples[-1].frame_idx != boundaries[4].frame_idx
         ):
             raise ValueError("Path endpoints must exactly match GRASP and RELEASE onset frames")
         for sample in samples:
@@ -183,16 +196,16 @@ class ExtractedTask:
 
     @property
     def grasp_frame(self) -> int:
-        return self.phase_boundaries[1].frame_idx
+        return self.phase_boundaries[2].frame_idx
 
     @property
     def release_frame(self) -> int:
-        return self.phase_boundaries[3].frame_idx
+        return self.phase_boundaries[4].frame_idx
 
     @property
-    def move_trajectory_xy_cm(self) -> Tuple[Tuple[float, float], ...]:
-        """MOVE-only observations; may be empty when tracking is sparse."""
-        return tuple(s.table_xy_cm for s in self.demonstrated_path if s.phase == ActionPhase.MOVE)
+    def carry_trajectory_xy_cm(self) -> Tuple[Tuple[float, float], ...]:
+        """CARRY-only observations; may be empty when tracking is sparse."""
+        return tuple(s.table_xy_cm for s in self.demonstrated_path if s.phase == ActionPhase.CARRY)
 
     @property
     def path_xy_cm(self) -> Tuple[Tuple[float, float], ...]:
@@ -229,13 +242,13 @@ class RetargetedTask:
         return self.demonstrated_path_xy_m[-1]
 
     @property
-    def move_trajectory_xy_m(self) -> Tuple[Tuple[float, float], ...]:
+    def carry_trajectory_xy_m(self) -> Tuple[Tuple[float, float], ...]:
         return tuple(
             point
             for point, sample in zip(
                 self.demonstrated_path_xy_m, self.source_task.demonstrated_path
             )
-            if sample.phase == ActionPhase.MOVE
+            if sample.phase == ActionPhase.CARRY
         )
 
     @property
@@ -248,7 +261,7 @@ class RetargetedTask:
 class TaskRepresentation:
     """Symbolic task representation independent of robot embodiment."""
 
-    actions: List[str]  # ["APPROACH", "GRASP", "MOVE", "RELEASE", ...]
+    actions: List[str]  # Composite skill labels from the active SkillCatalog.
     object_start: Tuple[float, float]  # normalized workspace coords
     object_end: Tuple[float, float]
     trajectory: List[Tuple[float, float]]  # waypoints in normalized workspace
@@ -364,7 +377,7 @@ class PickPlaceWaypoints:
 
     def __post_init__(self):
         if not self.path:
-            raise ValueError("MOVE requires a nonempty processed path")
+            raise ValueError("CARRY requires a nonempty processed path")
         if np.shape(self.goal_position) != (3,) or not np.all(np.isfinite(self.goal_position)):
             raise ValueError("Object goal must contain three finite world coordinates")
         poses = (self.approach, self.grasp, self.lift, *self.path, self.lower, self.retreat)

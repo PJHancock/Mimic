@@ -1,4 +1,4 @@
-"""Offline extraction from already labeled predictions and table-space tracks."""
+"""Offline extraction of complete episodes from resolved skill labels and tracks."""
 
 from typing import List, Sequence
 
@@ -17,13 +17,35 @@ class TaskExtractionError(ValueError):
 
 
 class TaskExtractor:
-    """Validate one complete action; never smooth, relabel, or repair input."""
+    """Validate complete actions; never smooth, relabel, or repair input."""
+
+    EPISODE = (
+        ActionPhase.IDLE,
+        ActionPhase.HOVER,
+        ActionPhase.GRASP,
+        ActionPhase.CARRY,
+        ActionPhase.RELEASE,
+        ActionPhase.HOVER,
+        ActionPhase.IDLE,
+    )
 
     def extract(
         self,
         action_predictions: Sequence[ActionPrediction],
         object_tracks: Sequence[ObjectTrack],
     ) -> ExtractedTask:
+        tasks = self.extract_tasks(action_predictions, object_tracks)
+        if len(tasks) != 1:
+            raise TaskExtractionError(
+                f"Expected exactly one complete episode, received {len(tasks)}; use extract_tasks"
+            )
+        return tasks[0]
+
+    def extract_tasks(
+        self,
+        action_predictions: Sequence[ActionPrediction],
+        object_tracks: Sequence[ObjectTrack],
+    ) -> tuple[ExtractedTask, ...]:
         predictions = tuple(action_predictions)
         tracks = tuple(object_tracks)
         if not predictions or not tracks:
@@ -42,14 +64,22 @@ class TaskExtractor:
             if not boundaries or onset.phase != boundaries[-1].phase:
                 boundaries.append(onset)
 
-        if tuple(b.phase for b in boundaries) != tuple(ActionPhase):
+        episodes: List[tuple[PhaseBoundary, ...]] = []
+        cursor = 0
+        while cursor + len(self.EPISODE) <= len(boundaries):
+            episode = tuple(boundaries[cursor : cursor + len(self.EPISODE)])
+            if tuple(boundary.phase for boundary in episode) != self.EPISODE:
+                break
+            episodes.append(episode)
+            cursor += len(self.EPISODE) - 1  # Adjacent episodes share their IDLE boundary.
+        if not episodes or cursor != len(boundaries) - 1:
+            expected = " -> ".join(phase.value for phase in self.EPISODE)
             raise TaskExtractionError(
-                "Expected one APPROACH -> GRASP -> MOVE -> RELEASE sequence; "
+                f"Expected one or more complete {expected} episodes; "
                 "state post-processing is not performed by the extractor"
             )
 
-        grasp_frame, release_frame = boundaries[1].frame_idx, boundaries[3].frame_idx
-        samples: List[TablePathSample] = []
+        detached_tracks: List[TablePathSample] = []
         previous_frame = 0
         object_id = tracks[0].object_id
         for track in tracks:
@@ -58,7 +88,7 @@ class TaskExtractor:
             # Phase intervals are [onset, next_onset), using source-video frames.
             # An absent prediction at a tracking frame does not require interpolation.
             try:
-                phase = ActionPhase.APPROACH
+                phase = ActionPhase.IDLE
                 for boundary in boundaries:
                     if boundary.frame_idx <= track.frame_idx:
                         phase = boundary.phase
@@ -70,21 +100,28 @@ class TaskExtractor:
             if sample.frame_idx <= previous_frame:
                 raise TaskExtractionError("Tracking frame IDs must be unique and increasing")
             previous_frame = sample.frame_idx
-            if grasp_frame <= sample.frame_idx <= release_frame:
-                samples.append(sample)
+            detached_tracks.append(sample)
 
-        observed = {sample.frame_idx for sample in samples}
-        for phase_name, frame in (("GRASP", grasp_frame), ("RELEASE", release_frame)):
-            if frame not in observed:
-                raise TaskExtractionError(
-                    f"Missing exact object observation at {phase_name} onset frame {frame}; "
-                    "no nearest-frame fallback or interpolation"
-                )
-
-        try:
-            return ExtractedTask(tuple(boundaries), tuple(samples), object_id)
-        except (ValueError, TypeError) as exc:
-            raise TaskExtractionError(str(exc)) from exc
+        tasks: List[ExtractedTask] = []
+        for episode in episodes:
+            grasp_frame, release_frame = episode[2].frame_idx, episode[4].frame_idx
+            samples = tuple(
+                sample
+                for sample in detached_tracks
+                if grasp_frame <= sample.frame_idx <= release_frame
+            )
+            observed = {sample.frame_idx for sample in samples}
+            for phase_name, frame in (("GRASP", grasp_frame), ("RELEASE", release_frame)):
+                if frame not in observed:
+                    raise TaskExtractionError(
+                        f"Missing exact object observation at {phase_name} onset frame {frame}; "
+                        "no nearest-frame fallback or interpolation"
+                    )
+            try:
+                tasks.append(ExtractedTask(episode, samples, object_id))
+            except (ValueError, TypeError) as exc:
+                raise TaskExtractionError(str(exc)) from exc
+        return tuple(tasks)
 
 
 def extract_task(
@@ -92,3 +129,10 @@ def extract_task(
 ) -> ExtractedTask:
     """Convenience entry point for extracting a single demonstration."""
     return TaskExtractor().extract(action_predictions, object_tracks)
+
+
+def extract_tasks(
+    action_predictions: Sequence[ActionPrediction], object_tracks: Sequence[ObjectTrack]
+) -> tuple[ExtractedTask, ...]:
+    """Convenience entry point for extracting every complete episode in a timeline."""
+    return TaskExtractor().extract_tasks(action_predictions, object_tracks)

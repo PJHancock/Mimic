@@ -4,6 +4,12 @@
 robot_execution:
   model_path: null
   home_keyframe: home
+  presets:
+    home:
+      source: keyframe
+      keyframe: home
+  # Per-arm-joint measured arrival tolerances for saved configurations.
+  preset_position_tolerances: null
   object_body: null
   gripper_driver: panda_standard_tendon
   # Authorized observation allowance per finger, in meters; not a command/model limit.

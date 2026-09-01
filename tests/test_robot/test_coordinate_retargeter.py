@@ -20,7 +20,9 @@ def test_known_origin_rotation_and_centimeter_conversion(extracted_task, mapping
     np.testing.assert_allclose(result.start_xy_m, (0.8, -1.9), rtol=0, atol=1e-14)
     np.testing.assert_allclose(result.goal_xy_m, (0.7, -1.4), rtol=0, atol=1e-14)
     assert len(result.path_xy_m) == 7
-    np.testing.assert_allclose(result.move_trajectory_xy_m, ((0.5, -1.7), (0.4, -1.6), (0.6, -1.5)))
+    np.testing.assert_allclose(
+        result.carry_trajectory_xy_m, ((0.5, -1.7), (0.4, -1.6), (0.6, -1.5))
+    )
 
 
 def test_explicit_downward_y_mapping(extracted_task, mapping_config_values):

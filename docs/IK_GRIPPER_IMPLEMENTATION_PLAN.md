@@ -137,16 +137,16 @@ Proposed execution sequence:
 
 | Learned phase | Internal execution | Completion evidence |
 | --- | --- | --- |
-| APPROACH | Open; hover above start | Gripper open and measured tool pose reached. |
+| HOVER | Open; hover above start | Gripper open and measured tool pose reached. |
 | GRASP | Descend; close | Descent reached; candidate grasp supported by contact with the target object on both fingers and plausible opening. |
-| MOVE | Lift; follow processed path; retain closure | Lift confirms the object leaves support and remains held; monitor object/tool relative motion during transport. |
+| CARRY | Lift; follow processed path; retain closure | Lift confirms the object leaves support and remains held; monitor object/tool relative motion during transport. |
 | RELEASE | Lower; open; retreat | Lowering reached; fingers open; object separates, remains at the destination, and settles after retreat. |
 
 Candidate grasp and confirmed transport must remain separate observations. Empty closure, one-sided contact, and contact with the table must not count as a successful grasp. All contact duration, lift, slip, settling, and placement thresholds need explicit definitions before acceptance tests.
 
 The implemented failure policy aborts the execution attempt, stops simulation
 stepping, and retains a diagnostic snapshot on IK, grasp, or transport failure.
-It does not advance to MOVE after a failed grasp or automatically open a held
+It does not advance to CARRY after a failed grasp or automatically open a held
 object after an arm failure.
 
 ## Implementation record and acceptance checks

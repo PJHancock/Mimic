@@ -13,7 +13,7 @@ Human Video
 │  │ V-JEPA 2     │───→│ Temporal Action  │                 │
 │  │ (frozen)     │    │ Classifier (GRU) │                 │
 │  └──────────────┘    └──────────────────┘                 │
-│                      APPROACH/GRASP/MOVE/RELEASE          │
+│                  IDLE/HOVER/GRASP/CARRY/RELEASE          │
 └─────────────────────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -35,8 +35,8 @@ Human Video
 │                  Robot Pipeline                            │
 │  ┌──────────────┐    ┌──────────────────┐                 │
 │  │ Task Symbol  │───→│ State Machine    │                 │
-│  │ Repr.        │    │ (APPROACH→GRASP→ │                 │
-│  └──────────────┘    │  MOVE→RELEASE)   │                 │
+│  │ Repr.        │    │ (catalog + graph │                 │
+│  └──────────────┘    │  + handlers)     │                 │
 │                      └──────────────────┘                 │
 │                                ↓                           │
 │                      ┌──────────────────┐                 │

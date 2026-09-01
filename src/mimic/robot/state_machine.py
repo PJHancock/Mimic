@@ -1,13 +1,14 @@
 """Deterministic skill expansion with measured gates; no geometry generation or IK math."""
 
 from dataclasses import asdict, dataclass
-from typing import Callable, Optional
+from typing import Callable, Mapping, Optional
 
 import numpy as np
 
 from mimic.common.types import ActionPhase, IKStatus, PickPlaceWaypoints, RobotState, ToolPose
 from mimic.robot.controller import ExecutionFailure, RobotController
 from mimic.robot.gripper import GripperAction, GripperStatus
+from mimic.robot.presets import JointPreset
 
 
 @dataclass(frozen=True)
@@ -36,12 +37,12 @@ class SkillStep:
 def expand_skills(task: PickPlaceWaypoints) -> tuple[SkillStep, ...]:
     """Subskills are execution metadata, never additional learned action labels."""
     return (
-        SkillStep(ActionPhase.APPROACH, "HOVER", task.approach, GripperAction.OPEN),
+        SkillStep(ActionPhase.HOVER, "HOVER", task.approach, GripperAction.OPEN),
         SkillStep(ActionPhase.GRASP, "DESCEND", task.grasp, GripperAction.OPEN),
         SkillStep(ActionPhase.GRASP, "CLOSE", task.grasp, GripperAction.CLOSE),
-        SkillStep(ActionPhase.MOVE, "LIFT", task.lift, GripperAction.HOLD),
+        SkillStep(ActionPhase.CARRY, "LIFT", task.lift, GripperAction.HOLD),
         *(
-            SkillStep(ActionPhase.MOVE, "FOLLOW_PATH", pose, GripperAction.HOLD)
+            SkillStep(ActionPhase.CARRY, "FOLLOW_PATH", pose, GripperAction.HOLD)
             for pose in task.path
         ),
         SkillStep(ActionPhase.RELEASE, "LOWER", task.lower, GripperAction.HOLD),
@@ -67,9 +68,41 @@ class SkillExecutor:
         controller: RobotController,
         settings: ExecutionSettings,
         record: Optional[Callable[[dict], None]] = None,
+        home_preset: Optional[JointPreset] = None,
+        preset_position_tolerances: Optional[Mapping[str, float]] = None,
     ):
         self.controller, self.settings = controller, settings
         self.record = record or (lambda event: None)
+        self.home_preset = home_preset
+        self.preset_position_tolerances = (
+            dict(preset_position_tolerances) if preset_position_tolerances is not None else None
+        )
+
+    def return_home(self) -> RobotState:
+        """Move to the configured full arm preset through the bounded joint trajectory."""
+        if self.home_preset is None or self.preset_position_tolerances is None:
+            raise ValueError("Home preset and measured joint tolerances must be configured")
+        started = self.controller.io.read().timestamp_s
+        self.record(
+            {
+                "event": "transition",
+                "timestamp_s": started,
+                "phase": ActionPhase.HOVER.value,
+                "skill": "MOVE_TO_HOME",
+                "preset_id": self.home_preset.preset_id,
+            }
+        )
+        while True:
+            sample = self.controller.prepare_joint(
+                self.home_preset.joint_positions,
+                self.preset_position_tolerances,
+                GripperAction.HOLD,
+            )
+            if sample.state.timestamp_s - started >= self.settings.step_timeout_s:
+                raise ExecutionFailure("MOVE_TO_HOME: target not achieved before timeout")
+            if sample.ik.status == IKStatus.AT_TARGET:
+                return sample.state
+            self.controller.commit(sample)
 
     def run(self, task: PickPlaceWaypoints) -> ExecutionReport:
         """Run one simulation attempt. A failure returns without further stepping/release."""
