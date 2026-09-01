@@ -31,7 +31,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True, help="New diagnostic directory")
     args = parser.parse_args()
-    args.output.mkdir(parents=True, exist_ok=False)
+    args.output.mkdir(parents=True, exist_ok=True)
     root = Path(__file__).resolve().parents[1]
     model_path = root / "models/franka_emika_panda/upstream/panda.xml"
     spec = mujoco.MjSpec.from_file(str(model_path))
