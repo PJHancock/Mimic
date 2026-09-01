@@ -91,3 +91,32 @@ The following are model/design settings and stay `null` in committed templates:
 They should be selected from held-out temporal predictions and simulated
 execution traces. Controller gains, Panda limits, gripper ranges, and the
 existing control rates were not changed for this feature.
+
+## Inference and robot result boundary
+
+The action classifier exposes the complete softmax matrix. The inference runner
+maps its columns through the active `SkillCatalog` into `SkillPrediction`
+records, then calls `GraphStatePostProcessor` in timestamp order. Graph logic is
+not embedded in the neural classifier.
+
+Two deliberately different JSON contracts are produced:
+
+- `mimic.skill_scores.v2` is a diagnostic artifact. Every valid frame contains
+  `frame_idx`, `timestamp_s`, `detection_valid`, and a complete `state_scores`
+  mapping. It records the catalog and checkpoint fingerprints.
+- `mimic.robot_actions.v1` is the only accepted robot action artifact. Every
+  frame contains exactly one post-processed `phase`, its corresponding model
+  confidence when available, and the decision source. It contains no competing
+  scores or raw classifier label.
+
+`mimic.integration.load_robot_actions` rejects diagnostic score files and old
+top-one-only result formats. This makes it impossible for task extraction to
+accidentally bypass graph post-processing. Existing legacy JSON cannot be
+converted to the score schema because its unreported probability mass is lost;
+inference must be rerun.
+
+Classifier checkpoint v2 embeds the ordered labels and catalog fingerprint.
+Robot-facing inference requires that metadata and rejects a checkpoint trained
+against another catalog. The robot artifact also fingerprints the graph and
+post-state settings. Named runtime-observation guards retain their existing
+fail-closed behavior when offline inference cannot evaluate them.

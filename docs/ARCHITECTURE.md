@@ -81,7 +81,9 @@ Human Video
 - `temporal_model.py` — GRU/Transformer classifier
 - `training.py` — Training loop and evaluation
 - `inference.py` — Prediction interface
-- Exports: `ActionPrediction` sequence (phase + confidence over time)
+- Exports: complete per-label `SkillPrediction` scores. The integration layer
+  applies graph-aware post-processing before producing robot-facing
+  `ActionPrediction` records.
 
 ### `src/mimic/tracking/`
 **Geometric tracking**
@@ -170,7 +172,10 @@ Output: Trained model checkpoint
 ### Between Vision and Tracking
 ```python
 # Vision outputs
-predictions: List[ActionPrediction]  # per frame
+predictions: List[SkillPrediction]  # complete scores per model timestep
+
+# Integration output accepted by the robot task extractor
+resolved_actions: List[ActionPrediction]  # exactly one phase per timestep
 
 # Tracking consumes
 action_phase: ActionPhase  # current phase (from vision)

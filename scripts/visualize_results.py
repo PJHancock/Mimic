@@ -44,24 +44,19 @@ def create_visualization(
 
     # Setup video writer for annotated version
     annotated_path = output_dir / "annotated.mp4"
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     out_annotated = cv2.VideoWriter(str(annotated_path), fourcc, fps, (width, height))
 
     # Setup video writer for side-by-side version
     sidebyside_path = output_dir / "sidebyside.mp4"
-    out_sidebyside = cv2.VideoWriter(
-        str(sidebyside_path),
-        fourcc,
-        fps,
-        (width * 2, height)
-    )
+    out_sidebyside = cv2.VideoWriter(str(sidebyside_path), fourcc, fps, (width * 2, height))
 
     per_frame_data = results["per_frame"]
     action_segments = results["action_segments"]
 
     frame_idx = 0
 
-    print(f"\nCreating visualizations...")
+    print("\nCreating visualizations...")
     print(f"  Video: {width}x{height} @ {fps:.1f} FPS")
     print(f"  Output: {output_dir}")
 
@@ -109,7 +104,8 @@ def create_visualization(
 
             # Draw action label and confidence
             action_color = (0, 255, 0) if action == "IDLE" else (0, 0, 255)
-            action_text = f"{action} ({action_conf:.1%})"
+            confidence_text = "n/a" if action_conf is None else f"{action_conf:.1%}"
+            action_text = f"{action} ({confidence_text})"
 
             # Background for text
             text_size = cv2.getTextSize(
@@ -140,7 +136,8 @@ def create_visualization(
             )
 
             # Add timestamp
-            timestamp_text = f"T: {frame_info['timestamp']:.2f}s"
+            timestamp = frame_info.get("timestamp_s", frame_info.get("timestamp", 0.0))
+            timestamp_text = f"T: {timestamp:.2f}s"
             cv2.putText(
                 annotated,
                 timestamp_text,
@@ -193,12 +190,14 @@ def create_visualization(
     print(f"   ✓ Side-by-side video: {sidebyside_path}")
 
     # Print summary
-    print(f"\nAction Segments Detected:")
+    print("\nAction Segments Detected:")
     for seg in action_segments:
+        confidence = seg["avg_confidence"]
+        confidence_text = "n/a" if confidence is None else f"{confidence:.1%}"
         print(
             f"  {seg['action']:10s} "
             f"{seg['start_time']:6.2f}s - {seg['end_time']:6.2f}s "
-            f"(dur: {seg['duration']:5.2f}s, conf: {seg['avg_confidence']:.1%})"
+            f"(dur: {seg['duration']:5.2f}s, conf: {confidence_text})"
         )
 
 
@@ -253,10 +252,12 @@ def main():
     except Exception as e:
         print(f"\nERROR: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(main())

@@ -68,6 +68,26 @@ python scripts/calibrate_camera.py --calibration-video data/raw/calibration.mp4
 
 ## Robot Pipeline
 
+### inference_action_classifier.py
+
+Run classifier inference, graph-aware post-processing, and export separate
+diagnostic and robot-action files:
+
+```bash
+uv run python scripts/inference_action_classifier.py \
+  --embeddings data/embeddings/demo.npy \
+  --model models/action_classifier_lstm.pt \
+  --fps 30 \
+  --skill-config path/to/experiment_skill.yaml \
+  --output results/demo_robot_actions.json
+```
+
+The supplied skill config must contain explicit post-state thresholds. The
+committed `configs/skills/pick_place.yaml` intentionally retains `null` template
+values and therefore fails closed for inference. The robot output contains one
+resolved phase per timestep; a sibling `_scores.json` file retains all model
+probabilities. Load robot actions with `mimic.integration.load_robot_actions`.
+
 ### run_inference.py
 Run the full inference pipeline on a video.
 ```bash

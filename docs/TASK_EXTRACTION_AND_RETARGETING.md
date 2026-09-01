@@ -10,7 +10,9 @@ coordinates and mandatory second-based timing at these two boundaries.
 - Step 2: `TaskExtractor` recovers task geometry and phase boundaries.
 - Step 3: `CoordinateRetargeter` maps source geometry into a named target frame.
 - Step 4: `PathProcessor` explicitly selects or interpolates mapped XY geometry.
-- State post-processing is deferred. Invalid phase sequences are rejected, not repaired.
+- State post-processing occurs upstream of this boundary. The extractor accepts
+  only the single resolved phase per timestep from `mimic.robot_actions.v1`;
+  invalid phase sequences are still rejected, not repaired here.
 - No robot actuation, IK, collision planning, heights, velocities, or
   demonstration-speed replay happens here.
 
@@ -29,10 +31,16 @@ repeats, each episode must contain exactly:
 Adjacent episodes share their boundary `IDLE`. `extract_task` requires exactly
 one episode; `extract_tasks` returns every complete episode in the timeline.
 The extractor does not apply the relationship graph or repair incomplete input.
+`mimic.integration.load_robot_actions` is the validated JSON adapter for this
+sequence. Raw `state_scores` and legacy top-one classifier files are rejected at
+that boundary, so the robot-side extractor never selects among model labels.
 
 `ActionPrediction.timestamp` is optional. If supplied, it remains nonnegative,
 finite video time in seconds. Extraction uses frames; it never substitutes frame
 counts for seconds or derives timestamps from a default FPS.
+`ActionPrediction.confidence` is the model probability of the accepted state
+when a valid model detection exists. It is `None` for an accepted fallback state
+rather than a fabricated probability; extraction does not threshold it.
 
 `ObjectTrack.table_xy_m` contains **already calibrated table coordinates**:
 

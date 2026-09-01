@@ -30,23 +30,29 @@ Usage:
 """
 
 import argparse
-import sys
 import json
-from pathlib import Path
-from datetime import datetime
+import sys
 from dataclasses import asdict
+from datetime import datetime
+from pathlib import Path
+from typing import Sequence
 
-import numpy as np
 import cv2
+import numpy as np
 from tqdm import tqdm
 
-from mimic.common.types import ActionPhase, PickPlaceWaypoints, ToolPose
+from mimic.common.types import PickPlaceWaypoints
+from mimic.integration import (
+    RobotActionResults,
+    build_action_inference_artifacts,
+    checkpoint_sha256,
+    load_skill_system,
+    predictions_from_probabilities,
+    write_results,
+)
 from mimic.vision import VJepaEncoder
 from mimic.vision.action_classifier import ActionClassifier
 from mimic.tracking import find_initial_bbox
-
-# Action class names
-ACTION_NAMES = [phase.value for phase in ActionPhase]
 
 
 def extract_tracks(video_path: str, device: str = "cpu"):
@@ -72,7 +78,9 @@ def extract_tracks(video_path: str, device: str = "cpu"):
     duration = frame_count / fps if fps > 0 else 0
 
     print(f"   Video: {Path(video_path).name}")
-    print(f"   Resolution: {int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))} × {int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))}")
+    print(
+        f"   Resolution: {int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))} × {int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))}"
+    )
     print(f"   FPS: {fps:.1f}, Duration: {duration:.1f}s, Frames: {frame_count}")
 
     tracks = []
@@ -101,21 +109,25 @@ def extract_tracks(video_path: str, device: str = "cpu"):
                 center_x = x + w / 2
                 center_y = y + h / 2
                 confidence = 0.8  # Placeholder confidence
-                tracks.append({
-                    "frame": int(frame_idx),
-                    "time": float(frame_idx / fps),
-                    "x": float(center_x),
-                    "y": float(center_y),
-                    "confidence": float(confidence),
-                })
+                tracks.append(
+                    {
+                        "frame": int(frame_idx),
+                        "time": float(frame_idx / fps),
+                        "x": float(center_x),
+                        "y": float(center_y),
+                        "confidence": float(confidence),
+                    }
+                )
             else:
-                tracks.append({
-                    "frame": int(frame_idx),
-                    "time": float(frame_idx / fps),
-                    "x": None,
-                    "y": None,
-                    "confidence": 0.0,
-                })
+                tracks.append(
+                    {
+                        "frame": int(frame_idx),
+                        "time": float(frame_idx / fps),
+                        "x": None,
+                        "y": None,
+                        "confidence": 0.0,
+                    }
+                )
 
             frame_idx += 1
             pbar.update(1)
@@ -149,6 +161,7 @@ def extract_embeddings(video_path: str, device: str = "cpu"):
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
     embeddings = []
+    embedding_frame_indices = []
     frame_idx = 0
 
     with tqdm(total=frame_count, desc="   Extracting embeddings", leave=False) as pbar:
@@ -160,6 +173,7 @@ def extract_embeddings(video_path: str, device: str = "cpu"):
             emb = encoder.extract_embedding(frame)
             if emb is not None:
                 embeddings.append(emb.numpy())
+                embedding_frame_indices.append(frame_idx + 1)
 
             frame_idx += 1
             pbar.update(1)
@@ -169,86 +183,97 @@ def extract_embeddings(video_path: str, device: str = "cpu"):
     embeddings_array = np.stack(embeddings)
     print(f"   ✓ Extracted {embeddings_array.shape[0]} embeddings ({embeddings_array.shape[1]}D)")
 
-    return embeddings_array, fps, frame_count
+    return embeddings_array, fps, frame_count, tuple(embedding_frame_indices)
 
 
-def predict_actions(embeddings: np.ndarray, model_path: str, fps: float):
+def _accepted_action_segments(actions: RobotActionResults) -> list[dict]:
+    """Collapse adjacent accepted states for reporting, never for robot input."""
+    frames = actions.frames
+    segments = []
+    current_phase = frames[0].phase
+    start = 0
+    confidences = [frames[0].confidence]
+    for index, frame in enumerate(frames[1:], start=1):
+        if frame.phase == current_phase:
+            confidences.append(frame.confidence)
+            continue
+        available = [value for value in confidences if value is not None]
+        segments.append(
+            {
+                "action": current_phase.value,
+                "start_frame": frames[start].frame_idx,
+                "end_frame": frames[index - 1].frame_idx,
+                "start_time": frames[start].timestamp_s,
+                "end_time": frames[index - 1].timestamp_s,
+                "duration": frames[index - 1].timestamp_s - frames[start].timestamp_s,
+                "avg_confidence": float(np.mean(available)) if available else None,
+            }
+        )
+        current_phase = frame.phase
+        start = index
+        confidences = [frame.confidence]
+    available = [value for value in confidences if value is not None]
+    segments.append(
+        {
+            "action": current_phase.value,
+            "start_frame": frames[start].frame_idx,
+            "end_frame": frames[-1].frame_idx,
+            "start_time": frames[start].timestamp_s,
+            "end_time": frames[-1].timestamp_s,
+            "duration": frames[-1].timestamp_s - frames[start].timestamp_s,
+            "avg_confidence": float(np.mean(available)) if available else None,
+        }
+    )
+    return segments
+
+
+def predict_actions(
+    embeddings: np.ndarray,
+    model_path: str,
+    fps: float,
+    skill_config_path: str,
+    frame_indices: Sequence[int],
+):
     """Predict action sequence from embeddings.
 
     Returns:
-        Dict with per-frame and segment predictions
+        Validated score and post-processed single-state artifacts.
     """
     print("\n3. Predicting action sequences...")
 
+    skill_system = load_skill_system(skill_config_path)
     classifier = ActionClassifier(
         embedding_dim=1024,
-        num_actions=len(ACTION_NAMES),
+        num_actions=skill_system.catalog.class_count,
         model_type="lstm",
     )
-    classifier.load(model_path)
+    classifier.load(model_path, catalog=skill_system.catalog)
     print(f"   ✓ Model loaded from: {model_path}")
 
-    actions, confidences = classifier.predict(embeddings)
-    print(f"   ✓ Predicted actions for {len(actions)} frames")
+    probabilities = classifier.predict_probabilities(embeddings)
+    print(f"   ✓ Predicted complete scores for {len(probabilities)} frames")
 
     # Compute timestamps
-    timestamps = np.arange(len(actions)) / fps
-
-    # Aggregate into segments
-    segments = []
-    current_action = actions[0]
-    current_start = 0
-    current_conf_sum = confidences[0]
-    frame_count = 1
-
-    for i in range(1, len(actions)):
-        if actions[i] == current_action:
-            current_conf_sum += confidences[i]
-            frame_count += 1
-        else:
-            avg_conf = current_conf_sum / frame_count
-            segments.append({
-                "action": ACTION_NAMES[current_action],
-                "start_frame": int(current_start),
-                "end_frame": int(i - 1),
-                "start_time": float(timestamps[current_start]),
-                "end_time": float(timestamps[i - 1]),
-                "duration": float(timestamps[i - 1] - timestamps[current_start]),
-                "avg_confidence": float(avg_conf),
-            })
-
-            current_action = actions[i]
-            current_start = i
-            current_conf_sum = confidences[i]
-            frame_count = 1
-
-    # Add final segment
-    avg_conf = current_conf_sum / frame_count
-    segments.append({
-        "action": ACTION_NAMES[current_action],
-        "start_frame": int(current_start),
-        "end_frame": int(len(actions) - 1),
-        "start_time": float(timestamps[current_start]),
-        "end_time": float(timestamps[-1]),
-        "duration": float(timestamps[-1] - timestamps[current_start]),
-        "avg_confidence": float(avg_conf),
-    })
-
+    if not np.isfinite(fps) or fps <= 0:
+        raise ValueError("fps must be finite and positive")
+    timestamps = (np.asarray(frame_indices) - 1) / fps
+    predictions = predictions_from_probabilities(
+        probabilities,
+        timestamps,
+        skill_system.catalog,
+        frame_indices=frame_indices,
+    )
+    artifacts = build_action_inference_artifacts(
+        predictions,
+        skill_system,
+        checkpoint_sha256(model_path),
+    )
+    segments = _accepted_action_segments(artifacts.robot_actions)
     print(f"   ✓ Detected {len(segments)} action segments")
-
-    return {
-        "fps": float(fps),
-        "num_frames": len(actions),
-        "per_frame": {
-            "actions": [ACTION_NAMES[int(a)] for a in actions],
-            "confidences": [float(c) for c in confidences],
-            "timestamps": [float(t) for t in timestamps],
-        },
-        "segments": segments,
-    }
+    return artifacts
 
 
-def combine_results(tracks_data: dict, actions_data: dict) -> dict:
+def combine_results(tracks_data: dict, actions_data: RobotActionResults) -> dict:
     """Combine tracking and action predictions.
 
     Returns:
@@ -256,43 +281,55 @@ def combine_results(tracks_data: dict, actions_data: dict) -> dict:
     """
     print("\n4. Combining tracks and actions...")
 
-    num_frames = len(actions_data["per_frame"]["actions"])
-    fps = actions_data["fps"]
-    timestamps = np.array(actions_data["per_frame"]["timestamps"])
+    num_frames = len(actions_data.frames)
+    fps = tracks_data["fps"]
 
     combined_frames = []
     for i in range(num_frames):
         # Get position at this frame
-        position = tracks_data["positions"][i] if i < len(tracks_data["positions"]) else None
+        track_index = actions_data.frames[i].frame_idx - 1
+        position = (
+            tracks_data["positions"][track_index]
+            if track_index < len(tracks_data["positions"])
+            else None
+        )
 
         # Get action at this frame
-        action = actions_data["per_frame"]["actions"][i]
-        action_conf = actions_data["per_frame"]["confidences"][i]
+        accepted = actions_data.frames[i]
 
         frame_data = {
-            "frame_index": int(i),
-            "timestamp": float(timestamps[i]),
-            "position": {
-                "x": position["x"] if position else None,
-                "y": position["y"] if position else None,
-                "confidence": position["confidence"] if position else 0.0,
-            } if position else None,
-            "action": action,
-            "action_confidence": float(action_conf),
+            "frame_idx": accepted.frame_idx,
+            "timestamp_s": accepted.timestamp_s,
+            "position": (
+                {
+                    "x": position["x"] if position else None,
+                    "y": position["y"] if position else None,
+                    "confidence": position["confidence"] if position else 0.0,
+                }
+                if position
+                else None
+            ),
+            "action": accepted.phase.value,
+            "action_confidence": accepted.confidence,
+            "decision_source": accepted.decision_source.value,
         }
         combined_frames.append(frame_data)
 
     print(f"   ✓ Combined {num_frames} frames")
 
     return {
+        "schema": "mimic.demo_results.v2",
         "metadata": {
             "created": datetime.now().isoformat(),
             "fps": float(fps),
             "total_frames": num_frames,
-            "duration": float(timestamps[-1]) if num_frames > 0 else 0,
+            "duration": actions_data.frames[-1].timestamp_s if num_frames > 0 else 0,
+            "catalog_fingerprint": actions_data.catalog.fingerprint,
+            "postprocessing_fingerprint": actions_data.postprocessing.fingerprint,
+            "tracking_coordinate_frame": "image_pixels",
         },
         "per_frame": combined_frames,
-        "action_segments": actions_data["segments"],
+        "action_segments": _accepted_action_segments(actions_data),
         "tracking_summary": {
             "total_positions": sum(1 for p in tracks_data["positions"] if p["x"] is not None),
             "fps": tracks_data["fps"],
@@ -309,12 +346,6 @@ def generate_default_waypoints() -> dict:
     Returns:
         Dict with waypoint format for robot simulation
     """
-    # Default poses in world coordinates - adjust based on your robot/scene
-    default_pose = {
-        "position": [0.5, 0.0, 0.2],
-        "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0],
-    }
-
     return {
         "approach": {"position": [0.5, 0.0, 0.4], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
         "grasp": {"position": [0.5, 0.0, 0.1], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
@@ -366,6 +397,7 @@ def run_robot_simulation(
 
     try:
         from mimic.robot.factory import build_executor
+
         executor = build_executor(config_path_obj, record_event)
         print(f"   ✓ Executor built from config: {config_path}")
 
@@ -399,9 +431,7 @@ def run_robot_simulation(
 
 def main():
     """Process video through full pipeline."""
-    parser = argparse.ArgumentParser(
-        description="Process demo video through full pipeline"
-    )
+    parser = argparse.ArgumentParser(description="Process demo video through full pipeline")
     parser.add_argument(
         "--video",
         type=str,
@@ -430,6 +460,12 @@ def main():
         "--config",
         type=str,
         help="Path to robot execution config (required for --simulate-robot)",
+    )
+    parser.add_argument(
+        "--skill-config",
+        type=str,
+        default="configs/skills/pick_place.yaml",
+        help="Skill catalog, graph, and explicit post-state settings YAML",
     )
     parser.add_argument(
         "--simulate-robot",
@@ -466,21 +502,35 @@ def main():
     print(f"Device: {args.device}")
     if args.simulate_robot:
         print(f"Robot Config: {args.config}")
-        print(f"Simulate Robot: Yes")
+        print("Simulate Robot: Yes")
 
     try:
         # Run pipeline
         tracks_data = extract_tracks(str(video_path), device=args.device)
-        embeddings, fps, frame_count = extract_embeddings(str(video_path), device=args.device)
-        actions_data = predict_actions(embeddings, str(model_path), fps)
-        results = combine_results(tracks_data, actions_data)
+        embeddings, fps, frame_count, embedding_frame_indices = extract_embeddings(
+            str(video_path), device=args.device
+        )
+        actions_data = predict_actions(
+            embeddings,
+            str(model_path),
+            fps,
+            args.skill_config,
+            embedding_frame_indices,
+        )
+        results = combine_results(tracks_data, actions_data.robot_actions)
 
         # Save results
         print("\n5. Saving results...")
         results_file = output_dir / f"{video_path.stem}_results.json"
+        scores_file = output_dir / f"{video_path.stem}_scores.json"
+        robot_actions_file = output_dir / f"{video_path.stem}_robot_actions.json"
+        write_results(scores_file, actions_data.scores)
+        write_results(robot_actions_file, actions_data.robot_actions)
         with open(results_file, "w") as f:
-            json.dump(results, f, indent=2)
+            json.dump(results, f, indent=2, allow_nan=False)
         print(f"   ✓ Saved to: {results_file}")
+        print(f"   ✓ Diagnostic scores: {scores_file}")
+        print(f"   ✓ Robot actions: {robot_actions_file}")
 
         # Run robot simulation if requested
         simulation_result = None
@@ -499,7 +549,7 @@ def main():
             # Save updated results with simulation
             with open(results_file, "w") as f:
                 json.dump(results, f, indent=2, allow_nan=False)
-            print(f"   ✓ Updated results with simulation data")
+            print("   ✓ Updated results with simulation data")
 
         # Print summary
         print("\n" + "=" * 70)
@@ -509,14 +559,20 @@ def main():
         print(f"Duration: {results['metadata']['duration']:.2f}s")
         print(f"FPS: {results['metadata']['fps']:.1f}")
         print(f"\nAction segments: {len(results['action_segments'])}")
-        for seg in results['action_segments']:
-            print(f"  {seg['action']:10s} {seg['start_time']:6.2f}s - {seg['end_time']:6.2f}s (conf: {seg['avg_confidence']:.1%})")
+        for seg in results["action_segments"]:
+            confidence = seg["avg_confidence"]
+            confidence_text = "n/a" if confidence is None else f"{confidence:.1%}"
+            print(
+                f"  {seg['action']:10s} {seg['start_time']:6.2f}s - {seg['end_time']:6.2f}s (conf: {confidence_text})"
+            )
 
-        print(f"\nTracked positions: {results['tracking_summary']['total_positions']}/{results['metadata']['total_frames']}")
+        print(
+            f"\nTracked positions: {results['tracking_summary']['total_positions']}/{results['metadata']['total_frames']}"
+        )
 
         if simulation_result:
             print(f"\nRobot Simulation: {simulation_result['status']}")
-            if simulation_result['status'] == 'completed':
+            if simulation_result["status"] == "completed":
                 print(f"  Success: {simulation_result['success']}")
                 print(f"  Log: {simulation_result['log_file']}")
 
@@ -527,6 +583,7 @@ def main():
     except Exception as e:
         print(f"\nERROR: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

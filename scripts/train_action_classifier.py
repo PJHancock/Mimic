@@ -16,17 +16,18 @@ Usage:
 """
 
 import argparse
-import sys
 import json
+import sys
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
-import matplotlib.pyplot as plt
 
+from mimic.integration import load_skill_system
 from mimic.vision.action_classifier import ActionClassifier
 
 
@@ -170,7 +171,14 @@ def plot_training_curves(train_losses, val_losses, val_accs, output_dir):
     ax2.plot(epochs, val_accs, "g-", linewidth=2)
     best_epoch = np.argmax(val_accs) + 1
     best_acc = np.max(val_accs)
-    ax2.scatter([best_epoch], [best_acc], color="red", s=100, zorder=5, label=f"Best: {best_acc:.1%} (epoch {best_epoch})")
+    ax2.scatter(
+        [best_epoch],
+        [best_acc],
+        color="red",
+        s=100,
+        zorder=5,
+        label=f"Best: {best_acc:.1%} (epoch {best_epoch})",
+    )
     ax2.set_xlabel("Epoch")
     ax2.set_ylabel("Accuracy")
     ax2.set_title("Validation Accuracy")
@@ -309,6 +317,11 @@ def main():
         default=0.8,
         help="Fraction of videos for training (rest for validation)",
     )
+    parser.add_argument(
+        "--skill-config",
+        default="configs/skills/pick_place.yaml",
+        help="Versioned classifier vocabulary and graph configuration",
+    )
 
     args = parser.parse_args()
 
@@ -327,9 +340,14 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    skill_system = load_skill_system(args.skill_config)
+
     # Load data
     print("1. Loading embeddings and labels...")
     video_data = load_video_data(args.embeddings_dir, args.labels_dir)
+    for _, labels in video_data:
+        if labels.ndim != 2 or labels.shape[1] != skill_system.catalog.class_count:
+            raise ValueError("Training labels must have one column for every active catalog label")
 
     # Split train/val by video
     print("\n2. Splitting data by video...")
@@ -355,7 +373,7 @@ def main():
 
     classifier = ActionClassifier(
         embedding_dim=1024,
-        num_actions=5,
+        num_actions=skill_system.catalog.class_count,
         device=device,
         model_type="lstm",
     )
@@ -399,7 +417,7 @@ def main():
     # Save model
     print("\n6. Saving model...")
     model_path = output_dir / args.model_name
-    classifier.save(str(model_path))
+    classifier.save(str(model_path), catalog=skill_system.catalog)
     print(f"  Saved to: {model_path}")
 
     # Plot training curves
@@ -423,6 +441,11 @@ def main():
         "best_epoch": best_epoch,
         "model_path": str(model_path),
         "device": str(device),
+        "catalog": {
+            "schema_version": skill_system.catalog.schema_version,
+            "fingerprint": skill_system.catalog.fingerprint,
+            "labels": list(skill_system.catalog.labels),
+        },
     }
 
     config_path = output_dir / "training_config.json"
@@ -443,7 +466,7 @@ def main():
     print("  2. Run inference on new videos:")
     print("     classifier = ActionClassifier(model_type='lstm')")
     print("     classifier.load(str(model_path))")
-    print("     actions, confidences = classifier.predict(embeddings)")
+    print("     probabilities = classifier.predict_probabilities(embeddings)")
     print("=" * 70 + "\n")
 
     return 0

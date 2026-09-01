@@ -7,7 +7,8 @@ Usage:
     # From embeddings file
     uv run python scripts/inference_action_classifier.py \\
         --embeddings data/embeddings/IMG_2006.npy \\
-        --model models/action_classifier_lstm.pt
+        --model models/action_classifier_lstm.pt \\
+        --fps 30
 
     # Or specify fps/duration for timestamps
     uv run python scripts/inference_action_classifier.py \\
@@ -21,17 +22,23 @@ import sys
 from pathlib import Path
 
 import numpy as np
-import json
 
-from mimic.common.types import ActionPhase
+from mimic.integration import (
+    build_action_inference_artifacts,
+    checkpoint_sha256,
+    load_skill_system,
+    predictions_from_probabilities,
+    write_results,
+)
 from mimic.vision.action_classifier import ActionClassifier
 
 
-# Action class names (must match training order)
-ACTION_NAMES = [phase.value for phase in ActionPhase]
-
-
-def run_inference(embeddings_path: str, model_path: str, fps: float = 30.0):
+def run_inference(
+    embeddings_path: str,
+    model_path: str,
+    fps: float,
+    skill_config_path: str = "configs/skills/pick_place.yaml",
+):
     """Run action classification on embeddings.
 
     Args:
@@ -40,7 +47,7 @@ def run_inference(embeddings_path: str, model_path: str, fps: float = 30.0):
         fps: Frames per second for timestamp calculation
 
     Returns:
-        Dict with actions, confidences, timestamps
+        Validated diagnostic-score and single-state robot artifacts.
     """
     print("\n" + "=" * 70)
     print("ACTION CLASSIFIER INFERENCE")
@@ -64,65 +71,80 @@ def run_inference(embeddings_path: str, model_path: str, fps: float = 30.0):
         print(f"ERROR: Model file not found: {model_path}")
         return None
 
+    skill_system = load_skill_system(skill_config_path)
     classifier = ActionClassifier(
         embedding_dim=1024,
-        num_actions=len(ACTION_NAMES),
+        num_actions=skill_system.catalog.class_count,
         model_type="lstm",
     )
-    classifier.load(str(model_path))
+    classifier.load(str(model_path), catalog=skill_system.catalog)
     print("   Model loaded successfully")
 
     # Run inference
     print(f"\n3. Running inference on {num_frames} frames...")
-    actions, confidences = classifier.predict(embeddings)
+    probabilities = classifier.predict_probabilities(embeddings)
 
     # Compute timestamps
     print(f"\n4. Computing timestamps (fps={fps})...")
+    if not np.isfinite(fps) or fps <= 0:
+        raise ValueError("fps must be finite and positive")
     timestamps = np.arange(num_frames) / fps
+    predictions = predictions_from_probabilities(
+        probabilities,
+        timestamps,
+        skill_system.catalog,
+    )
+    artifacts = build_action_inference_artifacts(
+        predictions,
+        skill_system,
+        checkpoint_sha256(model_path),
+    )
 
-    # Aggregate into contiguous segments
+    # Aggregate the accepted robot states for display only.
+    robot_frames = artifacts.robot_actions.frames
     segments = []
-    current_action = actions[0]
+    current_action = robot_frames[0].phase
     current_start = 0
-    current_conf_sum = confidences[0]
-    frame_count = 1
+    segment_confidences = [robot_frames[0].confidence]
 
     for i in range(1, num_frames):
-        if actions[i] == current_action:
-            current_conf_sum += confidences[i]
-            frame_count += 1
+        frame = robot_frames[i]
+        if frame.phase == current_action:
+            segment_confidences.append(frame.confidence)
         else:
-            # End of segment
-            avg_confidence = current_conf_sum / frame_count
-            segments.append({
-                "action": ACTION_NAMES[current_action],
-                "start_frame": int(current_start),
-                "end_frame": int(i - 1),
-                "start_time": float(timestamps[current_start]),
-                "end_time": float(timestamps[i - 1]),
-                "duration": float(timestamps[i - 1] - timestamps[current_start]),
-                "avg_confidence": float(avg_confidence),
-            })
+            available = [value for value in segment_confidences if value is not None]
+            segments.append(
+                {
+                    "action": current_action.value,
+                    "start_frame": robot_frames[current_start].frame_idx,
+                    "end_frame": robot_frames[i - 1].frame_idx,
+                    "start_time": float(timestamps[current_start]),
+                    "end_time": float(timestamps[i - 1]),
+                    "duration": float(timestamps[i - 1] - timestamps[current_start]),
+                    "avg_confidence": float(np.mean(available)) if available else None,
+                }
+            )
 
-            current_action = actions[i]
+            current_action = frame.phase
             current_start = i
-            current_conf_sum = confidences[i]
-            frame_count = 1
+            segment_confidences = [frame.confidence]
 
     # Add final segment
-    avg_confidence = current_conf_sum / frame_count
-    segments.append({
-        "action": ACTION_NAMES[current_action],
-        "start_frame": int(current_start),
-        "end_frame": int(num_frames - 1),
-        "start_time": float(timestamps[current_start]),
-        "end_time": float(timestamps[-1]),
-        "duration": float(timestamps[-1] - timestamps[current_start]),
-        "avg_confidence": float(avg_confidence),
-    })
+    available = [value for value in segment_confidences if value is not None]
+    segments.append(
+        {
+            "action": current_action.value,
+            "start_frame": robot_frames[current_start].frame_idx,
+            "end_frame": robot_frames[-1].frame_idx,
+            "start_time": float(timestamps[current_start]),
+            "end_time": float(timestamps[-1]),
+            "duration": float(timestamps[-1] - timestamps[current_start]),
+            "avg_confidence": float(np.mean(available)) if available else None,
+        }
+    )
 
     # Print results
-    print(f"\n" + "=" * 70)
+    print("\n" + "=" * 70)
     print("PREDICTED ACTION SEGMENTS")
     print("=" * 70)
     print(f"\nTotal frames: {num_frames}")
@@ -133,13 +155,16 @@ def run_inference(embeddings_path: str, model_path: str, fps: float = 30.0):
         print(f"Segment {i+1}: {seg['action']}")
         print(f"  Time: {seg['start_time']:.2f}s - {seg['end_time']:.2f}s ({seg['duration']:.2f}s)")
         print(f"  Frames: {seg['start_frame']} - {seg['end_frame']}")
-        print(f"  Confidence: {seg['avg_confidence']:.1%}")
+        confidence = seg["avg_confidence"]
+        print(f"  Confidence: {confidence:.1%}" if confidence is not None else "  Confidence: n/a")
         print()
 
     # Print per-frame summary (first and last 10 frames)
     print("Per-frame predictions (first 10 frames):")
     for i in range(min(10, num_frames)):
-        print(f"  Frame {i}: {ACTION_NAMES[actions[i]]} (conf: {confidences[i]:.1%})")
+        frame = robot_frames[i]
+        confidence = "n/a" if frame.confidence is None else f"{frame.confidence:.1%}"
+        print(f"  Frame {frame.frame_idx}: {frame.phase.value} (conf: {confidence})")
 
     if num_frames > 10:
         print(f"  ... ({num_frames - 20} frames omitted) ...")
@@ -147,30 +172,18 @@ def run_inference(embeddings_path: str, model_path: str, fps: float = 30.0):
     if num_frames > 20:
         print("Per-frame predictions (last 10 frames):")
         for i in range(max(0, num_frames - 10), num_frames):
-            print(f"  Frame {i}: {ACTION_NAMES[actions[i]]} (conf: {confidences[i]:.1%})")
+            frame = robot_frames[i]
+            confidence = "n/a" if frame.confidence is None else f"{frame.confidence:.1%}"
+            print(f"  Frame {frame.frame_idx}: {frame.phase.value} (conf: {confidence})")
 
     print("\n" + "=" * 70)
 
-    result = {
-        "num_frames": int(num_frames),
-        "duration": float(timestamps[-1]),
-        "fps": float(fps),
-        "per_frame": {
-            "actions": [ACTION_NAMES[int(a)] for a in actions],
-            "confidences": [float(c) for c in confidences],
-            "timestamps": [float(t) for t in timestamps],
-        },
-        "segments": segments,
-    }
-
-    return result
+    return artifacts
 
 
 def main():
     """Main inference script."""
-    parser = argparse.ArgumentParser(
-        description="Run action inference on video embeddings"
-    )
+    parser = argparse.ArgumentParser(description="Run action inference on video embeddings")
     parser.add_argument(
         "--embeddings",
         type=str,
@@ -186,24 +199,41 @@ def main():
     parser.add_argument(
         "--fps",
         type=float,
-        default=30.0,
-        help="Frames per second (for timestamps)",
+        required=True,
+        help="Source-video FPS used for timestamps; never inferred",
     )
     parser.add_argument(
         "--output",
         type=str,
         default=None,
-        help="Optional: save results to JSON",
+        help="Optional processed robot-action JSON output",
+    )
+    parser.add_argument(
+        "--scores-output",
+        type=str,
+        default=None,
+        help="Optional diagnostic full-score JSON; defaults beside --output",
+    )
+    parser.add_argument(
+        "--skill-config",
+        type=str,
+        default="configs/skills/pick_place.yaml",
+        help="Skill catalog, graph, and explicit post-state settings YAML",
     )
 
     args = parser.parse_args()
 
     # Run inference
-    result = run_inference(
-        embeddings_path=args.embeddings,
-        model_path=args.model,
-        fps=args.fps,
-    )
+    try:
+        result = run_inference(
+            embeddings_path=args.embeddings,
+            model_path=args.model,
+            fps=args.fps,
+            skill_config_path=args.skill_config,
+        )
+    except (OSError, ValueError) as exc:
+        print(f"ERROR: {exc}")
+        return 1
 
     if result is None:
         return 1
@@ -211,10 +241,18 @@ def main():
     # Save results if requested
     if args.output:
         output_path = Path(args.output)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, "w") as f:
-            json.dump(result, f, indent=2)
-        print(f"✓ Results saved to: {output_path}\n")
+        write_results(output_path, result.robot_actions)
+        print(f"✓ Robot actions saved to: {output_path}")
+        scores_path = (
+            Path(args.scores_output)
+            if args.scores_output
+            else output_path.with_name(f"{output_path.stem}_scores{output_path.suffix}")
+        )
+        write_results(scores_path, result.scores)
+        print(f"✓ Diagnostic scores saved to: {scores_path}\n")
+    elif args.scores_output:
+        write_results(args.scores_output, result.scores)
+        print(f"✓ Diagnostic scores saved to: {args.scores_output}\n")
 
     return 0
 

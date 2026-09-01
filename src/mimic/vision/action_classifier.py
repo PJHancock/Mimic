@@ -3,8 +3,8 @@
 Trains a simple MLP on V-JEPA embeddings + audio-labeled actions.
 """
 
-from typing import Tuple, Optional
 import logging
+from typing import TYPE_CHECKING, Optional, Tuple
 
 import numpy as np
 import torch
@@ -12,6 +12,9 @@ import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from mimic.common.types import ActionPhase
+
+if TYPE_CHECKING:
+    from mimic.skills.catalog import SkillCatalog
 
 logger = logging.getLogger(__name__)
 
@@ -266,16 +269,14 @@ class ActionClassifier:
 
         return accuracy, avg_loss
 
-    def predict(self, embeddings: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-        """Predict actions for embeddings.
+    def predict_probabilities(self, embeddings: np.ndarray) -> np.ndarray:
+        """Return the complete softmax distribution for every embedding.
 
         Args:
             embeddings: (num_frames, embedding_dim) array
 
         Returns:
-            (actions, confidences)
-                actions: (num_frames,) predicted action indices
-                confidences: (num_frames,) max softmax probability per frame
+            (num_frames, num_actions) array. Columns retain training/catalog order.
         """
         self.model.eval()
 
@@ -290,27 +291,86 @@ class ActionClassifier:
                 logits = self.model(X)  # (num_frames, num_actions)
 
             probs = torch.softmax(logits, dim=-1)  # (num_frames, num_actions)
-            actions = torch.argmax(probs, dim=-1)  # (num_frames,)
-            confidences = torch.max(probs, dim=-1)[0]  # (num_frames,)
 
-        return actions.cpu().numpy(), confidences.cpu().numpy()
+        return probs.cpu().numpy()
 
-    def save(self, path: str) -> None:
+    def predict(self, embeddings: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        """Return top-one predictions derived from the complete score matrix.
+
+        This compatibility helper is appropriate for display and metrics only.
+        Robot-facing inference must use :meth:`predict_probabilities` so graph
+        post-processing receives every catalog score.
+        """
+        probabilities = self.predict_probabilities(embeddings)
+        actions = np.argmax(probabilities, axis=-1)
+        confidences = np.max(probabilities, axis=-1)
+        return actions, confidences
+
+    def save(self, path: str, catalog: Optional["SkillCatalog"] = None) -> None:
         """Save model weights.
 
         Args:
             path: Path to save weights
+            catalog: Active classifier vocabulary. When supplied, its ordered
+                labels and fingerprint are embedded in the checkpoint.
         """
-        torch.save(self.model.state_dict(), path)
+        state_dict = self.model.state_dict()
+        if catalog is None:
+            torch.save(state_dict, path)
+        else:
+            if catalog.class_count != self.num_actions:
+                raise ValueError(
+                    "Classifier output count does not match the supplied skill catalog"
+                )
+            torch.save(
+                {
+                    "format": "mimic.action_classifier.v2",
+                    "model_state_dict": state_dict,
+                    "model_type": self.model_type,
+                    "num_actions": self.num_actions,
+                    "catalog": {
+                        "schema_version": catalog.schema_version,
+                        "fingerprint": catalog.fingerprint,
+                        "labels": list(catalog.labels),
+                    },
+                },
+                path,
+            )
         logger.info(f"✓ Model saved to {path}")
 
-    def load(self, path: str) -> None:
+    def load(self, path: str, catalog: Optional["SkillCatalog"] = None) -> None:
         """Load model weights.
 
         Args:
             path: Path to load weights from
+            catalog: Expected active vocabulary. Supplying it requires a v2
+                checkpoint with exactly matching catalog provenance.
         """
-        self.model.load_state_dict(torch.load(path, map_location=self.device))
+        checkpoint = torch.load(path, map_location=self.device)
+        if (
+            isinstance(checkpoint, dict)
+            and checkpoint.get("format") == "mimic.action_classifier.v2"
+        ):
+            if checkpoint.get("model_type") != self.model_type:
+                raise ValueError("Checkpoint model type does not match the classifier")
+            if checkpoint.get("num_actions") != self.num_actions:
+                raise ValueError("Checkpoint output count does not match the classifier")
+            if catalog is not None:
+                metadata = checkpoint.get("catalog") or {}
+                if (
+                    metadata.get("fingerprint") != catalog.fingerprint
+                    or tuple(metadata.get("labels", ())) != catalog.labels
+                ):
+                    raise ValueError("Checkpoint skill catalog does not match the active catalog")
+            state_dict = checkpoint["model_state_dict"]
+        else:
+            if catalog is not None:
+                raise ValueError(
+                    "Legacy checkpoint has no skill-catalog provenance; retrain or migrate it "
+                    "before robot-facing inference"
+                )
+            state_dict = checkpoint
+        self.model.load_state_dict(state_dict)
         logger.info(f"✓ Model loaded from {path}")
 
 
@@ -409,10 +469,12 @@ if __name__ == "__main__":
         val_acc, val_loss = classifier.evaluate(val_loader)
 
         if (epoch + 1) % 5 == 0:
-            print(f"   Epoch {epoch+1:2d}/{num_epochs} | "
-                  f"Train loss: {train_loss:.4f} | "
-                  f"Val acc: {val_acc:.3f} | "
-                  f"Val loss: {val_loss:.4f}")
+            print(
+                f"   Epoch {epoch+1:2d}/{num_epochs} | "
+                f"Train loss: {train_loss:.4f} | "
+                f"Val acc: {val_acc:.3f} | "
+                f"Val loss: {val_loss:.4f}"
+            )
 
     # Step 5: Save model
     print("\n5. Saving LSTM model...")

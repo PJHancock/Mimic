@@ -66,7 +66,7 @@ class ActionPrediction:
 
     frame_idx: int
     phase: ActionPhase
-    confidence: float
+    confidence: Optional[float]
     timestamp: Optional[float] = None  # seconds, not inferred from frame_idx
 
 

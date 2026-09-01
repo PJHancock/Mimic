@@ -5,6 +5,12 @@ The classifier output order must come from the active versioned
 `RELEASE`; a different training feature set requires a matching catalog,
 relationship graph, and complete handler registry.
 
+Robot-facing inference never exports classifier argmax directly. The classifier
+returns every label probability, the inference pipeline applies
+`GraphStatePostProcessor`, and only its one accepted state per timestep is
+written to `mimic.robot_actions.v1`. The full distributions are retained
+separately in `mimic.skill_scores.v2` for auditing and replay.
+
 ## Architecture Overview
 
 ```
