@@ -269,15 +269,24 @@ class ActionClassifier:
 
         return accuracy, avg_loss
 
-    def predict_probabilities(self, embeddings: np.ndarray) -> np.ndarray:
+    def predict_probabilities(
+        self, embeddings: np.ndarray, context_window: Optional[int] = None
+    ) -> np.ndarray:
         """Return the complete softmax distribution for every embedding.
 
         Args:
             embeddings: (num_frames, embedding_dim) array
+            context_window: For LSTM only. If specified, uses a sliding window approach
+                with context_window frames before and after each frame.
+                E.g., context_window=32 means 32 frames before + current + 32 frames after.
+                If None, uses full sequence (recommended for batch processing).
 
         Returns:
             (num_frames, num_actions) array. Columns retain training/catalog order.
         """
+        if self.model_type == "lstm" and context_window is not None:
+            return self._predict_probabilities_with_context_window(embeddings, context_window)
+
         self.model.eval()
 
         with torch.no_grad():
@@ -293,6 +302,64 @@ class ActionClassifier:
             probs = torch.softmax(logits, dim=-1)  # (num_frames, num_actions)
 
         return probs.cpu().numpy()
+
+    def _predict_probabilities_with_context_window(
+        self, embeddings: np.ndarray, context_window: int
+    ) -> np.ndarray:
+        """Predict using sliding context window for LSTM.
+
+        Args:
+            embeddings: (num_frames, embedding_dim) array
+            context_window: Number of frames before/after to include
+
+        Returns:
+            (num_frames, num_actions) probability array
+        """
+        num_frames = embeddings.shape[0]
+        num_actions = self.num_actions
+        probabilities = np.zeros((num_frames, num_actions), dtype=np.float32)
+
+        self.model.eval()
+
+        with torch.no_grad():
+            for frame_idx in range(num_frames):
+                # Define window boundaries
+                start_idx = max(0, frame_idx - context_window)
+                end_idx = min(num_frames, frame_idx + context_window + 1)
+
+                # Extract window
+                window = embeddings[start_idx:end_idx]  # (window_size, embedding_dim)
+
+                # Pad if at boundaries
+                if start_idx == 0 and end_idx == num_frames:
+                    # Full window available (middle of sequence)
+                    pass
+                elif start_idx == 0:
+                    # Pad at beginning
+                    pad_size = context_window - frame_idx
+                    pad = np.zeros((pad_size, embeddings.shape[1]))
+                    window = np.vstack([pad, window])
+                elif end_idx == num_frames:
+                    # Pad at end
+                    pad_size = context_window - (num_frames - frame_idx - 1)
+                    pad = np.zeros((pad_size, embeddings.shape[1]))
+                    window = np.vstack([window, pad])
+
+                # Forward pass
+                X = torch.from_numpy(window).float().to(self.device)
+                X = X.unsqueeze(0)  # Add batch dimension: (1, window_size, embedding_dim)
+
+                logits = self.model(X)  # (1, window_size, num_actions)
+                logits = logits.squeeze(0)  # (window_size, num_actions)
+
+                # Get prediction for center frame (current frame)
+                center_idx = min(frame_idx - start_idx, context_window)
+                frame_logits = logits[center_idx]  # (num_actions,)
+
+                probs = torch.softmax(frame_logits, dim=-1)
+                probabilities[frame_idx] = probs.cpu().numpy()
+
+        return probabilities
 
     def predict(self, embeddings: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Return top-one predictions derived from the complete score matrix.

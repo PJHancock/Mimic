@@ -233,8 +233,17 @@ def predict_actions(
     fps: float,
     skill_config_path: str,
     frame_indices: Sequence[int],
+    context_window: int = 32,
 ):
     """Predict action sequence from embeddings.
+
+    Args:
+        embeddings: Array of embeddings to classify
+        model_path: Path to trained model
+        fps: Frames per second for timing
+        skill_config_path: Path to skill system config
+        frame_indices: Frame indices for embeddings
+        context_window: Context window size for LSTM (±N frames, default 32)
 
     Returns:
         Validated score and post-processed single-state artifacts.
@@ -250,8 +259,9 @@ def predict_actions(
     classifier.load(model_path, catalog=skill_system.catalog)
     print(f"   ✓ Model loaded from: {model_path}")
 
-    probabilities = classifier.predict_probabilities(embeddings)
+    probabilities = classifier.predict_probabilities(embeddings, context_window=context_window)
     print(f"   ✓ Predicted complete scores for {len(probabilities)} frames")
+    print(f"   ✓ Context window: ±{context_window} frames")
 
     # Compute timestamps
     if not np.isfinite(fps) or fps <= 0:
@@ -472,6 +482,12 @@ def main():
         action="store_true",
         help="Run robot simulation with inferred waypoints",
     )
+    parser.add_argument(
+        "--context-window",
+        type=int,
+        default=32,
+        help="Context window size for LSTM (±N frames, default 32)",
+    )
 
     args = parser.parse_args()
 
@@ -516,6 +532,7 @@ def main():
             fps,
             args.skill_config,
             embedding_frame_indices,
+            context_window=args.context_window,
         )
         results = combine_results(tracks_data, actions_data.robot_actions)
 
