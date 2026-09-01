@@ -13,7 +13,7 @@
   },
   "checkpoint_sha256": "08762e8599146de68fb2e0ef40b2c7f530e386715dfddb0f73b8f75004e82979",
   "postprocessing": {
-    "fingerprint": "bd1e4b2cead2f7ca767823601e6286416da28667e54b806cd27cd83ad8afafcf",
+    "fingerprint": "fd956da630153b9411651ecf4f71e85f51f30dcea4ffed4864dd63f2a123141a",
     "settings": {
       "minimum_confidence": 0.5,
       "minimum_transition_margin": 0.1,
@@ -21,7 +21,7 @@
       "required_consecutive_observations": 1,
       "missing_detection_timeout_s": 0.5
     },
-    "guard_policy": "fail_closed_without_runtime_observations"
+    "guard_policy": "defer_runtime_guards_to_execution"
   },
   "frames": [
     {
@@ -468,540 +468,540 @@
     {
       "frame_idx": 64,
       "timestamp_s": 2.1015,
-      "phase": "GRASP",
-      "confidence": 0.2239840179681778,
+      "phase": "CARRY",
+      "confidence": 0.7735282778739929,
       "decision_source": "model"
     },
     {
       "frame_idx": 65,
       "timestamp_s": 2.134857142857143,
-      "phase": "GRASP",
-      "confidence": 0.04015127569437027,
+      "phase": "CARRY",
+      "confidence": 0.9570892453193665,
       "decision_source": "model"
     },
     {
       "frame_idx": 66,
       "timestamp_s": 2.168214285714286,
-      "phase": "GRASP",
-      "confidence": 0.0015093273250386119,
+      "phase": "CARRY",
+      "confidence": 0.9982036352157593,
       "decision_source": "model"
     },
     {
       "frame_idx": 67,
       "timestamp_s": 2.2015714285714285,
-      "phase": "GRASP",
-      "confidence": 7.329112122533843e-06,
+      "phase": "CARRY",
+      "confidence": 0.9999788999557495,
       "decision_source": "model"
     },
     {
       "frame_idx": 68,
       "timestamp_s": 2.2349285714285716,
-      "phase": "GRASP",
-      "confidence": 1.888040124242707e-08,
+      "phase": "CARRY",
+      "confidence": 0.9999995231628418,
       "decision_source": "model"
     },
     {
       "frame_idx": 69,
       "timestamp_s": 2.2682857142857142,
-      "phase": "GRASP",
-      "confidence": 2.585741516736295e-11,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 70,
       "timestamp_s": 2.3016428571428573,
-      "phase": "GRASP",
-      "confidence": 1.4566686056563484e-15,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 71,
       "timestamp_s": 2.335,
-      "phase": "GRASP",
-      "confidence": 9.498130666156942e-22,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 72,
       "timestamp_s": 2.368357142857143,
-      "phase": "GRASP",
-      "confidence": 8.894715471455592e-26,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 73,
       "timestamp_s": 2.4017142857142857,
-      "phase": "GRASP",
-      "confidence": 1.4271018591357949e-27,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 74,
       "timestamp_s": 2.4350714285714288,
-      "phase": "GRASP",
-      "confidence": 2.1162756193221026e-28,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 75,
       "timestamp_s": 2.4684285714285714,
-      "phase": "GRASP",
-      "confidence": 6.456590462445173e-29,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 76,
       "timestamp_s": 2.5017857142857145,
-      "phase": "GRASP",
-      "confidence": 2.3744498385593035e-29,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 77,
       "timestamp_s": 2.535142857142857,
-      "phase": "GRASP",
-      "confidence": 1.052113260053765e-29,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 78,
       "timestamp_s": 2.5685000000000002,
-      "phase": "GRASP",
-      "confidence": 9.505921512387836e-30,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 79,
       "timestamp_s": 2.601857142857143,
-      "phase": "GRASP",
-      "confidence": 2.4729203796666693e-29,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 80,
       "timestamp_s": 2.635214285714286,
-      "phase": "GRASP",
-      "confidence": 3.0556664867726916e-28,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 81,
       "timestamp_s": 2.6685714285714286,
-      "phase": "GRASP",
-      "confidence": 7.992870425307488e-27,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 82,
       "timestamp_s": 2.7019285714285717,
-      "phase": "GRASP",
-      "confidence": 1.1986653694057569e-24,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 83,
       "timestamp_s": 2.7352857142857143,
-      "phase": "GRASP",
-      "confidence": 8.555935522017884e-23,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 84,
       "timestamp_s": 2.7686428571428574,
-      "phase": "GRASP",
-      "confidence": 3.2738376325880444e-22,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 85,
       "timestamp_s": 2.802,
-      "phase": "GRASP",
-      "confidence": 1.592349740249071e-21,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 86,
       "timestamp_s": 2.835357142857143,
-      "phase": "GRASP",
-      "confidence": 2.588467048735066e-21,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 87,
       "timestamp_s": 2.8687142857142858,
-      "phase": "GRASP",
-      "confidence": 1.460336965143793e-20,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 88,
       "timestamp_s": 2.902071428571429,
-      "phase": "GRASP",
-      "confidence": 8.031930210238434e-20,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 89,
       "timestamp_s": 2.9354285714285715,
-      "phase": "GRASP",
-      "confidence": 4.85289908182304e-19,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 90,
       "timestamp_s": 2.9687857142857146,
-      "phase": "GRASP",
-      "confidence": 4.6397776513599775e-18,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 91,
       "timestamp_s": 3.0021428571428572,
-      "phase": "GRASP",
-      "confidence": 7.534846168562857e-16,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 92,
       "timestamp_s": 3.0355000000000003,
-      "phase": "GRASP",
-      "confidence": 2.2524798866385698e-13,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 93,
       "timestamp_s": 3.068857142857143,
-      "phase": "GRASP",
-      "confidence": 4.797732523764697e-12,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 94,
       "timestamp_s": 3.102214285714286,
-      "phase": "GRASP",
-      "confidence": 1.4428630512597351e-10,
+      "phase": "CARRY",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 95,
       "timestamp_s": 3.1355714285714287,
-      "phase": "GRASP",
-      "confidence": 1.7339643054725684e-09,
+      "phase": "CARRY",
+      "confidence": 0.9999998807907104,
       "decision_source": "model"
     },
     {
       "frame_idx": 96,
       "timestamp_s": 3.1689285714285718,
-      "phase": "GRASP",
-      "confidence": 5.303472327966574e-09,
+      "phase": "CARRY",
+      "confidence": 0.999998927116394,
       "decision_source": "model"
     },
     {
       "frame_idx": 97,
       "timestamp_s": 3.2022857142857144,
-      "phase": "GRASP",
-      "confidence": 5.991336138322367e-07,
+      "phase": "CARRY",
+      "confidence": 0.9997687935829163,
       "decision_source": "model"
     },
     {
       "frame_idx": 98,
       "timestamp_s": 3.235642857142857,
-      "phase": "GRASP",
-      "confidence": 7.055012247292325e-05,
+      "phase": "CARRY",
+      "confidence": 0.9147871136665344,
       "decision_source": "model"
     },
     {
       "frame_idx": 99,
       "timestamp_s": 3.269,
-      "phase": "GRASP",
-      "confidence": 1.885249548649881e-05,
+      "phase": "RELEASE",
+      "confidence": 0.9471458196640015,
       "decision_source": "model"
     },
     {
       "frame_idx": 100,
       "timestamp_s": 3.3023571428571428,
-      "phase": "GRASP",
-      "confidence": 1.7970985481952084e-06,
+      "phase": "RELEASE",
+      "confidence": 0.9962320923805237,
       "decision_source": "model"
     },
     {
       "frame_idx": 101,
       "timestamp_s": 3.335714285714286,
-      "phase": "GRASP",
-      "confidence": 1.6475543418437155e-07,
+      "phase": "RELEASE",
+      "confidence": 0.999749481678009,
       "decision_source": "model"
     },
     {
       "frame_idx": 102,
       "timestamp_s": 3.3690714285714285,
-      "phase": "GRASP",
-      "confidence": 2.0986933080280323e-08,
+      "phase": "RELEASE",
+      "confidence": 0.9999573230743408,
       "decision_source": "model"
     },
     {
       "frame_idx": 103,
       "timestamp_s": 3.4024285714285716,
-      "phase": "GRASP",
-      "confidence": 1.0699179320283747e-08,
+      "phase": "RELEASE",
+      "confidence": 0.9999666213989258,
       "decision_source": "model"
     },
     {
       "frame_idx": 104,
       "timestamp_s": 3.435785714285714,
-      "phase": "GRASP",
-      "confidence": 9.400776157519886e-09,
+      "phase": "RELEASE",
+      "confidence": 0.9994716048240662,
       "decision_source": "model"
     },
     {
       "frame_idx": 105,
       "timestamp_s": 3.4691428571428573,
-      "phase": "GRASP",
-      "confidence": 1.0870886413272274e-08,
+      "phase": "RELEASE",
+      "confidence": 0.993067741394043,
       "decision_source": "model"
     },
     {
       "frame_idx": 106,
       "timestamp_s": 3.5025,
-      "phase": "GRASP",
-      "confidence": 1.0171262943003967e-08,
+      "phase": "RELEASE",
+      "confidence": 0.9677761197090149,
       "decision_source": "model"
     },
     {
       "frame_idx": 107,
       "timestamp_s": 3.535857142857143,
-      "phase": "GRASP",
-      "confidence": 1.5617331428074976e-08,
+      "phase": "RELEASE",
+      "confidence": 0.8238804340362549,
       "decision_source": "model"
     },
     {
       "frame_idx": 108,
       "timestamp_s": 3.5692142857142857,
-      "phase": "GRASP",
-      "confidence": 2.0537907374773567e-08,
+      "phase": "RELEASE",
+      "confidence": 0.49300387501716614,
       "decision_source": "model"
     },
     {
       "frame_idx": 109,
       "timestamp_s": 3.6025714285714288,
-      "phase": "GRASP",
-      "confidence": 4.762309657735386e-09,
+      "phase": "RELEASE",
+      "confidence": 0.5067588090896606,
       "decision_source": "model"
     },
     {
       "frame_idx": 110,
       "timestamp_s": 3.6359285714285714,
-      "phase": "GRASP",
-      "confidence": 7.263635248833111e-10,
+      "phase": "RELEASE",
+      "confidence": 0.93112713098526,
       "decision_source": "model"
     },
     {
       "frame_idx": 111,
       "timestamp_s": 3.6692857142857145,
-      "phase": "GRASP",
-      "confidence": 8.892267477911275e-11,
+      "phase": "RELEASE",
+      "confidence": 0.9986479878425598,
       "decision_source": "model"
     },
     {
       "frame_idx": 112,
       "timestamp_s": 3.702642857142857,
-      "phase": "GRASP",
-      "confidence": 7.332962015382805e-11,
+      "phase": "RELEASE",
+      "confidence": 0.9989050626754761,
       "decision_source": "model"
     },
     {
       "frame_idx": 113,
       "timestamp_s": 3.736,
-      "phase": "GRASP",
-      "confidence": 3.140145088398327e-11,
+      "phase": "RELEASE",
+      "confidence": 0.9999932050704956,
       "decision_source": "model"
     },
     {
       "frame_idx": 114,
       "timestamp_s": 3.769357142857143,
-      "phase": "GRASP",
-      "confidence": 1.2861136634845227e-11,
+      "phase": "RELEASE",
+      "confidence": 0.9999998807907104,
       "decision_source": "model"
     },
     {
       "frame_idx": 115,
       "timestamp_s": 3.802714285714286,
-      "phase": "GRASP",
-      "confidence": 1.3387172446976958e-11,
+      "phase": "RELEASE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 116,
       "timestamp_s": 3.8360714285714286,
-      "phase": "GRASP",
-      "confidence": 3.028186483788886e-06,
+      "phase": "RELEASE",
+      "confidence": 0.9998946189880371,
       "decision_source": "model"
     },
     {
       "frame_idx": 117,
       "timestamp_s": 3.8694285714285717,
-      "phase": "GRASP",
-      "confidence": 0.013854250311851501,
+      "phase": "RELEASE",
+      "confidence": 0.9780217409133911,
       "decision_source": "model"
     },
     {
       "frame_idx": 118,
       "timestamp_s": 3.9027857142857143,
-      "phase": "GRASP",
-      "confidence": 0.009796244092285633,
+      "phase": "RELEASE",
+      "confidence": 0.9770959615707397,
       "decision_source": "model"
     },
     {
       "frame_idx": 119,
       "timestamp_s": 3.9361428571428574,
-      "phase": "GRASP",
-      "confidence": 0.01144593395292759,
+      "phase": "RELEASE",
+      "confidence": 0.9801450967788696,
       "decision_source": "model"
     },
     {
       "frame_idx": 120,
       "timestamp_s": 3.9695,
-      "phase": "GRASP",
-      "confidence": 0.00029654530226252973,
+      "phase": "RELEASE",
+      "confidence": 0.9990596175193787,
       "decision_source": "model"
     },
     {
       "frame_idx": 121,
       "timestamp_s": 4.002857142857143,
-      "phase": "GRASP",
-      "confidence": 5.894383775739698e-06,
+      "phase": "RELEASE",
+      "confidence": 0.9998750686645508,
       "decision_source": "model"
     },
     {
       "frame_idx": 122,
       "timestamp_s": 4.036214285714286,
-      "phase": "GRASP",
-      "confidence": 1.2819460835089558e-06,
+      "phase": "RELEASE",
+      "confidence": 0.9999463558197021,
       "decision_source": "model"
     },
     {
       "frame_idx": 123,
       "timestamp_s": 4.069571428571429,
-      "phase": "GRASP",
-      "confidence": 7.300556603695441e-07,
+      "phase": "RELEASE",
+      "confidence": 0.9999513626098633,
       "decision_source": "model"
     },
     {
       "frame_idx": 124,
       "timestamp_s": 4.1029285714285715,
-      "phase": "GRASP",
-      "confidence": 1.4070354154682718e-05,
+      "phase": "RELEASE",
+      "confidence": 0.99974125623703,
       "decision_source": "model"
     },
     {
       "frame_idx": 125,
       "timestamp_s": 4.136285714285714,
-      "phase": "GRASP",
-      "confidence": 0.0020261257886886597,
+      "phase": "RELEASE",
+      "confidence": 0.7598820328712463,
       "decision_source": "model"
     },
     {
       "frame_idx": 126,
       "timestamp_s": 4.169642857142858,
-      "phase": "GRASP",
-      "confidence": 1.98072157218121e-05,
+      "phase": "IDLE",
+      "confidence": 0.983334481716156,
       "decision_source": "model"
     },
     {
       "frame_idx": 127,
       "timestamp_s": 4.203,
-      "phase": "GRASP",
-      "confidence": 7.461704853994888e-08,
+      "phase": "IDLE",
+      "confidence": 0.9998946189880371,
       "decision_source": "model"
     },
     {
       "frame_idx": 128,
       "timestamp_s": 4.236357142857143,
-      "phase": "GRASP",
-      "confidence": 5.377629452851806e-10,
+      "phase": "IDLE",
+      "confidence": 0.9999979734420776,
       "decision_source": "model"
     },
     {
       "frame_idx": 129,
       "timestamp_s": 4.269714285714286,
-      "phase": "GRASP",
-      "confidence": 1.6549185632985797e-11,
+      "phase": "IDLE",
+      "confidence": 0.9999998807907104,
       "decision_source": "model"
     },
     {
       "frame_idx": 130,
       "timestamp_s": 4.303071428571429,
-      "phase": "GRASP",
-      "confidence": 5.760077202536518e-13,
+      "phase": "IDLE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 131,
       "timestamp_s": 4.336428571428572,
-      "phase": "GRASP",
-      "confidence": 8.158957450626891e-13,
+      "phase": "IDLE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 132,
       "timestamp_s": 4.369785714285714,
-      "phase": "GRASP",
-      "confidence": 1.7079270289710458e-11,
+      "phase": "IDLE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 133,
       "timestamp_s": 4.403142857142857,
-      "phase": "GRASP",
-      "confidence": 3.5159161693165686e-10,
+      "phase": "IDLE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 134,
       "timestamp_s": 4.4365000000000006,
-      "phase": "GRASP",
-      "confidence": 5.482596598938017e-10,
+      "phase": "IDLE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 135,
       "timestamp_s": 4.469857142857143,
-      "phase": "GRASP",
-      "confidence": 5.739939079596468e-10,
+      "phase": "IDLE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 136,
       "timestamp_s": 4.503214285714286,
-      "phase": "GRASP",
-      "confidence": 6.5628980028265e-10,
+      "phase": "IDLE",
+      "confidence": 1.0,
       "decision_source": "model"
     },
     {
       "frame_idx": 137,
       "timestamp_s": 4.5365714285714285,
-      "phase": "GRASP",
-      "confidence": 2.2987316494749166e-09,
+      "phase": "IDLE",
+      "confidence": 0.999998927116394,
       "decision_source": "model"
     },
     {
       "frame_idx": 138,
       "timestamp_s": 4.569928571428572,
-      "phase": "GRASP",
-      "confidence": 2.6756390436588617e-09,
+      "phase": "IDLE",
+      "confidence": 0.9998997449874878,
       "decision_source": "model"
     },
     {
       "frame_idx": 139,
       "timestamp_s": 4.603285714285715,
-      "phase": "GRASP",
-      "confidence": 2.9556121439178185e-10,
+      "phase": "IDLE",
+      "confidence": 0.9999630451202393,
       "decision_source": "model"
     },
     {
       "frame_idx": 140,
       "timestamp_s": 4.636642857142857,
-      "phase": "GRASP",
-      "confidence": 5.247663414920112e-12,
+      "phase": "IDLE",
+      "confidence": 0.9999978542327881,
       "decision_source": "model"
     }
   ]

@@ -7,7 +7,9 @@
     "duration": 9.271648745519714,
     "catalog_fingerprint": "85407b9fabd71de6404a20183342162ec1363009453cee1f396616c7aa4ef8fa",
     "postprocessing_fingerprint": "bd1e4b2cead2f7ca767823601e6286416da28667e54b806cd27cd83ad8afafcf",
-    "tracking_coordinate_frame": "image_pixels"
+    "tracking_coordinate_frame": "image_pixels",
+    "tracking_frame_width_px": 1920,
+    "tracking_frame_height_px": 1080
   },
   "per_frame": [
     {
