@@ -4,6 +4,7 @@ data/processed/
 data/embeddings/
 data/tracks/
 *.mp4
+!results/IMG_2067/IMG_2067.mimic.mp4
 *.avi
 *.mov
 *.MOV
