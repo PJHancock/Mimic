@@ -13,7 +13,7 @@ The interactive dashboard provides:
 - 🎬 **Live Video Processing** — Watch videos flow through the complete pipeline in real-time
 - 📈 **Expandable Visualizations** — Inspect loss curves and detailed analysis
 - 🤖 **Execution Results** — See the robot simulation playback and movement tracking
-- ⚙️ **Interactive Controls** — Run your own videos through the pipeline
+- ⚙️ **Interactive Controls** — Run your own videos through the pipeline (if ran locally)
 
 **Run locally:**
 ```bash
