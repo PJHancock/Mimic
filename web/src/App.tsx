@@ -89,7 +89,7 @@ function Trajectory({ detail }: { detail: Detail }) {
   </div>
 }
 
-type FlowboxInfo = { title: string; technical: string; desc: string; skills: string[]; image?: string }
+type FlowboxInfo = { title: string; technical: string; desc: string; skills: string[]; image?: string; video?: string }
 
 const flowboxData: Record<string, FlowboxInfo> = {
   video: { title: '📹 VIDEO INPUT', technical: 'Raw video frames from human demonstrations', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['RGB-D data', 'Dataset inspection', 'Sensory inputs'] },
@@ -100,7 +100,7 @@ const flowboxData: Record<string, FlowboxInfo> = {
   audio: { title: '🎵 AUDIO INPUT', technical: 'Capture audio events and vocal cues corresponding to actions', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['Sensory data', 'Multimodal learning'] },
   labels: { title: '📊 LABELS', technical: 'Wav2vec + CTC decoder generates labels from audio automatically', desc: '"Analyze successful and failed robot trials to identify learnable patterns and production-relevant failure modes."', skills: ['Failure analysis', 'Pattern recognition', 'Data debugging'] },
   probs: { title: '📤 PROBABILITIES', technical: 'Output confidence scores for each predicted skill/phase', desc: '"Present clear technical findings, including what worked, what failed, and what should be tested next."', skills: ['Model evaluation', 'Confidence scoring', 'Technical analysis'] },
-  postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', desc: 'Filter predictions and generate skill sequence graph from state probabilities. Smooth temporal sequences and extract transition patterns for task planning.', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'] },
+  postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', desc: 'Filter predictions and generate skill sequence graph from state probabilities. Smooth temporal sequences and extract transition patterns for task planning.', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'], video: '/artifacts/results/IMG_2013_final/visualization/sidebyside.mp4' },
   taskext: { title: '🎯 TASK EXTRACTION', technical: 'Combine skill graph and object coordinates to extract task primitives', desc: 'Extract task-level actions from skill predictions and object coordinates. Decompose complex manipulation tasks into executable skill sequences.', skills: ['Task decomposition', 'Action sequencing', 'Coordinate integration'] },
   pathproc: { title: '🛤️ PATH PROCESSING', technical: 'Convert task sequences and coordinates into robot waypoint trajectories', desc: 'Convert skill sequences to robot waypoints and trajectories', skills: ['Trajectory planning', 'Path optimization', 'Collision avoidance'] },
   skillexp: { title: '⚙️ SKILL EXPANDER', technical: 'Expand abstract skills into parametrized motion primitives and sub-skills', desc: 'Expand abstract skills into detailed motion primitives', skills: ['Motion planning', 'Skill libraries', 'Parameter tuning'] },
@@ -119,6 +119,14 @@ function FlowboxModal({ info, onClose }: { info: FlowboxInfo | null; onClose: ()
         <div className="panel-content">
           <div className="flowbox-modal-technical">{info.technical}</div>
           <div className="flowbox-modal-desc">{info.desc}</div>
+          {info.video && (
+            <video
+              src={info.video}
+              controls
+              controlsList="nodownload"
+              style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px', backgroundColor: '#000' }}
+            />
+          )}
           {info.image && <img src={info.image} alt={info.title} style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px' }} />}
           <div className="flowbox-modal-skills">
             {info.skills.map((skill) => <span key={skill} className="skill-badge">{skill}</span>)}
@@ -232,10 +240,10 @@ export default function App() {
         <div className="job-title">🤖 Anyware Robotics · Robot Learning Intern</div>
         <div className="job-company">Manipulation Policy Learning · Fall 2026 · Fremont, CA</div>
         <div className="job-description">
-          <strong>About Anyware Robotics:</strong> We build general-purpose mobile manipulator robots for industrial applications, deployed in real warehouse and logistics environments supporting truck unloading, mobile palletizing, and machine tending.
+          <strong>About Anyware Robotics:</strong> Anyware Robotics builds general-purpose mobile manipulator robots for industrial applications, deployed in real warehouse and logistics environments supporting truck unloading, mobile palletizing, and machine tending.
           <br /><br />
           <strong>The Role:</strong> Work on applied manipulation learning using real robot data collected from production and in-house operations. Take a scoped robot learning problem from data understanding to model training, evaluation, and technical recommendation. Example directions include vision-language-action models, imitation learning, diffusion policies, action prediction, failure-mode analysis, or policy evaluation using multimodal robot data.
-          <br /><br />
+          <br /><br /><br />
           <strong>What You'll Do:</strong>
           <ul>
             <li>Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes</li>
@@ -245,9 +253,16 @@ export default function App() {
             <li>Analyze successful and failed robot trials to identify learnable patterns and production-relevant failure modes</li>
             <li>Collaborate with planning, perception, and controls engineers</li>
           </ul>
-          <strong>Required Skills:</strong> MS/PhD in robotics or ML · Experience with robot learning, imitation learning, diffusion policies, or visuomotor policy learning · Strong Python + PyTorch/JAX · Strong data debugging and failure analysis · Familiarity with ROS, RGB-D data, point clouds, or robot kinematics
-          <br /><br />
-          <strong>What We Did:</strong> Built a complete imitation learning pipeline that processes real robot demonstrations through computer vision, temporal modeling, and learned policy execution. The system extracts visual embeddings using V-JEPA, predicts manipulation skills with LSTM classifiers, and executes actions in MuJoCo simulation with inverse kinematics and joint control.
+          <strong>Required Skills:</strong>
+          <ul style={{marginTop: '8px', marginBottom: '8px'}}>
+            <li>MS/PhD in robotics or machine learning</li>
+            <li>Experience with imitation learning, diffusion policies, or visuomotor policy learning</li>
+            <li>Strong Python + PyTorch/JAX programming skills</li>
+            <li>Data debugging and failure analysis</li>
+            <li>Familiarity with ROS, RGB-D data, point clouds, or robot kinematics</li>
+          </ul>
+          <br />
+          <strong>What We Did:</strong> We trained a model and built a system that learns robot skills from human demonstrations. The system uses computer vision to understand human actions, predicts the individual manipulation subskills being performed, and chains these inferred subskills together to execute new robot manipulation tasks.
         </div>
       </div>
 

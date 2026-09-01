@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Video Test</title>
+  <style>
+    body { font-family: Arial; margin: 20px; background: #1a1a1a; color: #ccc; }
+    video { max-width: 100%; border: 1px solid #444; }
+    .info { margin: 20px 0; padding: 10px; background: #2a2a2a; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Video Test</h1>
+  <div class="info">
+    <p>Testing sidebyside.mp4 from /public directory</p>
+    <p>Video size: ~35MB, MP4 format</p>
+  </div>
+
+  <h2>Test 1: Video from /public directory</h2>
+  <video controls width="100%" style="max-width: 600px;">
+    <source src="/sidebyside.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <h2>Test 2: Video from /artifacts API</h2>
+  <video controls width="100%" style="max-width: 600px;">
+    <source src="/artifacts/results/IMG_2013_final/visualization/sidebyside.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+  <div class="info">
+    <p>If you see a video player above with controls and can play the video, the issue is with the React component.</p>
+    <p>Check the browser console for any errors.</p>
+  </div>
+</body>
+</html>
