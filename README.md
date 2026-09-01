@@ -6,7 +6,7 @@ A system that learns robot manipulation skills from human video demonstrations a
 
 ## 🌐 Interactive Dashboard
 
-**[View the Live Dashboard](https://pjhancock.github.io/Mimic/)** ← Start here to explore the project!
+**[View the Live Dashboard](https://pjhancock.github.io/Mimic/)** ← Start here to explore and learn more about the project!
 
 The interactive dashboard provides:
 - 📊 **Visual Pipeline** — Click through each stage to see what the system is doing
