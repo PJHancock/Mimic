@@ -134,6 +134,26 @@ for the fixed diagnostic fixture. These entry points require explicit arguments,
 not the general default config. See [Robot Execution](../docs/ROBOT_EXECUTION.md)
 for unresolved general configuration and the successful fixed-fixture result.
 
+### Existing JSON to robot waypoints
+
+Use the integration runner when inference and tracking JSON already exist:
+
+```bash
+uv run python integration/run_robot_pipeline.py \
+  --actions results/demo/demo_robot_actions.json \
+  --results results/demo/demo_results.json \
+  --calibration data/annotations/calibrations.json \
+  --pipeline-config path/to/experiment_robot_pipeline.yaml \
+  --waypoints results/demo/demo_world_waypoints.json
+```
+
+The runner validates action/catalog provenance, applies the saved pixel-to-table
+homography, verifies that the calibrated table dimensions match the tabletop
+clone, extracts one complete episode, retargets it using `configs/retargeting.yaml`,
+and invokes the configured path processor and waypoint builder. Add
+`--robot-config ... --log ...` to run the simulator. If multiple complete episodes
+exist, select one explicitly with `--episode N`.
+
 ## Utilities
 
 ### explore_data.py

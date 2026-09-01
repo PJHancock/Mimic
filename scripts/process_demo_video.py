@@ -24,7 +24,9 @@ Usage:
     uv run python scripts/process_demo_video.py \\
         --video new_demo.mov \\
         --model models/action_classifier_lstm.pt \\
-        --config config.yaml \\
+        --config path/to/experiment_robot.yaml \\
+        --calibration data/annotations/calibrations.json \\
+        --robot-pipeline-config path/to/experiment_robot_pipeline.yaml \\
         --output results/new_demo/ \\
         --simulate-robot
 
@@ -50,10 +52,12 @@ from tqdm import tqdm
 from mimic.common.types import PickPlaceWaypoints
 from mimic.integration import (
     RobotActionResults,
+    build_robot_pipeline,
     build_action_inference_artifacts,
     checkpoint_sha256,
     load_skill_system,
     predictions_from_probabilities,
+    write_world_waypoints,
     write_results,
 )
 from mimic.vision import VJepaEncoder
@@ -341,6 +345,19 @@ def combine_results(tracks_data: dict, actions_data: RobotActionResults) -> dict
 
     print(f"   ✓ Combined {num_frames} frames")
 
+    object_tracks = [
+        {
+            "frame_idx": position["frame"] + 1,
+            "timestamp_s": position["time"],
+            "position": {
+                "x": position["x"],
+                "y": position["y"],
+                "confidence": position["confidence"],
+            },
+        }
+        for position in tracks_data["positions"]
+    ]
+
     return {
         "schema": "mimic.demo_results.v2",
         "metadata": {
@@ -353,6 +370,8 @@ def combine_results(tracks_data: dict, actions_data: RobotActionResults) -> dict
             "tracking_coordinate_frame": "image_pixels",
         },
         "per_frame": combined_frames,
+        # Preserve tracker-native samples independently of sparse classifier frames.
+        "object_tracks": object_tracks,
         "action_segments": _accepted_action_segments(actions_data),
         "tracking_summary": {
             "total_positions": sum(1 for p in tracks_data["positions"] if p["x"] is not None),
@@ -361,33 +380,9 @@ def combine_results(tracks_data: dict, actions_data: RobotActionResults) -> dict
     }
 
 
-def generate_default_waypoints() -> dict:
-    """Generate default pick-place waypoints for robot simulation.
-
-    These are placeholder waypoints that should be replaced with
-    actual values inferred from tracking data or learned from demonstration.
-
-    Returns:
-        Dict with waypoint format for robot simulation
-    """
-    return {
-        "approach": {"position": [0.5, 0.0, 0.4], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-        "grasp": {"position": [0.5, 0.0, 0.1], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-        "lift": {"position": [0.5, 0.0, 0.3], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-        "lower": {"position": [0.6, 0.1, 0.1], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-        "retreat": {"position": [0.6, 0.1, 0.4], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-        "path": [
-            {"position": [0.52, 0.02, 0.25], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-            {"position": [0.54, 0.04, 0.25], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-            {"position": [0.58, 0.08, 0.2], "quaternion_wxyz": [1.0, 0.0, 0.0, 0.0]},
-        ],
-        "goal_position": [0.6, 0.1, 0.0],
-    }
-
-
 def run_robot_simulation(
     config_path: str,
-    waypoints: dict,
+    waypoints: PickPlaceWaypoints,
     output_dir: Path,
     video_stem: str,
 ) -> dict:
@@ -395,7 +390,7 @@ def run_robot_simulation(
 
     Args:
         config_path: Path to robot execution config
-        waypoints: Dict with pick-place waypoints
+        waypoints: Validated world-space pick-place waypoints
         output_dir: Directory to save simulation results
         video_stem: Stem of video file for naming outputs
 
@@ -425,8 +420,7 @@ def run_robot_simulation(
         executor = build_executor(config_path_obj, record_event)
         print(f"   ✓ Executor built from config: {config_path}")
 
-        # Convert waypoints dict to the expected format and run
-        report = executor.run(PickPlaceWaypoints(**waypoints))
+        report = executor.run(waypoints)
 
         # Save execution log
         with open(log_file, "w") as f:
@@ -486,6 +480,27 @@ def main():
         help="Path to robot execution config (required for --simulate-robot)",
     )
     parser.add_argument(
+        "--calibration",
+        type=str,
+        help="Camera homography JSON (required for --simulate-robot)",
+    )
+    parser.add_argument(
+        "--retargeting-config",
+        type=str,
+        default="configs/retargeting.yaml",
+        help="Table-to-MuJoCo mapping and tabletop clone YAML",
+    )
+    parser.add_argument(
+        "--robot-pipeline-config",
+        type=str,
+        help="Explicit path and waypoint construction YAML (required for --simulate-robot)",
+    )
+    parser.add_argument(
+        "--episode",
+        type=int,
+        help="One-based complete episode to simulate when multiple are present",
+    )
+    parser.add_argument(
         "--skill-config",
         type=str,
         default="configs/skills/pick_place.yaml",
@@ -519,9 +534,23 @@ def main():
     output_dir = Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    if args.simulate_robot and not args.config:
-        print("ERROR: --config is required when using --simulate-robot")
-        return 1
+    if args.simulate_robot:
+        required_robot_inputs = {
+            "--config": args.config,
+            "--calibration": args.calibration,
+            "--robot-pipeline-config": args.robot_pipeline_config,
+        }
+        missing = [name for name, value in required_robot_inputs.items() if not value]
+        if missing:
+            print(f"ERROR: {', '.join(missing)} required when using --simulate-robot")
+            return 1
+        for name, value in {
+            **required_robot_inputs,
+            "--retargeting-config": args.retargeting_config,
+        }.items():
+            if not Path(value).is_file():
+                print(f"ERROR: {name} file not found: {value}")
+                return 1
 
     print("\n" + "=" * 70)
     print("DEMO VIDEO PROCESSING PIPELINE")
@@ -566,15 +595,34 @@ def main():
         # Run robot simulation if requested
         simulation_result = None
         if args.simulate_robot:
-            waypoints = generate_default_waypoints()
+            robot_artifacts = build_robot_pipeline(
+                actions_source=actions_data.robot_actions.model_dump(mode="json"),
+                results_source=results,
+                calibration_source=args.calibration,
+                retargeting_source=args.retargeting_config,
+                pipeline_config_source=args.robot_pipeline_config,
+                episode=args.episode,
+            )
+            world_waypoints_file = output_dir / f"{video_path.stem}_world_waypoints.json"
+            write_world_waypoints(
+                world_waypoints_file,
+                robot_artifacts.waypoints,
+                overwrite=True,
+            )
+            print(f"   ✓ World waypoints: {world_waypoints_file}")
             simulation_result = run_robot_simulation(
                 args.config,
-                waypoints,
+                robot_artifacts.waypoints,
                 output_dir,
                 video_path.stem,
             )
 
             # Add simulation result to output
+            results["robot_pipeline"] = {
+                "selected_episode": robot_artifacts.selected_episode,
+                "episode_count": robot_artifacts.episode_count,
+                "world_waypoints": str(world_waypoints_file),
+            }
             results["simulation"] = simulation_result
 
             # Save updated results with simulation

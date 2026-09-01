@@ -69,6 +69,23 @@ uv run --group robot python scripts/simulate_robot.py \
   --log outputs/robot_attempt.jsonl
 ```
 
+To build those world waypoints from existing postprocessed actions and pixel
+tracking results without rerunning video inference:
+
+```bash
+uv run mimic-robot-pipeline \
+  --actions results/demo/demo_robot_actions.json \
+  --results results/demo/demo_results.json \
+  --calibration data/annotations/calibrations.json \
+  --pipeline-config path/to/experiment_robot_pipeline.yaml \
+  --waypoints results/demo/demo_world_waypoints.json
+```
+
+Add `--robot-config path/to/experiment_robot.yaml --log outputs/robot_attempt.jsonl`
+to execute the generated waypoints immediately. The committed
+`configs/robot_pipeline.yaml` is a fail-closed template: copy it and explicitly
+set the scene's world-Z coordinates and fixed tool quaternion before use.
+
 Requires explicit scene/tool geometry and acceptance criteria; the Panda config is
 an unconfigured template. See [Robot Execution](docs/ROBOT_EXECUTION.md) for setup,
 interfaces, tests, and the retained simulation limit-check failure.

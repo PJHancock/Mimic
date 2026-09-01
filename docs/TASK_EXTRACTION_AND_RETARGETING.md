@@ -263,6 +263,46 @@ path-processing option.
 The package exposes extraction/retargeting without importing MuJoCo, Mink, or
 Torch. Existing execution exports load their dependencies only when requested.
 
+## Saved-results integration
+
+`mimic.integration.build_robot_pipeline` connects the committed offline contracts
+without rerunning perception:
+
+```text
+mimic.robot_actions.v1 + mimic.demo_results.v2 image pixels + calibration homography
+  -> ObjectTrack(table_xy_m)
+  -> ExtractedTask
+  -> RetargetedTask
+  -> ProcessedPath
+  -> PickPlaceWaypoints
+```
+
+The adapter verifies that classifier catalog and post-processing fingerprints
+match the combined results, and that calibration table dimensions match the
+configured MuJoCo tabletop clone. Missing pixel detections remain missing; exact
+GRASP and RELEASE observations are still required by task extraction. With more
+than one complete episode, the caller must explicitly select a one-based episode.
+New `mimic.demo_results.v2` files preserve tracker-native observations in
+`object_tracks`, independently of potentially sparse classifier `per_frame`
+records. The loader falls back to `per_frame` for existing v2 files.
+
+The command-line entry point writes the existing executor JSON contract:
+
+```bash
+uv run mimic-robot-pipeline \
+  --actions results/demo/demo_robot_actions.json \
+  --results results/demo/demo_results.json \
+  --calibration data/annotations/calibrations.json \
+  --retargeting-config configs/retargeting.yaml \
+  --pipeline-config path/to/experiment_robot_pipeline.yaml \
+  --waypoints results/demo/demo_world_waypoints.json
+```
+
+Supplying `--robot-config` and a new `--log` path invokes the existing headless
+MuJoCo executor after waypoint generation. `configs/robot_pipeline.yaml` is only
+a contract template: its unresolved world-Z and orientation values deliberately
+fail validation rather than deriving grasp geometry from a robot model.
+
 ## Verification
 
 ```bash

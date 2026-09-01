@@ -54,8 +54,30 @@ def test_simulation_requires_and_forwards_robot_config(tmp_path: Path) -> None:
         build_pipeline_command(**base)
 
     robot_config = tmp_path / "robot.yaml"
-    command = build_pipeline_command(**base, robot_config=robot_config)
-    assert command[-3:] == ("--config", str(robot_config), "--simulate-robot")
+    calibration = tmp_path / "calibration.json"
+    retargeting_config = tmp_path / "retargeting.yaml"
+    robot_pipeline_config = tmp_path / "robot_pipeline.yaml"
+    command = build_pipeline_command(
+        **base,
+        robot_config=robot_config,
+        calibration=calibration,
+        retargeting_config=retargeting_config,
+        robot_pipeline_config=robot_pipeline_config,
+        episode=2,
+    )
+    assert command[-11:] == (
+        "--config",
+        str(robot_config),
+        "--calibration",
+        str(calibration),
+        "--retargeting-config",
+        str(retargeting_config),
+        "--robot-pipeline-config",
+        str(robot_pipeline_config),
+        "--episode",
+        "2",
+        "--simulate-robot",
+    )
 
 
 def test_main_preflights_and_runs_existing_pipeline(

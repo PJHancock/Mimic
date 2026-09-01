@@ -36,12 +36,24 @@ def build_pipeline_command(
     context_window: int,
     simulate_robot: bool = False,
     robot_config: Optional[Path] = None,
+    calibration: Optional[Path] = None,
+    retargeting_config: Optional[Path] = None,
+    robot_pipeline_config: Optional[Path] = None,
+    episode: Optional[int] = None,
 ) -> Tuple[str, ...]:
     """Build the subprocess argument vector without invoking a shell."""
     if context_window < 0:
         raise ValueError("context_window must be nonnegative")
-    if simulate_robot and robot_config is None:
-        raise ValueError("robot_config is required when simulate_robot is enabled")
+    if simulate_robot and any(
+        value is None
+        for value in (robot_config, calibration, retargeting_config, robot_pipeline_config)
+    ):
+        raise ValueError(
+            "robot_config, calibration, retargeting_config, and robot_pipeline_config "
+            "are required when simulate_robot is enabled"
+        )
+    if episode is not None and episode < 1:
+        raise ValueError("episode must be a positive one-based integer")
 
     command = [
         python_executable,
@@ -60,7 +72,21 @@ def build_pipeline_command(
         str(context_window),
     ]
     if simulate_robot:
-        command.extend(("--config", str(robot_config), "--simulate-robot"))
+        command.extend(
+            (
+                "--config",
+                str(robot_config),
+                "--calibration",
+                str(calibration),
+                "--retargeting-config",
+                str(retargeting_config),
+                "--robot-pipeline-config",
+                str(robot_pipeline_config),
+            )
+        )
+        if episode is not None:
+            command.extend(("--episode", str(episode)))
+        command.append("--simulate-robot")
     return tuple(command)
 
 
@@ -100,13 +126,33 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--simulate-robot",
         action="store_true",
-        help="Also invoke the existing optional MuJoCo execution stage",
+        help="Build calibrated world waypoints and invoke MuJoCo execution",
     )
     parser.add_argument(
         "--robot-config",
         type=Path,
         default=None,
         help="Robot execution YAML required with --simulate-robot",
+    )
+    parser.add_argument(
+        "--calibration",
+        type=Path,
+        help="Camera homography JSON required with --simulate-robot",
+    )
+    parser.add_argument(
+        "--retargeting-config",
+        type=Path,
+        help="Table-to-world YAML; defaults to configs/retargeting.yaml",
+    )
+    parser.add_argument(
+        "--robot-pipeline-config",
+        type=Path,
+        help="Explicit path/waypoint YAML required with --simulate-robot",
+    )
+    parser.add_argument(
+        "--episode",
+        type=int,
+        help="One-based complete episode to simulate when multiple are present",
     )
     parser.add_argument(
         "--dry-run",
@@ -151,18 +197,52 @@ def main(
     robot_config = (
         (caller_directory / args.robot_config).resolve() if args.robot_config is not None else None
     )
+    calibration = (
+        (caller_directory / args.calibration).resolve() if args.calibration is not None else None
+    )
+    retargeting_config = (
+        (caller_directory / args.retargeting_config).resolve()
+        if args.retargeting_config is not None
+        else root / "configs" / "retargeting.yaml"
+    )
+    robot_pipeline_config = (
+        (caller_directory / args.robot_pipeline_config).resolve()
+        if args.robot_pipeline_config is not None
+        else None
+    )
 
-    required_files = (
+    required_files: Tuple[Tuple[Path, str], ...] = (
         (video, "Input video"),
         (model, "Classifier checkpoint"),
         (skill_config, "Skill configuration"),
         (pipeline_script, "Pipeline script"),
     )
     if args.simulate_robot:
-        if robot_config is None:
-            print("ERROR: --robot-config is required with --simulate-robot", file=sys.stderr)
+        missing = [
+            name
+            for name, value in (
+                ("--robot-config", robot_config),
+                ("--calibration", calibration),
+                ("--robot-pipeline-config", robot_pipeline_config),
+            )
+            if value is None
+        ]
+        if missing:
+            print(
+                f"ERROR: {', '.join(missing)} required with --simulate-robot",
+                file=sys.stderr,
+            )
             return 2
-        required_files = (*required_files, (robot_config, "Robot configuration"))
+        assert robot_config is not None
+        assert calibration is not None
+        assert robot_pipeline_config is not None
+        required_files = (
+            *required_files,
+            (robot_config, "Robot configuration"),
+            (calibration, "Camera calibration"),
+            (retargeting_config, "Retargeting configuration"),
+            (robot_pipeline_config, "Robot pipeline configuration"),
+        )
 
     for path, description in required_files:
         error = _existing_file(path, description)
@@ -187,6 +267,10 @@ def main(
         context_window=args.context_window,
         simulate_robot=args.simulate_robot,
         robot_config=robot_config,
+        calibration=calibration,
+        retargeting_config=retargeting_config,
+        robot_pipeline_config=robot_pipeline_config,
+        episode=args.episode,
     )
     print(f"Running: {shlex.join(command)}")
     if args.dry_run:

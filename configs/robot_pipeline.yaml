@@ -1,0 +1,16 @@
+# Contract template for saved-results -> world-waypoint construction.
+# Path selection is explicit. World Z coordinates and the fixed tool orientation
+# remain unresolved experiment settings and deliberately fail validation until an
+# experiment copies this file and replaces every null.
+robot_pipeline:
+  path_processing:
+    interpolation: direct
+  waypoint_construction:
+    approach_z_m: null
+    grasp_z_m: null
+    lift_z_m: null
+    transport_z_m: null
+    lower_z_m: null
+    retreat_z_m: null
+    object_goal_z_m: null
+    tool_quaternion_wxyz: null

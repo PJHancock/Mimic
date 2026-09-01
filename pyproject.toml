@@ -85,6 +85,7 @@ Issues = "https://github.com/yourusername/Mimic/issues"
 
 [project.scripts]
 mimic-video-pipeline = "mimic.integration.run_video_pipeline:main"
+mimic-robot-pipeline = "mimic.integration.robot_pipeline:main"
 
 [tool.uv.dependency-groups]
 robot = {requires-python = ">=3.10"}
