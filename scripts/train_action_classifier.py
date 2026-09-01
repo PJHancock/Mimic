@@ -25,6 +25,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 from mimic.vision.action_classifier import ActionClassifier
 
@@ -141,6 +142,49 @@ def compute_label_weights(all_labels):
     weights = weights / weights.sum()  # Normalize
 
     return torch.from_numpy(weights).float()
+
+
+def plot_training_curves(train_losses, val_losses, val_accs, output_dir):
+    """Plot training and validation curves.
+
+    Args:
+        train_losses: List of training losses per epoch
+        val_losses: List of validation losses per epoch
+        val_accs: List of validation accuracies per epoch
+        output_dir: Directory to save plot
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+    epochs = np.arange(1, len(train_losses) + 1)
+
+    # Plot 1: Loss curves
+    ax1.plot(epochs, train_losses, "b-", label="Training loss", linewidth=2)
+    ax1.plot(epochs, val_losses, "r-", label="Validation loss", linewidth=2)
+    ax1.set_xlabel("Epoch")
+    ax1.set_ylabel("Loss")
+    ax1.set_title("Training and Validation Loss")
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Plot 2: Validation accuracy
+    ax2.plot(epochs, val_accs, "g-", linewidth=2)
+    best_epoch = np.argmax(val_accs) + 1
+    best_acc = np.max(val_accs)
+    ax2.scatter([best_epoch], [best_acc], color="red", s=100, zorder=5, label=f"Best: {best_acc:.1%} (epoch {best_epoch})")
+    ax2.set_xlabel("Epoch")
+    ax2.set_ylabel("Accuracy")
+    ax2.set_title("Validation Accuracy")
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+
+    # Save plot
+    output_path = Path(output_dir) / "training_curves.png"
+    plt.savefig(output_path, dpi=100, bbox_inches="tight")
+    print(f"  ✓ Saved plot to: {output_path}")
+
+    plt.close()
 
 
 def train_epoch(model, classifier, train_loader, device):
@@ -325,9 +369,18 @@ def main():
     best_val_acc = 0.0
     best_epoch = 0
 
+    # Track losses and accuracies for plotting
+    train_losses = []
+    val_losses = []
+    val_accs = []
+
     for epoch in range(args.epochs):
         train_loss = train_epoch(classifier.model, classifier, train_loader, device)
         val_acc, val_loss = evaluate_epoch(classifier.model, val_loader, device)
+
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
+        val_accs.append(val_acc)
 
         if val_acc > best_val_acc:
             best_val_acc = val_acc
@@ -348,6 +401,10 @@ def main():
     model_path = output_dir / args.model_name
     classifier.save(str(model_path))
     print(f"  Saved to: {model_path}")
+
+    # Plot training curves
+    print("\n7. Plotting training curves...")
+    plot_training_curves(train_losses, val_losses, val_accs, output_dir)
 
     # Save training config
     config = {
@@ -375,7 +432,7 @@ def main():
 
     # Final summary
     print("\n" + "=" * 70)
-    print("✓ TRAINING COMPLETE")
+    print("✓ TRAINING COMPLETE!")
     print("=" * 70)
     print(f"\nModel: {model_path}")
     print(f"Best validation accuracy: {best_val_acc:.1%} (epoch {best_epoch})")
