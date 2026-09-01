@@ -81,13 +81,13 @@ class ActionClassifierLSTM(nn.Module):
 
     Action classes:
         0: IDLE (no action, waiting)
-        1: APPROACH (moving towards object)
+        1: MOVE (moving towards object)
         2: GRASP (grasping object)
-        3: MOVE (moving with object)
+        3: CARRY (moving with object)
         4: RELEASE (releasing object)
 
     Learns temporal patterns and action transitions:
-    - Models IDLE → APPROACH → GRASP → MOVE → RELEASE sequence
+    - Models IDLE → MOVE → GRASP → CARRY → RELEASE sequence
     - Uses bidirectional context (past and future frames)
     - Better for continuous action sequences
     """
