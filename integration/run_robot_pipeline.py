@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run saved Mimic JSON artifacts through waypoint generation and simulation."""
+"""Run a consolidated Mimic task input through waypoints and simulation."""
 
 from mimic.integration.robot_pipeline import main
 

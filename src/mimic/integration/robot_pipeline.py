@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 import sys
 from dataclasses import asdict, dataclass
@@ -15,14 +16,19 @@ import numpy as np
 import yaml
 
 from mimic.common.types import ExtractedTask, ObjectTrack, PickPlaceWaypoints, RetargetedTask
-from mimic.integration.action_results import RobotActionResults, load_robot_actions
+from mimic.integration.task_input import (
+    DemoTaskInput,
+    DemoVideoMetadata,
+    load_demo_task_input,
+    load_task_actions,
+)
 from mimic.robot import build_waypoints, extract_tasks, process_path, retarget_task
 from mimic.robot.path_processing import ProcessedPath
 from mimic.tracking.coordinate_mapping import CoordinateMapper
 
-_DEMO_RESULTS_SCHEMA = "mimic.demo_results.v2"
-_JSON_SOURCE = Union[str, Path, Mapping[str, Any]]
+_JSON_SOURCE = Union[str, Path, Mapping[str, Any], DemoTaskInput]
 _YAML_SOURCE = Union[str, Path, Mapping[str, Any]]
+_TIMESTAMPED_VIDEO = object()
 
 
 @dataclass(frozen=True)
@@ -58,21 +64,6 @@ def _load_yaml(source: _YAML_SOURCE, description: str) -> dict:
     return payload
 
 
-def _strict_positive_frame(value: object) -> int:
-    if isinstance(value, bool) or not isinstance(value, Integral) or value < 1:
-        raise ValueError("tracking frame_idx must be a positive one-based integer")
-    return int(value)
-
-
-def _strict_probability(value: object) -> float:
-    if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
-        raise ValueError("tracking confidence must be a finite probability")
-    result = float(value)
-    if not np.isfinite(result) or not 0 <= result <= 1:
-        raise ValueError("tracking confidence must be a finite probability")
-    return result
-
-
 def _strict_positive_length(value: object, name: str) -> float:
     if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
         raise ValueError(f"{name} must be a finite positive number of meters")
@@ -82,10 +73,20 @@ def _strict_positive_length(value: object, name: str) -> float:
     return result
 
 
+def _strict_positive_pixel_count(value: object, name: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, Integral) or value < 1:
+        raise ValueError(f"{name} must be a positive integer pixel count")
+    return int(value)
+
+
 def _coordinate_mapper(calibration_source: _JSON_SOURCE) -> CoordinateMapper:
     payload = _load_json(calibration_source, "Calibration")
     width_m = _strict_positive_length(payload.get("table_width_m"), "table_width_m")
     height_m = _strict_positive_length(payload.get("table_height_m"), "table_height_m")
+    image_width_px = _strict_positive_pixel_count(payload.get("image_width_px"), "image_width_px")
+    image_height_px = _strict_positive_pixel_count(
+        payload.get("image_height_px"), "image_height_px"
+    )
     homography = np.asarray(payload.get("homography"))
     if homography.shape != (3, 3) or not np.issubdtype(homography.dtype, np.number):
         raise ValueError("Calibration homography must be a numeric 3x3 matrix")
@@ -93,82 +94,64 @@ def _coordinate_mapper(calibration_source: _JSON_SOURCE) -> CoordinateMapper:
     if not np.all(np.isfinite(homography)) or np.linalg.matrix_rank(homography) != 3:
         raise ValueError("Calibration homography must be finite and nonsingular")
     mapper = CoordinateMapper(width_m, height_m)
+    mapper.image_width_px = image_width_px
+    mapper.image_height_px = image_height_px
     mapper.homography = homography
     mapper.is_calibrated = True
     return mapper
 
 
-def _demo_metadata(payload: Mapping[str, Any]) -> Mapping[str, Any]:
-    if payload.get("schema") != _DEMO_RESULTS_SCHEMA:
-        raise ValueError(f"Tracking input requires schema {_DEMO_RESULTS_SCHEMA}")
-    metadata = payload.get("metadata")
-    if not isinstance(metadata, Mapping):
-        raise ValueError("Demo results metadata must be a mapping")
-    if metadata.get("tracking_coordinate_frame") != "image_pixels":
-        raise ValueError("Demo results must explicitly declare image-pixel tracking")
-    return metadata
+def _validate_calibration_frame(metadata: DemoVideoMetadata, mapper: CoordinateMapper) -> None:
+    tracking_size = (
+        metadata.image_width_px,
+        metadata.image_height_px,
+    )
+    calibration_size = (mapper.image_width_px, mapper.image_height_px)
+    if tracking_size != calibration_size:
+        raise ValueError(
+            "Tracking and calibration image dimensions differ; check video rotation "
+            "and resolution"
+        )
 
 
 def load_calibrated_object_tracks(
-    results_source: _JSON_SOURCE,
+    task_input_source: _JSON_SOURCE,
     calibration_source: _JSON_SOURCE,
 ) -> Tuple[ObjectTrack, ...]:
     """Load saved image-pixel observations and map them into table meters."""
 
-    payload = _load_json(results_source, "Demo results")
-    _demo_metadata(payload)
+    task_input = load_demo_task_input(task_input_source)
     mapper = _coordinate_mapper(calibration_source)
-    return _calibrated_tracks_from_payload(payload, mapper)
+    _validate_calibration_frame(task_input.video, mapper)
+    return _calibrated_tracks_from_task_input(task_input, mapper)
 
 
-def _calibrated_tracks_from_payload(
-    payload: Mapping[str, Any], mapper: CoordinateMapper
+def _calibrated_tracks_from_task_input(
+    task_input: DemoTaskInput, mapper: CoordinateMapper
 ) -> Tuple[ObjectTrack, ...]:
-    # New results preserve the complete tracker-native stream separately from
-    # potentially sparse classifier frames. Fall back for existing v2 artifacts.
-    frames = payload.get("object_tracks", payload.get("per_frame"))
-    if not isinstance(frames, list) or not frames:
-        raise ValueError("Demo results object_tracks/per_frame must be a nonempty list")
-
+    if mapper.image_width_px is None or mapper.image_height_px is None:
+        raise ValueError("Calibration requires its decoded image width and height")
+    image_width_px, image_height_px = mapper.image_width_px, mapper.image_height_px
     tracks = []
-    previous_frame = 0
-    for frame in frames:
-        if not isinstance(frame, Mapping):
-            raise ValueError("Each demo result frame must be a mapping")
-        frame_idx = _strict_positive_frame(frame.get("frame_idx"))
-        if frame_idx <= previous_frame:
-            raise ValueError("Tracking frame_idx values must be unique and increasing")
-        previous_frame = frame_idx
-        position = frame.get("position")
+    for frame in task_input.object_tracks:
+        position = frame.position
         if position is None:
             continue
-        if not isinstance(position, Mapping):
-            raise ValueError("Tracking position must be a mapping or null")
-        pixel_x, pixel_y = position.get("x"), position.get("y")
-        if pixel_x is None and pixel_y is None:
-            continue
-        if (
-            pixel_x is None
-            or pixel_y is None
-            or isinstance(pixel_x, (bool, np.bool_))
-            or isinstance(pixel_y, (bool, np.bool_))
-            or not isinstance(pixel_x, Real)
-            or not isinstance(pixel_y, Real)
-        ):
-            raise ValueError("Tracking x and y must both be finite pixel coordinates or null")
-        pixel_xy = (float(pixel_x), float(pixel_y))
-        if not np.all(np.isfinite(pixel_xy)):
-            raise ValueError("Tracking x and y must both be finite pixel coordinates or null")
-        confidence = _strict_probability(position.get("confidence"))
+        pixel_xy = (position.x, position.y)
+        if not (0 <= pixel_xy[0] < image_width_px and 0 <= pixel_xy[1] < image_height_px):
+            raise ValueError(
+                "Tracking pixel coordinate is outside the calibrated image frame; "
+                "check video rotation and resolution"
+            )
         tracks.append(
             ObjectTrack(
-                frame_idx=frame_idx,
+                frame_idx=frame.frame_idx,
                 table_xy_m=mapper.pixel_to_table_xy_m(pixel_xy),
-                confidence=confidence,
+                confidence=position.confidence,
             )
         )
     if not tracks:
-        raise ValueError("Demo results contain no valid object observations")
+        raise ValueError("Demo task input contains no valid object observations")
     return tuple(tracks)
 
 
@@ -188,8 +171,7 @@ def _validate_table_clone(mapper: CoordinateMapper, retargeting_payload: Mapping
 
 def build_robot_pipeline(
     *,
-    actions_source: _JSON_SOURCE,
-    results_source: _JSON_SOURCE,
+    task_input_source: _JSON_SOURCE,
     calibration_source: _JSON_SOURCE,
     retargeting_source: _YAML_SOURCE,
     pipeline_config_source: _YAML_SOURCE,
@@ -197,30 +179,21 @@ def build_robot_pipeline(
 ) -> RobotPipelineArtifacts:
     """Run saved artifacts through calibration, extraction, retargeting, and waypoints."""
 
-    results_payload = _load_json(results_source, "Demo results")
-    metadata = _demo_metadata(results_payload)
-    expected_catalog = metadata.get("catalog_fingerprint")
-    if not isinstance(expected_catalog, str):
-        raise ValueError("Demo results require catalog_fingerprint provenance")
-
-    actions_payload = _load_json(actions_source, "Robot actions")
-    action_results = RobotActionResults.model_validate(actions_payload)
-    predictions = load_robot_actions(
-        actions_payload,
-        expected_catalog_fingerprint=expected_catalog,
+    task_input = load_demo_task_input(task_input_source)
+    predictions = load_task_actions(
+        task_input,
+        expected_catalog_fingerprint=task_input.catalog.fingerprint,
     )
-    expected_postprocessing = metadata.get("postprocessing_fingerprint")
-    if expected_postprocessing != action_results.postprocessing.fingerprint:
-        raise ValueError("Demo results and robot actions use different post-processing settings")
 
     mapper = _coordinate_mapper(calibration_source)
+    _validate_calibration_frame(task_input.video, mapper)
     retargeting_payload = _load_yaml(retargeting_source, "Retargeting config")
     _validate_table_clone(mapper, retargeting_payload)
     mapping = retargeting_payload.get("retargeting")
     if not isinstance(mapping, Mapping):
         raise ValueError("Retargeting config requires retargeting")
 
-    tracks = _calibrated_tracks_from_payload(results_payload, mapper)
+    tracks = _calibrated_tracks_from_task_input(task_input, mapper)
     tasks = extract_tasks(predictions, tracks)
     if episode is None:
         if len(tasks) != 1:
@@ -289,8 +262,12 @@ def _repository_root() -> Path:
 def _parser() -> argparse.ArgumentParser:
     root = _repository_root()
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--actions", type=Path, required=True, help="mimic.robot_actions.v1 JSON")
-    parser.add_argument("--results", type=Path, required=True, help="mimic.demo_results.v2 JSON")
+    parser.add_argument(
+        "--task-input",
+        type=Path,
+        required=True,
+        help="mimic.demo_task_input.v1 JSON",
+    )
     parser.add_argument("--calibration", type=Path, required=True, help="Camera homography JSON")
     parser.add_argument(
         "--retargeting-config",
@@ -309,6 +286,21 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--overwrite", action="store_true", help="Replace --waypoints if it exists")
     parser.add_argument("--robot-config", type=Path, help="Also run this robot simulation config")
     parser.add_argument("--log", type=Path, help="New simulator JSONL log; requires --robot-config")
+    parser.add_argument(
+        "--viewer",
+        action="store_true",
+        help="Show live robot simulation; requires --robot-config and --log",
+    )
+    parser.add_argument(
+        "--video-out",
+        nargs="?",
+        type=Path,
+        const=_TIMESTAMPED_VIDEO,
+        help=(
+            "Write a simulation MP4 to PATH, or to a timestamped file when PATH is omitted; "
+            "requires --robot-config and --log"
+        ),
+    )
     return parser
 
 
@@ -317,9 +309,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     args = parser.parse_args(argv)
     if (args.robot_config is None) != (args.log is None):
         parser.error("--robot-config and --log must be supplied together")
+    if args.viewer and args.robot_config is None:
+        parser.error("--viewer requires --robot-config and --log")
+    if args.video_out is not None and args.robot_config is None:
+        parser.error("--video-out requires --robot-config and --log")
     for path, description in (
-        (args.actions, "Robot actions"),
-        (args.results, "Demo results"),
+        (args.task_input, "Demo task input"),
         (args.calibration, "Calibration"),
         (args.retargeting_config, "Retargeting config"),
         (args.pipeline_config, "Robot pipeline config"),
@@ -331,8 +326,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     try:
         artifacts = build_robot_pipeline(
-            actions_source=args.actions,
-            results_source=args.results,
+            task_input_source=args.task_input,
             calibration_source=args.calibration,
             retargeting_source=args.retargeting_config,
             pipeline_config_source=args.pipeline_config,
@@ -349,8 +343,17 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     )
     if args.robot_config is None:
         return 0
+    executable = sys.executable
+    if (args.viewer or args.video_out is not None) and sys.platform == "darwin":
+        executable = shutil.which("mjpython")
+        if executable is None:
+            print(
+                "ERROR: mjpython is required for MuJoCo viewing or video output on macOS",
+                file=sys.stderr,
+            )
+            return 2
     command = (
-        sys.executable,
+        executable,
         str(_repository_root() / "scripts" / "simulate_robot.py"),
         "--config",
         str(args.robot_config),
@@ -359,6 +362,12 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         "--log",
         str(args.log),
     )
+    if args.video_out is _TIMESTAMPED_VIDEO:
+        command += ("--video-out",)
+    elif args.video_out is not None:
+        command += ("--video-out", str(args.video_out))
+    if args.viewer:
+        command += ("--viewer",)
     return subprocess.run(command, cwd=_repository_root(), check=False).returncode
 
 

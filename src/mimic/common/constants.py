@@ -36,5 +36,6 @@ TRACK_CACHE_DIR = "data/tracks"
 
 # Calibration: table dimensions (in meters)
 # Measured from actual poster board setup
-TABLE_WIDTH_M = 0.508   # 20 inches in meters
+TABLE_WIDTH_M = 0.508  # 20 inches in meters
 TABLE_HEIGHT_M = 0.762  # 30 inches in meters
+ROBOT_TABLE_SETBACK_M = 0.15  # Simulation experiment: base behind the table's near edge

@@ -21,6 +21,7 @@ class TabletopCloneSettings(BaseModel):
     surface_z_m: float
     robot_edge: Literal["left"]
     robot_base_xy_m: Tuple[float, float]
+    robot_setback_m: float
 
     @field_validator("width_m", "depth_m", "thickness_m", mode="before")
     @classmethod
@@ -42,6 +43,16 @@ class TabletopCloneSettings(BaseModel):
             raise ValueError("Table surface Z must be finite meters")
         return result
 
+    @field_validator("robot_setback_m", mode="before")
+    @classmethod
+    def validate_robot_setback(cls, value):
+        if isinstance(value, (bool, np.bool_)) or not isinstance(value, Real):
+            raise ValueError("Robot setback must be real meters")
+        result = float(value)
+        if not np.isfinite(result) or result < 0:
+            raise ValueError("Robot setback must be finite and nonnegative")
+        return result
+
     @field_validator("robot_base_xy_m", mode="before")
     @classmethod
     def validate_robot_base(cls, value):
@@ -59,15 +70,16 @@ def add_tabletop_clone(
     spec: mujoco.MjSpec,
     settings: Union[TabletopCloneSettings, Mapping[str, object]],
 ) -> TabletopCloneSettings:
-    """Add a bounded tabletop with its left-edge center at the base-frame marker."""
+    """Add a bounded tabletop in front of a separately marked robot base."""
 
     config = TabletopCloneSettings.model_validate(settings)
     base_x, base_y = config.robot_base_xy_m
+    near_edge_x = base_x + config.robot_setback_m
     spec.worldbody.add_geom(
         name="tabletop_clone",
         type=mujoco.mjtGeom.mjGEOM_BOX,
         pos=[
-            base_x + config.width_m / 2,
+            near_edge_x + config.width_m / 2,
             base_y,
             config.surface_z_m - config.thickness_m / 2,
         ],

@@ -1,66 +1,45 @@
 """Central configuration for the Mimic project."""
 
-import os
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Union
 
 import yaml
+
+DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "configs" / "default.yaml"
+LOCAL_CONFIG_PATH = Path("config.local.yaml")
+
+
+def _load_mapping(path: Path, description: str) -> Dict[str, Any]:
+    """Load one YAML mapping, failing clearly when the configuration is invalid."""
+
+    if not path.is_file():
+        raise FileNotFoundError(f"{description} not found: {path}")
+    with path.open() as stream:
+        payload = yaml.safe_load(stream) or {}
+    if not isinstance(payload, dict):
+        raise ValueError(f"{description} must contain a YAML mapping: {path}")
+    return payload
 
 
 class Config:
     """Configuration management for Mimic."""
 
-    _defaults = {
-        "data_dir": "data",
-        "output_dir": "outputs",
-        "fps": 30,
-        "video_extension": ".mp4",
-        "cache_embeddings": True,
-        "cache_tracks": True,
-        "device": "cuda",  # or "cpu"
-        "random_seed": 42,
-        "temporal_model": {
-            "type": "gru",  # "gru", "transformer", "mlp"
-            "hidden_size": 256,
-            "num_layers": 2,
-            "dropout": 0.1,
-        },
-        "tracking": {
-            "hand_confidence_threshold": 0.5,
-            "object_confidence_threshold": 0.5,
-            "use_mediapipe": True,
-            "use_sam2": True,
-        },
-        "path_processing": {
-            "interpolation": "direct",
-            "corner_max_deviation_m": None,
-            "output_spacing_m": None,
-            "maximum_spline_deviation_m": None,
-        },
-        "robot": {
-            "arm_control_hz": 100,
-            "gripper_control_hz": 10,
-        },
-    }
-
-    def __init__(self, config_path: str = None):
-        """Initialize config from file or defaults.
+    def __init__(self, config_path: Optional[Union[str, Path]] = None):
+        """Initialize from the canonical YAML, then apply optional YAML overlays.
 
         Args:
-            config_path: Path to YAML config file. If None, uses defaults.
+            config_path: Optional experiment-specific YAML overlay.
         """
-        self.config = self._defaults.copy()
+        self.config = _load_mapping(DEFAULT_CONFIG_PATH, "Default configuration")
 
-        if config_path and os.path.exists(config_path):
-            with open(config_path) as f:
-                user_config = yaml.safe_load(f) or {}
-                self.config.update(user_config)
+        if config_path is not None:
+            requested_path = Path(config_path)
+            if requested_path.resolve() != DEFAULT_CONFIG_PATH.resolve():
+                self.config.update(_load_mapping(requested_path, "Configuration overlay"))
 
         # Check for local override
-        if os.path.exists("config.local.yaml"):
-            with open("config.local.yaml") as f:
-                local_config = yaml.safe_load(f) or {}
-                self.config.update(local_config)
+        if LOCAL_CONFIG_PATH.is_file():
+            self.config.update(_load_mapping(LOCAL_CONFIG_PATH, "Local configuration override"))
 
     def __getitem__(self, key: str) -> Any:
         """Get config value by key."""
@@ -88,7 +67,7 @@ class Config:
 _global_config = None
 
 
-def get_config(config_path: str = None) -> Config:
+def get_config(config_path: Optional[Union[str, Path]] = None) -> Config:
     """Get or create global config instance."""
     global _global_config
     if _global_config is None:

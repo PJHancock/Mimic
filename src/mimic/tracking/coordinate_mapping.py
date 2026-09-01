@@ -25,6 +25,8 @@ class CoordinateMapper:
         """
         self.table_width_m = table_width_m
         self.table_height_m = table_height_m
+        self.image_width_px: Optional[int] = None
+        self.image_height_px: Optional[int] = None
         self.homography: Optional[np.ndarray] = None
         self.is_calibrated = False
 
@@ -50,6 +52,7 @@ class CoordinateMapper:
         pts_world = np.float32(table_corners_world)
 
         self.homography = cv2.getPerspectiveTransform(pts_img, pts_world)
+        self.image_height_px, self.image_width_px = frame.shape[:2]
         self.is_calibrated = True
 
         if camera_matrix is None:
@@ -59,6 +62,8 @@ class CoordinateMapper:
         calib = CalibrationData(
             homography=self.homography.copy(),
             camera_matrix=camera_matrix,
+            image_width_px=self.image_width_px,
+            image_height_px=self.image_height_px,
             table_corners_image=list(table_corners_image),
             table_corners_world=list(table_corners_world),
             table_height=0.0,  # Z offset from world origin (not used for tabletop)
@@ -78,6 +83,8 @@ class CoordinateMapper:
         self.homography = np.array(data["homography"])
         self.table_width_m = data["table_width_m"]
         self.table_height_m = data["table_height_m"]
+        self.image_width_px = data.get("image_width_px")
+        self.image_height_px = data.get("image_height_px")
         self.is_calibrated = True
 
     def save(self, path: str, calib: CalibrationData) -> None:
@@ -95,6 +102,8 @@ class CoordinateMapper:
         data = {
             "homography": self.homography.tolist(),
             "camera_matrix": calib.camera_matrix.tolist(),
+            "image_width_px": calib.image_width_px,
+            "image_height_px": calib.image_height_px,
             "table_corners_image": calib.table_corners_image,
             "table_corners_world": calib.table_corners_world,
             "table_width_m": self.table_width_m,
@@ -105,9 +114,7 @@ class CoordinateMapper:
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
 
-    def pixel_to_normalized_table(
-        self, pixel_point: Tuple[float, float]
-    ) -> Tuple[float, float]:
+    def pixel_to_normalized_table(self, pixel_point: Tuple[float, float]) -> Tuple[float, float]:
         """Convert pixel coordinates to normalized physical-table coordinates.
 
         Pipeline:
@@ -137,9 +144,7 @@ class CoordinateMapper:
         """Map image pixels to calibrated table meters without clipping."""
         if not self.is_calibrated:
             raise RuntimeError("Mapper not calibrated. Call calibrate() or load() first.")
-        pt_img = np.array(
-            [[[float(pixel_point[0]), float(pixel_point[1])]]], dtype=np.float32
-        )
+        pt_img = np.array([[[float(pixel_point[0]), float(pixel_point[1])]]], dtype=np.float32)
         point_m = cv2.perspectiveTransform(pt_img, self.homography)[0][0]
         return (float(point_m[0]), float(point_m[1]))
 

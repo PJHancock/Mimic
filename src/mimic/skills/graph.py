@@ -1,8 +1,8 @@
 """Validated directed relationships between classifier-visible skills."""
 
-from typing import Dict, Mapping, Optional, Sequence, Tuple
+from typing import Dict, Literal, Mapping, Optional, Sequence, Tuple
 
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from .catalog import SkillCatalog
 
@@ -14,6 +14,7 @@ class SkillTransition(BaseModel):
     target: str
     variant: Optional[str] = None
     guard: Optional[str] = None
+    guard_scope: Optional[Literal["runtime"]] = None
 
     @field_validator("source", "target", "variant", "guard")
     @classmethod
@@ -21,6 +22,12 @@ class SkillTransition(BaseModel):
         if value is not None and (not value or value != value.strip()):
             raise ValueError("Transition identifiers must be nonempty without edge spaces")
         return value
+
+    @model_validator(mode="after")
+    def validate_guard_scope(self) -> "SkillTransition":
+        if (self.guard is None) != (self.guard_scope is None):
+            raise ValueError("guard and guard_scope must either both be set or both be omitted")
+        return self
 
 
 class SkillGraph:

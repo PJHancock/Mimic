@@ -11,6 +11,7 @@ robot_execution:
   # Per-arm-joint measured arrival tolerances for saved configurations.
   preset_position_tolerances: null
   object_body: null
+  support_geom: null
   gripper_driver: panda_standard_tendon
   # Authorized observation allowance per finger, in meters; not a command/model limit.
   measured_gripper_joint_tolerance_m: 0.00001
@@ -54,7 +55,13 @@ robot_execution:
     step_timeout_s: null
     minimum_lift_m: null
     maximum_slip_m: null
+    # Intermediate Cartesian waypoints may be approximated within this radius.
+    waypoint_handoff_radius_m: null
     contact_loss_timeout_s: null
     settle_time_s: null
     settled_speed_m_s: null
     placement_tolerance_m: null
+    placement_approach_clearance_m: null
+    placement_maximum_descent_speed_m_s: null
+    placement_maximum_descent_acceleration_m_s2: null
+    placement_contact_confirmation_s: null

@@ -1,12 +1,12 @@
 # Default tabletop clone in MuJoCo world meters. The world/robot-base origin is
-# the center of the filmed table's left edge: +X points into the table, +Y points
-# left from the robot's perspective, and +Z points upward. The tabletop surface
-# is z=0 until a concrete robot/scene supplies a different mounting transform.
+# 0.15 m behind the center of the filmed table's left/near long edge: +X points
+# from the robot into the table, +Y points left from the robot's perspective,
+# and +Z points upward. The tabletop surface is z=0.
 # Config("configs/retargeting.yaml").get("retargeting") returns this section.
 retargeting:
   source_frame: table
   target_frame: mujoco_world
-  table_origin_target_xy_m: [0.0, 0.381]
+  table_origin_target_xy_m: [0.15, 0.381]
   table_x_axis_target_xy: [1.0, 0.0]
   table_y_axis_target_xy: [0.0, -1.0]
 
@@ -17,3 +17,4 @@ tabletop_clone:
   surface_z_m: 0.0
   robot_edge: left
   robot_base_xy_m: [0.0, 0.0]
+  robot_setback_m: 0.15

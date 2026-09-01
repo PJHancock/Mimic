@@ -145,7 +145,7 @@ class ExtractedTask:
     def __post_init__(self):
         boundaries = tuple(self.phase_boundaries)
         samples = tuple(self.demonstrated_path)
-        expected = (
+        complete_with_retreat = (
             ActionPhase.IDLE,
             ActionPhase.HOVER,
             ActionPhase.GRASP,
@@ -154,10 +154,21 @@ class ExtractedTask:
             ActionPhase.HOVER,
             ActionPhase.IDLE,
         )
-        if tuple(b.phase for b in boundaries) != expected:
+        complete_direct_to_idle = (
+            ActionPhase.IDLE,
+            ActionPhase.HOVER,
+            ActionPhase.GRASP,
+            ActionPhase.CARRY,
+            ActionPhase.RELEASE,
+            ActionPhase.IDLE,
+        )
+        if tuple(b.phase for b in boundaries) not in (
+            complete_with_retreat,
+            complete_direct_to_idle,
+        ):
             raise ValueError(
-                "Task requires IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> HOVER -> IDLE "
-                "boundaries"
+                "Task requires IDLE -> HOVER -> GRASP -> CARRY -> RELEASE, followed "
+                "by either HOVER -> IDLE or IDLE boundaries"
             )
         if any(a.frame_idx >= b.frame_idx for a, b in zip(boundaries, boundaries[1:])):
             raise ValueError("Phase boundaries must have strictly increasing frame IDs")
@@ -289,6 +300,8 @@ class CalibrationData:
 
     homography: np.ndarray  # 3x3 image-pixel to table-meter transform
     camera_matrix: np.ndarray  # 3x3 intrinsic matrix
+    image_width_px: int
+    image_height_px: int
     table_corners_image: List[Tuple[float, float]]  # 4 corners in image space
     table_corners_world: List[Tuple[float, float]]  # 4 corners in world space
     table_height: float  # z offset from world origin

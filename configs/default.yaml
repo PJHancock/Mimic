@@ -49,7 +49,8 @@ tracking:
   min_contour_area: 500  # Minimum pixel area to consider valid cup detection
 
 
-# Robot-independent path geometry. Direct preserves the former endpoint-only default.
+# Robot-independent path geometry. Cubic is the project default; direct remains
+# available for exact endpoint-only behavior.
 path_processing:
   interpolation: cubic  # direct | corners_only | none | cubic
   corner_max_deviation_m: .04       # Required by corners_only and cubic

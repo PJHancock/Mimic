@@ -5,7 +5,7 @@ Processes a new demo video through the complete pipeline:
   1. Extract object position tracks (from tracking module)
   2. Extract V-JEPA embeddings from frames
   3. Predict action sequences from embeddings
-  4. Combine into unified output with timestamps
+  4. Build one consolidated task input with independent action/tracker streams
   5. Generate robot waypoints from predictions
   6. Run robot simulation with inferred waypoints
 
@@ -41,7 +41,6 @@ import argparse
 import json
 import sys
 from dataclasses import asdict
-from datetime import datetime
 from pathlib import Path
 from typing import Sequence
 
@@ -52,6 +51,7 @@ from tqdm import tqdm
 from mimic.common.types import PickPlaceWaypoints
 from mimic.integration import (
     RobotActionResults,
+    build_demo_task_input,
     build_robot_pipeline,
     build_action_inference_artifacts,
     checkpoint_sha256,
@@ -85,12 +85,12 @@ def extract_tracks(video_path: str, device: str = "cpu"):
 
     fps = cap.get(cv2.CAP_PROP_FPS)
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    frame_width_px = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height_px = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     duration = frame_count / fps if fps > 0 else 0
 
     print(f"   Video: {Path(video_path).name}")
-    print(
-        f"   Resolution: {int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))} × {int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))}"
-    )
+    print(f"   Resolution: {frame_width_px} × {frame_height_px}")
     print(f"   FPS: {fps:.1f}, Duration: {duration:.1f}s, Frames: {frame_count}")
 
     tracks = []
@@ -149,6 +149,8 @@ def extract_tracks(video_path: str, device: str = "cpu"):
         "fps": float(fps),
         "duration": float(duration),
         "frame_count": frame_count,
+        "frame_width_px": frame_width_px,
+        "frame_height_px": frame_height_px,
         "positions": tracks,
     }
 
@@ -299,85 +301,6 @@ def predict_actions(
     segments = _accepted_action_segments(artifacts.robot_actions)
     print(f"   ✓ Detected {len(segments)} action segments")
     return artifacts
-
-
-def combine_results(tracks_data: dict, actions_data: RobotActionResults) -> dict:
-    """Combine tracking and action predictions.
-
-    Returns:
-        Unified result with synchronized data
-    """
-    print("\n4. Combining tracks and actions...")
-
-    num_frames = len(actions_data.frames)
-    fps = tracks_data["fps"]
-
-    combined_frames = []
-    for i in range(num_frames):
-        # Get position at this frame
-        track_index = actions_data.frames[i].frame_idx - 1
-        position = (
-            tracks_data["positions"][track_index]
-            if track_index < len(tracks_data["positions"])
-            else None
-        )
-
-        # Get action at this frame
-        accepted = actions_data.frames[i]
-
-        frame_data = {
-            "frame_idx": accepted.frame_idx,
-            "timestamp_s": accepted.timestamp_s,
-            "position": (
-                {
-                    "x": position["x"] if position else None,
-                    "y": position["y"] if position else None,
-                    "confidence": position["confidence"] if position else 0.0,
-                }
-                if position
-                else None
-            ),
-            "action": accepted.phase.value,
-            "action_confidence": accepted.confidence,
-            "decision_source": accepted.decision_source.value,
-        }
-        combined_frames.append(frame_data)
-
-    print(f"   ✓ Combined {num_frames} frames")
-
-    object_tracks = [
-        {
-            "frame_idx": position["frame"] + 1,
-            "timestamp_s": position["time"],
-            "position": {
-                "x": position["x"],
-                "y": position["y"],
-                "confidence": position["confidence"],
-            },
-        }
-        for position in tracks_data["positions"]
-    ]
-
-    return {
-        "schema": "mimic.demo_results.v2",
-        "metadata": {
-            "created": datetime.now().isoformat(),
-            "fps": float(fps),
-            "total_frames": num_frames,
-            "duration": actions_data.frames[-1].timestamp_s if num_frames > 0 else 0,
-            "catalog_fingerprint": actions_data.catalog.fingerprint,
-            "postprocessing_fingerprint": actions_data.postprocessing.fingerprint,
-            "tracking_coordinate_frame": "image_pixels",
-        },
-        "per_frame": combined_frames,
-        # Preserve tracker-native samples independently of sparse classifier frames.
-        "object_tracks": object_tracks,
-        "action_segments": _accepted_action_segments(actions_data),
-        "tracking_summary": {
-            "total_positions": sum(1 for p in tracks_data["positions"] if p["x"] is not None),
-            "fps": tracks_data["fps"],
-        },
-    }
 
 
 def run_robot_simulation(
@@ -577,27 +500,28 @@ def main():
             embedding_frame_indices,
             context_window=args.context_window,
         )
-        results = combine_results(tracks_data, actions_data.robot_actions)
+        print("\n4. Building consolidated robot task input...")
+        task_input = build_demo_task_input(tracks_data, actions_data.robot_actions)
+        print(
+            "   ✓ Preserved "
+            f"{len(task_input.resolved_actions)} resolved actions and "
+            f"{len(task_input.object_tracks)} tracker samples"
+        )
 
         # Save results
         print("\n5. Saving results...")
-        results_file = output_dir / f"{video_path.stem}_results.json"
+        task_input_file = output_dir / f"{video_path.stem}_task_input.json"
         scores_file = output_dir / f"{video_path.stem}_scores.json"
-        robot_actions_file = output_dir / f"{video_path.stem}_robot_actions.json"
         write_results(scores_file, actions_data.scores)
-        write_results(robot_actions_file, actions_data.robot_actions)
-        with open(results_file, "w") as f:
-            json.dump(results, f, indent=2, allow_nan=False)
-        print(f"   ✓ Saved to: {results_file}")
+        write_results(task_input_file, task_input)
+        print(f"   ✓ Robot task input: {task_input_file}")
         print(f"   ✓ Diagnostic scores: {scores_file}")
-        print(f"   ✓ Robot actions: {robot_actions_file}")
 
         # Run robot simulation if requested
         simulation_result = None
         if args.simulate_robot:
             robot_artifacts = build_robot_pipeline(
-                actions_source=actions_data.robot_actions.model_dump(mode="json"),
-                results_source=results,
+                task_input_source=task_input,
                 calibration_source=args.calibration,
                 retargeting_source=args.retargeting_config,
                 pipeline_config_source=args.robot_pipeline_config,
@@ -617,28 +541,16 @@ def main():
                 video_path.stem,
             )
 
-            # Add simulation result to output
-            results["robot_pipeline"] = {
-                "selected_episode": robot_artifacts.selected_episode,
-                "episode_count": robot_artifacts.episode_count,
-                "world_waypoints": str(world_waypoints_file),
-            }
-            results["simulation"] = simulation_result
-
-            # Save updated results with simulation
-            with open(results_file, "w") as f:
-                json.dump(results, f, indent=2, allow_nan=False)
-            print("   ✓ Updated results with simulation data")
-
         # Print summary
         print("\n" + "=" * 70)
         print("SUMMARY")
         print("=" * 70)
-        print(f"\nTotal frames: {results['metadata']['total_frames']}")
-        print(f"Duration: {results['metadata']['duration']:.2f}s")
-        print(f"FPS: {results['metadata']['fps']:.1f}")
-        print(f"\nAction segments: {len(results['action_segments'])}")
-        for seg in results["action_segments"]:
+        print(f"\nTotal video frames: {task_input.video.frame_count}")
+        print(f"Duration: {task_input.video.duration_s:.2f}s")
+        print(f"FPS: {task_input.video.fps:.1f}")
+        action_segments = _accepted_action_segments(actions_data.robot_actions)
+        print(f"\nAction segments: {len(action_segments)}")
+        for seg in action_segments:
             confidence = seg["avg_confidence"]
             confidence_text = "n/a" if confidence is None else f"{confidence:.1%}"
             print(
@@ -646,7 +558,9 @@ def main():
             )
 
         print(
-            f"\nTracked positions: {results['tracking_summary']['total_positions']}/{results['metadata']['total_frames']}"
+            "\nTracked positions: "
+            f"{sum(frame.position is not None for frame in task_input.object_tracks)}"
+            f"/{task_input.video.frame_count}"
         )
 
         if simulation_result:

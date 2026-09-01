@@ -87,6 +87,7 @@ def build_executor(
         model, open_command_width_m=gripper_config.pop("open_command_width_m")
     )
     io = MuJoCoAdapter(bindings, driver.observe, driver.actuator_names, cfg["object_body"])
+    support_contact = io.support_contact_observer(cfg["support_geom"])
     state = io.reset(cfg["home_keyframe"])
     reference = {name: state.joint_positions[name][0] for name in profile.arm_joints}
     differential_ik = MinkIKSolver(
@@ -127,10 +128,15 @@ def build_executor(
     tolerances = cfg["preset_position_tolerances"]
     if len(tolerances) != len(profile.arm_joints):
         raise ValueError("Preset position tolerances must match the arm joint count")
+    execution_settings = ExecutionSettings(**cfg["execution"])
+    if execution_settings.waypoint_handoff_radius_m <= cfg["ik"]["position_tolerance_m"]:
+        raise ValueError("execution.waypoint_handoff_radius_m must exceed ik.position_tolerance_m")
     return SkillExecutor(
         controller,
-        ExecutionSettings(**cfg["execution"]),
+        execution_settings,
         record,
         home,
         dict(zip(profile.arm_joints, tolerances)),
+        io.initialize_object_position,
+        support_contact,
     )

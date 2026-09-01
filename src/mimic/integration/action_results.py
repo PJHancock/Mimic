@@ -15,12 +15,22 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from mimic.common.types import ActionPhase, ActionPrediction
 from mimic.skills.catalog import SkillCatalog
-from mimic.skills.graph import SkillGraph
+from mimic.skills.graph import SkillGraph, SkillTransition
 from mimic.skills.post_state import GraphStatePostProcessor, PostStateSettings
 from mimic.skills.types import DecisionSource, SkillPrediction, StateDecision
 
 SCORE_RESULTS_SCHEMA = "mimic.skill_scores.v2"
 ROBOT_ACTIONS_SCHEMA = "mimic.robot_actions.v1"
+FAIL_CLOSED_GUARD_POLICY = "fail_closed_without_runtime_observations"
+DEFER_RUNTIME_GUARD_POLICY = "defer_runtime_guards_to_execution"
+GuardPolicy = Literal[
+    "fail_closed_without_runtime_observations",
+    "defer_runtime_guards_to_execution",
+]
+
+
+def _defer_runtime_guard(transition: SkillTransition) -> bool:
+    return transition.guard is None or transition.guard_scope == "runtime"
 
 
 def _frame_idx(value: int) -> int:
@@ -48,14 +58,27 @@ class SkillSystemDefinition:
     graph: SkillGraph
     post_state: Mapping[str, object]
 
-    def build_postprocessor(self) -> GraphStatePostProcessor:
+    def build_postprocessor(
+        self, guard_policy: GuardPolicy = FAIL_CLOSED_GUARD_POLICY
+    ) -> GraphStatePostProcessor:
         unresolved = sorted(key for key, value in self.post_state.items() if value is None)
         if unresolved:
             raise ValueError(
                 "Post-state settings are unresolved: "
                 f"{unresolved}. Supply an experiment skill config with explicit values."
             )
-        return GraphStatePostProcessor(self.catalog, self.graph, self.post_state)
+        if guard_policy == FAIL_CLOSED_GUARD_POLICY:
+            transition_guard = None
+        elif guard_policy == DEFER_RUNTIME_GUARD_POLICY:
+            transition_guard = _defer_runtime_guard
+        else:
+            raise ValueError(f"Unknown transition guard policy: {guard_policy}")
+        return GraphStatePostProcessor(
+            self.catalog,
+            self.graph,
+            self.post_state,
+            transition_guard=transition_guard,
+        )
 
 
 class CatalogProvenance(BaseModel):
@@ -176,7 +199,7 @@ class PostprocessingProvenance(BaseModel):
 
     fingerprint: str
     settings: PostStateSettings
-    guard_policy: Literal["fail_closed_without_runtime_observations"]
+    guard_policy: GuardPolicy
 
     @field_validator("fingerprint")
     @classmethod
@@ -354,7 +377,9 @@ def predictions_from_probabilities(
 
 
 def _postprocessing_provenance(
-    system: SkillSystemDefinition, settings: PostStateSettings
+    system: SkillSystemDefinition,
+    settings: PostStateSettings,
+    guard_policy: GuardPolicy,
 ) -> PostprocessingProvenance:
     graph_payload = {
         "start_skill": system.graph.start_skill,
@@ -366,13 +391,13 @@ def _postprocessing_provenance(
         "catalog_fingerprint": system.catalog.fingerprint,
         "graph": graph_payload,
         "settings": settings.model_dump(mode="json"),
-        "guard_policy": "fail_closed_without_runtime_observations",
+        "guard_policy": guard_policy,
     }
     encoded = json.dumps(fingerprint_payload, sort_keys=True, separators=(",", ":")).encode()
     return PostprocessingProvenance(
         fingerprint=hashlib.sha256(encoded).hexdigest(),
         settings=settings,
-        guard_policy="fail_closed_without_runtime_observations",
+        guard_policy=guard_policy,
     )
 
 
@@ -385,7 +410,10 @@ def build_action_inference_artifacts(
     prediction_records = tuple(predictions)
     if not prediction_records:
         raise ValueError("At least one classifier prediction is required")
-    processor = system.build_postprocessor()
+    # Classifier export has no MuJoCo observations. Runtime-scoped guards are
+    # deliberately deferred to execution rather than treated as failed evidence.
+    guard_policy: GuardPolicy = DEFER_RUNTIME_GUARD_POLICY
+    processor = system.build_postprocessor(guard_policy=guard_policy)
     decisions = tuple(processor.process(prediction) for prediction in prediction_records)
     catalog = catalog_provenance(system.catalog)
     scores = SkillScoreResults(
@@ -404,7 +432,7 @@ def build_action_inference_artifacts(
     robot_actions = RobotActionResults(
         catalog=catalog,
         checkpoint_sha256=checkpoint_digest,
-        postprocessing=_postprocessing_provenance(system, processor.settings),
+        postprocessing=_postprocessing_provenance(system, processor.settings, guard_policy),
         frames=tuple(
             RobotActionFrame(
                 frame_idx=prediction.frame_idx,
@@ -432,12 +460,15 @@ def write_results(path: Union[str, Path], result: BaseModel) -> None:
 
 
 def load_robot_actions(
-    source: Union[str, Path, Mapping[str, Any]],
+    source: Union[str, Path, Mapping[str, Any], RobotActionResults],
     *,
     expected_catalog_fingerprint: Optional[str] = None,
 ) -> Tuple[ActionPrediction, ...]:
     """Load only the post-processed, one-state-per-timestep robot schema."""
-    if isinstance(source, Mapping):
+    if isinstance(source, RobotActionResults):
+        result = source
+        payload = result.model_dump(mode="json")
+    elif isinstance(source, Mapping):
         payload = dict(source)
     else:
         payload = json.loads(Path(source).read_text())
@@ -446,7 +477,8 @@ def load_robot_actions(
             f"Robot input requires schema {ROBOT_ACTIONS_SCHEMA}; raw scores and legacy "
             "top-one results are not robot inputs"
         )
-    result = RobotActionResults.model_validate(payload)
+    if not isinstance(source, RobotActionResults):
+        result = RobotActionResults.model_validate(payload)
     if (
         expected_catalog_fingerprint is not None
         and result.catalog.fingerprint != expected_catalog_fingerprint

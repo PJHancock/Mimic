@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+
+import numpy as np
 
 from mimic.common.types import PickPlaceWaypoints
 from mimic.robot.action_primitives import CartesianMotion, JointPresetMotion, RobotAction
@@ -16,6 +18,15 @@ from mimic.skills.registry import SkillRegistry
 class PickPlaceSkillContext:
     waypoints: PickPlaceWaypoints
     home: JointPreset
+    placement_approach_clearance_m: float
+
+    def __post_init__(self) -> None:
+        if (
+            isinstance(self.placement_approach_clearance_m, bool)
+            or not np.isfinite(self.placement_approach_clearance_m)
+            or self.placement_approach_clearance_m <= 0
+        ):
+            raise ValueError("Placement approach clearance must be finite and positive")
 
 
 def _idle(decision: StateDecision, context: PickPlaceSkillContext) -> tuple[RobotAction, ...]:
@@ -59,7 +70,17 @@ def _carry(decision: StateDecision, context: PickPlaceSkillContext) -> tuple[Rob
 
 
 def _release(decision: StateDecision, context: PickPlaceSkillContext) -> tuple[RobotAction, ...]:
+    lower = context.waypoints.lower
+    placement_approach = replace(
+        lower,
+        position=(
+            lower.position[0],
+            lower.position[1],
+            lower.position[2] + context.placement_approach_clearance_m,
+        ),
+    )
     return (
+        CartesianMotion("PLACE_APPROACH", placement_approach, GripperAction.HOLD),
         CartesianMotion("LOWER", context.waypoints.lower, GripperAction.HOLD),
         CartesianMotion("OPEN", context.waypoints.lower, GripperAction.OPEN),
     )

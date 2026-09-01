@@ -68,7 +68,20 @@ def main() -> int:
     gripper_settings = GripperSettings(0.001, 0.002, 0.1, 0.1, 2)
     # Previous fixture maximum_slip_m was 0.01. Measured stable in-gripper settling
     # reached 0.01219 m; 0.015 retains loss detection with 2.81 mm fixture headroom.
-    execution_settings = ExecutionSettings(10, 0.05, 0.015, 0.1, 0.25, 0.01, 0.01)
+    execution_settings = ExecutionSettings(
+        step_timeout_s=10,
+        minimum_lift_m=0.05,
+        maximum_slip_m=0.015,
+        waypoint_handoff_radius_m=0.1,
+        contact_loss_timeout_s=0.25,
+        settle_time_s=0.01,
+        settled_speed_m_s=0.01,
+        placement_tolerance_m=0.01,
+        placement_approach_clearance_m=0.015,
+        placement_maximum_descent_speed_m_s=0.05,
+        placement_maximum_descent_acceleration_m_s2=0.5,
+        placement_contact_confirmation_s=0.05,
+    )
     measured_gripper_tolerances_m = {model.joint(joint).name: 1e-5 for joint in driver.joint_ids}
     differential_ik = MinkIKSolver(
         bindings,
@@ -125,7 +138,12 @@ def main() -> int:
                 },
             }
         )
-        report = SkillExecutor(controller, execution_settings, record).run(waypoints)
+        report = SkillExecutor(
+            controller,
+            execution_settings,
+            record,
+            support_contact=io.support_contact_observer("table"),
+        ).run(waypoints)
     summary = asdict(report)
     (args.output / "result.json").write_text(json.dumps(summary, indent=2, allow_nan=False) + "\n")
     print(json.dumps({k: v for k, v in summary.items() if k != "final_state"}, indent=2))

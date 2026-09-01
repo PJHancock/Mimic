@@ -15,14 +15,17 @@ skill_system:
       - {source: IDLE, target: HOVER, variant: TO_GRASP}
       - {source: HOVER, target: HOVER, variant: CONTINUE}
       - {source: HOVER, target: GRASP}
-      - {source: HOVER, target: IDLE, guard: home_reached}
+      - {source: HOVER, target: IDLE}
       - {source: GRASP, target: GRASP}
-      - {source: GRASP, target: CARRY, guard: grasp_confirmed}
-      - {source: GRASP, target: HOVER, variant: TO_HOME_ABORT, guard: grasp_empty}
+      - {source: GRASP, target: CARRY, guard: grasp_confirmed, guard_scope: runtime}
+      - {source: GRASP, target: HOVER, variant: TO_HOME_ABORT, guard: grasp_empty, guard_scope: runtime}
+      - {source: GRASP, target: IDLE}
       - {source: CARRY, target: CARRY}
-      - {source: CARRY, target: RELEASE, guard: transport_complete}
+      - {source: CARRY, target: RELEASE, guard: transport_complete, guard_scope: runtime}
+      - {source: CARRY, target: IDLE}
       - {source: RELEASE, target: RELEASE}
       - {source: RELEASE, target: HOVER, variant: TO_HOME}
+      - {source: RELEASE, target: IDLE}
   post_state:
     minimum_confidence: 0.5
     minimum_transition_margin: 0.1

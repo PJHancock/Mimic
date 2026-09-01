@@ -19,7 +19,7 @@ class TaskExtractionError(ValueError):
 class TaskExtractor:
     """Validate complete actions; never smooth, relabel, or repair input."""
 
-    EPISODE = (
+    EPISODE_WITH_RETREAT = (
         ActionPhase.IDLE,
         ActionPhase.HOVER,
         ActionPhase.GRASP,
@@ -28,6 +28,15 @@ class TaskExtractor:
         ActionPhase.HOVER,
         ActionPhase.IDLE,
     )
+    EPISODE_DIRECT_TO_IDLE = (
+        ActionPhase.IDLE,
+        ActionPhase.HOVER,
+        ActionPhase.GRASP,
+        ActionPhase.CARRY,
+        ActionPhase.RELEASE,
+        ActionPhase.IDLE,
+    )
+    EPISODES = (EPISODE_WITH_RETREAT, EPISODE_DIRECT_TO_IDLE)
 
     def extract(
         self,
@@ -66,16 +75,22 @@ class TaskExtractor:
 
         episodes: List[tuple[PhaseBoundary, ...]] = []
         cursor = 0
-        while cursor + len(self.EPISODE) <= len(boundaries):
-            episode = tuple(boundaries[cursor : cursor + len(self.EPISODE)])
-            if tuple(boundary.phase for boundary in episode) != self.EPISODE:
+        while cursor < len(boundaries) - 1:
+            episode = None
+            for expected in self.EPISODES:
+                candidate = tuple(boundaries[cursor : cursor + len(expected)])
+                if tuple(boundary.phase for boundary in candidate) == expected:
+                    episode = candidate
+                    break
+            if episode is None:
                 break
             episodes.append(episode)
-            cursor += len(self.EPISODE) - 1  # Adjacent episodes share their IDLE boundary.
+            cursor += len(episode) - 1  # Adjacent episodes share their IDLE boundary.
         if not episodes or cursor != len(boundaries) - 1:
-            expected = " -> ".join(phase.value for phase in self.EPISODE)
+            expected = " -> ".join(phase.value for phase in self.EPISODE_WITH_RETREAT)
             raise TaskExtractionError(
-                f"Expected one or more complete {expected} episodes; "
+                f"Expected one or more complete {expected} episodes (terminal HOVER is "
+                "optional); "
                 "state post-processing is not performed by the extractor"
             )
 
@@ -92,9 +107,7 @@ class TaskExtractor:
                 for boundary in boundaries:
                     if boundary.frame_idx <= track.frame_idx:
                         phase = boundary.phase
-                sample = TablePathSample(
-                    track.frame_idx, track.table_xy_m, phase, track.confidence
-                )
+                sample = TablePathSample(track.frame_idx, track.table_xy_m, phase, track.confidence)
             except (ValueError, TypeError) as exc:
                 raise TaskExtractionError(f"Invalid track: {exc}") from exc
             if sample.frame_idx <= previous_frame:

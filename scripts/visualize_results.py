@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Visualize pipeline results: original video + inferred actions + tracking overlay."""
+"""Visualize a consolidated task input: video + resolved actions + tracking."""
 
 import argparse
 import json
@@ -10,15 +10,41 @@ import numpy as np
 from tqdm import tqdm
 
 
-def load_results(results_file: str) -> dict:
-    """Load results JSON file."""
-    with open(results_file) as f:
-        return json.load(f)
+def load_task_input(task_input_file: str) -> dict:
+    """Load and identify the canonical post-model artifact."""
+    with open(task_input_file) as f:
+        payload = json.load(f)
+    if payload.get("schema") != "mimic.demo_task_input.v1":
+        raise ValueError("Visualization requires mimic.demo_task_input.v1")
+    return payload
+
+
+def _action_segments(resolved_actions: list[dict]) -> list[dict]:
+    """Derive display-only segments; they are not persisted robot inputs."""
+    segments = []
+    start = 0
+    for index in range(1, len(resolved_actions) + 1):
+        at_end = index == len(resolved_actions)
+        if not at_end and resolved_actions[index]["phase"] == resolved_actions[start]["phase"]:
+            continue
+        frames = resolved_actions[start:index]
+        confidences = [frame["confidence"] for frame in frames if frame["confidence"] is not None]
+        segments.append(
+            {
+                "action": frames[0]["phase"],
+                "start_time": frames[0]["timestamp_s"],
+                "end_time": frames[-1]["timestamp_s"],
+                "duration": frames[-1]["timestamp_s"] - frames[0]["timestamp_s"],
+                "avg_confidence": float(np.mean(confidences)) if confidences else None,
+            }
+        )
+        start = index
+    return segments
 
 
 def create_visualization(
     video_path: str,
-    results_file: str,
+    task_input_file: str,
     output_path: str,
 ):
     """Create side-by-side visualization of video + predictions.
@@ -27,7 +53,7 @@ def create_visualization(
     1. Original video with tracking overlay and action labels
     2. Side-by-side comparison of original and annotated versions
     """
-    results = load_results(results_file)
+    task_input = load_task_input(task_input_file)
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
@@ -51,10 +77,16 @@ def create_visualization(
     sidebyside_path = output_dir / "sidebyside.mp4"
     out_sidebyside = cv2.VideoWriter(str(sidebyside_path), fourcc, fps, (width * 2, height))
 
-    per_frame_data = results["per_frame"]
-    action_segments = results["action_segments"]
+    actions_by_frame = {
+        frame["frame_idx"]: frame for frame in task_input["resolved_actions"]
+    }
+    tracks_by_frame = {
+        frame["frame_idx"]: frame for frame in task_input["object_tracks"]
+    }
+    action_segments = _action_segments(task_input["resolved_actions"])
 
     frame_idx = 0
+    current_action = None
 
     print("\nCreating visualizations...")
     print(f"  Video: {width}x{height} @ {fps:.1f} FPS")
@@ -66,16 +98,17 @@ def create_visualization(
             if not ret:
                 break
 
-            # Get data for this frame
-            if frame_idx < len(per_frame_data):
-                frame_info = per_frame_data[frame_idx]
-                action = frame_info["action"]
-                action_conf = frame_info["action_confidence"]
-                position = frame_info["position"]
-            else:
-                action = "UNKNOWN"
-                action_conf = 0.0
-                position = None
+            # Classifier and tracker streams may have different sampling density.
+            # For display only, retain the latest resolved action while reading
+            # the tracker observation at the exact source-video frame.
+            source_frame_idx = frame_idx + 1
+            accepted = actions_by_frame.get(source_frame_idx)
+            if accepted is not None:
+                current_action = accepted
+            action = current_action["phase"] if current_action else "UNKNOWN"
+            action_conf = current_action["confidence"] if current_action else None
+            track = tracks_by_frame.get(source_frame_idx)
+            position = track["position"] if track else None
 
             # Create annotated frame
             annotated = frame.copy()
@@ -136,7 +169,7 @@ def create_visualization(
             )
 
             # Add timestamp
-            timestamp = frame_info.get("timestamp_s", frame_info.get("timestamp", 0.0))
+            timestamp = frame_idx / fps
             timestamp_text = f"T: {timestamp:.2f}s"
             cv2.putText(
                 annotated,
@@ -212,10 +245,10 @@ def main():
         help="Path to original video file",
     )
     parser.add_argument(
-        "--results",
+        "--task-input",
         type=str,
         required=True,
-        help="Path to results JSON file from process_demo_video",
+        help="Path to mimic.demo_task_input.v1 JSON from process_demo_video",
     )
     parser.add_argument(
         "--output",
@@ -231,20 +264,20 @@ def main():
         print(f"ERROR: Video file not found: {args.video}")
         return 1
 
-    results_file = Path(args.results)
-    if not results_file.exists():
-        print(f"ERROR: Results file not found: {args.results}")
+    task_input_file = Path(args.task_input)
+    if not task_input_file.exists():
+        print(f"ERROR: Task input file not found: {args.task_input}")
         return 1
 
     print("\n" + "=" * 70)
     print("VISUALIZATION: VIDEO + PREDICTIONS")
     print("=" * 70)
     print(f"\nVideo: {args.video}")
-    print(f"Results: {args.results}")
+    print(f"Task input: {args.task_input}")
     print(f"Output: {args.output}")
 
     try:
-        create_visualization(str(video_path), str(results_file), args.output)
+        create_visualization(str(video_path), str(task_input_file), args.output)
         print("\n" + "=" * 70)
         print("✓ Visualization complete!")
         print("=" * 70)

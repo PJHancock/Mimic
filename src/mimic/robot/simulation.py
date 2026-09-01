@@ -35,13 +35,82 @@ class MuJoCoAdapter:
         if set(self._gripper_ids.values()) & set(bindings.actuator_ids):
             raise ValueError("Arm and gripper actuator ownership must be disjoint")
         self._object_id = self.model.body(object_body).id if object_body else None
+        self._object_body_ids = self._descendant_bodies(self._object_id)
         self._tool_position = np.empty(3)
         self._tool_quaternion = np.empty(4)
+        self._advance_observer: Optional[Callable[[float], None]] = None
         mujoco.mj_forward(self.model, self.data)
+
+    def _descendant_bodies(self, body_id: Optional[int]) -> frozenset[int]:
+        if body_id is None:
+            return frozenset()
+        result = {body_id}
+        for candidate in range(body_id + 1, self.model.nbody):
+            if int(self.model.body_parentid[candidate]) in result:
+                result.add(candidate)
+        return frozenset(result)
+
+    def support_contact_observer(self, support_geom: str) -> Callable[[], bool]:
+        """Return an active-contact predicate for the configured object and support."""
+        if self._object_id is None:
+            raise ValueError("Support contact observation requires a named simulated object")
+        if not isinstance(support_geom, str) or not support_geom.strip():
+            raise ValueError("Support geometry must be a nonempty MuJoCo geom name")
+        try:
+            support_id = int(self.model.geom(support_geom).id)
+        except KeyError as exc:
+            raise ValueError(f"Unknown support geometry: {support_geom}") from exc
+        object_geom_ids = frozenset(
+            geom_id
+            for geom_id in range(self.model.ngeom)
+            if int(self.model.geom_bodyid[geom_id]) in self._object_body_ids
+        )
+        if not object_geom_ids or support_id in object_geom_ids:
+            raise ValueError("Support geometry must be separate from the observed object")
+
+        def observed() -> bool:
+            mujoco.mj_forward(self.model, self.data)
+            for contact_id in range(self.data.ncon):
+                contact = self.data.contact[contact_id]
+                if contact.efc_address < 0:
+                    continue
+                if (contact.geom1 == support_id and contact.geom2 in object_geom_ids) or (
+                    contact.geom2 == support_id and contact.geom1 in object_geom_ids
+                ):
+                    return True
+            return False
+
+        return observed
+
+    def set_advance_observer(self, observer: Optional[Callable[[float], None]]) -> None:
+        """Observe completed physics intervals without changing simulation timing."""
+        if observer is not None and not callable(observer):
+            raise TypeError("Advance observer must be callable or None")
+        self._advance_observer = observer
 
     def reset(self, keyframe: str) -> RobotState:
         """Only explicit initialization resets joint/object coordinates."""
         mujoco.mj_resetDataKeyframe(self.model, self.data, self.model.key(keyframe).id)
+        mujoco.mj_forward(self.model, self.data)
+        return self.read()
+
+    def initialize_object_position(self, position: Tuple[float, float, float]) -> RobotState:
+        """Set a free simulated object's initial position before physics starts."""
+        if self._object_id is None:
+            raise ValueError("Object initialization requires a named simulated object")
+        if self.data.time != 0:
+            raise RuntimeError("Object position may only be initialized before simulation starts")
+        values = np.asarray(position, dtype=float)
+        if values.shape != (3,) or not np.all(np.isfinite(values)):
+            raise ValueError("Initial object position must contain three finite meters")
+        joint_count = int(self.model.body_jntnum[self._object_id])
+        joint_id = int(self.model.body_jntadr[self._object_id])
+        if joint_count != 1 or self.model.jnt_type[joint_id] != mujoco.mjtJoint.mjJNT_FREE:
+            raise ValueError("Named simulated object must have exactly one free joint")
+        qpos_address = int(self.model.jnt_qposadr[joint_id])
+        dof_address = int(self.model.jnt_dofadr[joint_id])
+        self.data.qpos[qpos_address : qpos_address + 3] = values
+        self.data.qvel[dof_address : dof_address + 6] = 0
         mujoco.mj_forward(self.model, self.data)
         return self.read()
 
@@ -105,3 +174,5 @@ class MuJoCoAdapter:
             mujoco.mj_step(self.model, self.data)
             if not np.array_equal(self.data.warning.number, warnings_before):
                 raise RuntimeError("MuJoCo emitted a warning; execution stopped without recovery")
+        if self._advance_observer is not None:
+            self._advance_observer(duration_s)

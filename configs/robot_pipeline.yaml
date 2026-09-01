@@ -1,16 +1,20 @@
-# Contract template for saved-results -> world-waypoint construction.
-# Path selection is explicit. World Z coordinates and the fixed tool orientation
-# remain unresolved experiment settings and deliberately fail validation until an
-# experiment copies this file and replaces every null.
+# Simulation-default saved-results -> world-waypoint construction for the Panda.
+# These explicit values reuse the verified 4 cm cube fixture assumptions: the
+# tabletop surface is z=0, the object center is z=0.02 m, local tool +Z points
+# downward via a 180-degree world-X rotation, and 0.17 m provides 0.15 m of
+# vertical clearance. This is not a physical-robot or arbitrary-object calibration.
 robot_pipeline:
   path_processing:
-    interpolation: direct
+    interpolation: cubic
+    corner_max_deviation_m: .04
+    output_spacing_m: .05
+    maximum_spline_deviation_m: .10
   waypoint_construction:
-    approach_z_m: null
-    grasp_z_m: null
-    lift_z_m: null
-    transport_z_m: null
-    lower_z_m: null
-    retreat_z_m: null
-    object_goal_z_m: null
-    tool_quaternion_wxyz: null
+    approach_z_m: 0.17
+    grasp_z_m: 0.02
+    lift_z_m: 0.17
+    transport_z_m: 0.17
+    lower_z_m: 0.02
+    retreat_z_m: 0.17
+    object_goal_z_m: 0.02
+    tool_quaternion_wxyz: [0.0, 1.0, 0.0, 0.0]
