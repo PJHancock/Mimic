@@ -37,6 +37,19 @@ def read_waypoints(value: dict) -> PickPlaceWaypoints:
     )
 
 
+def read_waypoint_sequence(value: dict) -> tuple[PickPlaceWaypoints, ...]:
+    """Read either the legacy single-task payload or a versioned episode sequence."""
+
+    if value.get("schema") != "mimic.world_waypoint_sequence.v1":
+        return (read_waypoints(value),)
+    if set(value) != {"schema", "episodes"}:
+        raise ValueError("Waypoint sequence requires exactly schema and episodes")
+    episodes = value["episodes"]
+    if not isinstance(episodes, list) or not episodes:
+        raise ValueError("Waypoint sequence episodes must be a nonempty list")
+    return tuple(read_waypoints(episode) for episode in episodes)
+
+
 def build_executor(
     config_path: Path, record: Optional[Callable[[dict], None]] = None
 ) -> SkillExecutor:

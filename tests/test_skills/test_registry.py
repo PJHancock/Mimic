@@ -85,6 +85,28 @@ def test_repeated_label_does_not_restart_composite_skill(
     assert registry.plan(decision, skill_context) == ()
 
 
+def test_continuation_regrasp_still_approaches_before_descend(
+    skill_catalog, skill_graph, post_state_settings, skill_context
+) -> None:
+    processor = GraphStatePostProcessor(
+        skill_catalog,
+        skill_graph,
+        post_state_settings,
+        transition_guard=lambda transition: True,
+    )
+    processor.reset("IDLE")
+    registry = build_pick_place_skill_registry(skill_catalog)
+    decision = processor.process(prediction(0, "GRASP"))
+    assert decision.transition.variant == "CONTINUATION_REGRASP"
+    actions = registry.plan(decision, skill_context)
+    assert [action.primitive_id for action in actions] == [
+        "MOVE_TO_GRASP_HOVER",
+        "DESCEND",
+        "CLOSE",
+    ]
+    assert actions[0].target == skill_context.waypoints.approach
+
+
 def test_carry_handler_expands_to_lift_and_each_processed_waypoint(
     skill_catalog, skill_graph, post_state_settings, skill_context
 ) -> None:

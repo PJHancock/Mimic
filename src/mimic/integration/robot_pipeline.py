@@ -29,6 +29,7 @@ from mimic.tracking.coordinate_mapping import CoordinateMapper
 _JSON_SOURCE = Union[str, Path, Mapping[str, Any], DemoTaskInput]
 _YAML_SOURCE = Union[str, Path, Mapping[str, Any]]
 _TIMESTAMPED_VIDEO = object()
+_WAYPOINT_SEQUENCE_SCHEMA = "mimic.world_waypoint_sequence.v1"
 
 
 @dataclass(frozen=True)
@@ -169,15 +170,14 @@ def _validate_table_clone(mapper: CoordinateMapper, retargeting_payload: Mapping
         )
 
 
-def build_robot_pipeline(
+def build_robot_pipelines(
     *,
     task_input_source: _JSON_SOURCE,
     calibration_source: _JSON_SOURCE,
     retargeting_source: _YAML_SOURCE,
     pipeline_config_source: _YAML_SOURCE,
-    episode: Optional[int] = None,
-) -> RobotPipelineArtifacts:
-    """Run saved artifacts through calibration, extraction, retargeting, and waypoints."""
+) -> Tuple[RobotPipelineArtifacts, ...]:
+    """Build simulator-ready artifacts for every complete episode in source order."""
 
     task_input = load_demo_task_input(task_input_source)
     predictions = load_task_actions(
@@ -195,21 +195,6 @@ def build_robot_pipeline(
 
     tracks = _calibrated_tracks_from_task_input(task_input, mapper)
     tasks = extract_tasks(predictions, tracks)
-    if episode is None:
-        if len(tasks) != 1:
-            raise ValueError(
-                f"Found {len(tasks)} complete episodes; select one with --episode (one-based)"
-            )
-        selected_episode = 1
-    else:
-        if isinstance(episode, bool) or not isinstance(episode, Integral) or episode < 1:
-            raise ValueError("episode must be a positive one-based integer")
-        selected_episode = int(episode)
-        if selected_episode > len(tasks):
-            raise ValueError(
-                f"Episode {selected_episode} is unavailable; found {len(tasks)} complete episodes"
-            )
-
     pipeline_payload = _load_yaml(pipeline_config_source, "Robot pipeline config")
     if set(pipeline_payload) != {"robot_pipeline"} or not isinstance(
         pipeline_payload["robot_pipeline"], Mapping
@@ -221,25 +206,75 @@ def build_robot_pipeline(
             "robot_pipeline must contain exactly path_processing and waypoint_construction"
         )
 
-    task = tasks[selected_episode - 1]
-    target_task = retarget_task(task, mapping)
-    path = process_path(target_task, pipeline_config["path_processing"])
-    waypoints = build_waypoints(path, pipeline_config["waypoint_construction"])
-    return RobotPipelineArtifacts(
-        episode_count=len(tasks),
-        selected_episode=selected_episode,
-        table_tracks=tracks,
-        task=task,
-        retargeted_task=target_task,
-        processed_path=path,
-        waypoints=waypoints,
+    artifacts = []
+    for selected_episode, task in enumerate(tasks, 1):
+        target_task = retarget_task(task, mapping)
+        path = process_path(target_task, pipeline_config["path_processing"])
+        waypoints = build_waypoints(path, pipeline_config["waypoint_construction"])
+        artifacts.append(
+            RobotPipelineArtifacts(
+                episode_count=len(tasks),
+                selected_episode=selected_episode,
+                table_tracks=tracks,
+                task=task,
+                retargeted_task=target_task,
+                processed_path=path,
+                waypoints=waypoints,
+            )
+        )
+    return tuple(artifacts)
+
+
+def build_robot_pipeline(
+    *,
+    task_input_source: _JSON_SOURCE,
+    calibration_source: _JSON_SOURCE,
+    retargeting_source: _YAML_SOURCE,
+    pipeline_config_source: _YAML_SOURCE,
+    episode: Optional[int] = None,
+) -> RobotPipelineArtifacts:
+    """Build one explicitly selected episode for compatibility and diagnostics."""
+
+    artifacts = build_robot_pipelines(
+        task_input_source=task_input_source,
+        calibration_source=calibration_source,
+        retargeting_source=retargeting_source,
+        pipeline_config_source=pipeline_config_source,
     )
+    if episode is None:
+        if len(artifacts) != 1:
+            raise ValueError(
+                f"Found {len(artifacts)} complete episodes; select one with --episode (one-based)"
+            )
+        return artifacts[0]
+    if isinstance(episode, bool) or not isinstance(episode, Integral) or episode < 1:
+        raise ValueError("episode must be a positive one-based integer")
+    selected_episode = int(episode)
+    if selected_episode > len(artifacts):
+        raise ValueError(
+            f"Episode {selected_episode} is unavailable; found {len(artifacts)} complete episodes"
+        )
+    return artifacts[selected_episode - 1]
 
 
 def waypoint_payload(waypoints: PickPlaceWaypoints) -> dict:
     """Serialize the existing executor contract without adding another schema layer."""
 
     return asdict(waypoints)
+
+
+def waypoint_sequence_payload(waypoints: Sequence[PickPlaceWaypoints]) -> dict:
+    """Serialize one legacy task or an ordered multi-episode waypoint sequence."""
+
+    tasks = tuple(waypoints)
+    if not tasks:
+        raise ValueError("At least one world-waypoint episode is required")
+    if len(tasks) == 1:
+        return waypoint_payload(tasks[0])
+    return {
+        "schema": _WAYPOINT_SEQUENCE_SCHEMA,
+        "episodes": [waypoint_payload(task) for task in tasks],
+    }
 
 
 def write_world_waypoints(
@@ -252,6 +287,22 @@ def write_world_waypoints(
     mode = "w" if overwrite else "x"
     with output.open(mode) as stream:
         json.dump(waypoint_payload(waypoints), stream, indent=2, allow_nan=False)
+        stream.write("\n")
+
+
+def write_world_waypoint_sequence(
+    path: Union[str, Path],
+    waypoints: Sequence[PickPlaceWaypoints],
+    *,
+    overwrite: bool = False,
+) -> None:
+    """Write all episodes, preserving the legacy payload when exactly one exists."""
+
+    output = Path(path)
+    output.parent.mkdir(parents=True, exist_ok=True)
+    mode = "w" if overwrite else "x"
+    with output.open(mode) as stream:
+        json.dump(waypoint_sequence_payload(waypoints), stream, indent=2, allow_nan=False)
         stream.write("\n")
 
 
@@ -329,22 +380,43 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         parser.error(f"Robot config not found: {args.robot_config}")
 
     try:
-        artifacts = build_robot_pipeline(
-            task_input_source=args.task_input,
-            calibration_source=args.calibration,
-            retargeting_source=args.retargeting_config,
-            pipeline_config_source=args.pipeline_config,
-            episode=args.episode,
+        if args.episode is None:
+            artifacts = build_robot_pipelines(
+                task_input_source=args.task_input,
+                calibration_source=args.calibration,
+                retargeting_source=args.retargeting_config,
+                pipeline_config_source=args.pipeline_config,
+            )
+        else:
+            artifacts = (
+                build_robot_pipeline(
+                    task_input_source=args.task_input,
+                    calibration_source=args.calibration,
+                    retargeting_source=args.retargeting_config,
+                    pipeline_config_source=args.pipeline_config,
+                    episode=args.episode,
+                ),
+            )
+        write_world_waypoint_sequence(
+            args.waypoints,
+            tuple(artifact.waypoints for artifact in artifacts),
+            overwrite=args.overwrite,
         )
-        write_world_waypoints(args.waypoints, artifacts.waypoints, overwrite=args.overwrite)
     except (OSError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         return 2
 
-    print(
-        f"Wrote episode {artifacts.selected_episode}/{artifacts.episode_count} "
-        f"with {len(artifacts.processed_path.xy_m)} path points to {args.waypoints}"
-    )
+    if len(artifacts) == 1:
+        artifact = artifacts[0]
+        print(
+            f"Wrote episode {artifact.selected_episode}/{artifact.episode_count} "
+            f"with {len(artifact.processed_path.xy_m)} path points to {args.waypoints}"
+        )
+    else:
+        path_points = sum(len(artifact.processed_path.xy_m) for artifact in artifacts)
+        print(
+            f"Wrote all {len(artifacts)} episodes with {path_points} path points to {args.waypoints}"
+        )
     if args.robot_config is None:
         return 0
     executable = sys.executable

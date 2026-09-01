@@ -53,7 +53,16 @@ def _hover(decision: StateDecision, context: PickPlaceSkillContext) -> tuple[Rob
 
 
 def _grasp(decision: StateDecision, context: PickPlaceSkillContext) -> tuple[RobotAction, ...]:
-    return (
+    # A missed continuation HOVER is an extraction exception, not a skipped approach.
+    approach = ()
+    variant = decision.transition.variant if decision.transition is not None else None
+    if variant == "CONTINUATION_REGRASP":
+        approach = (
+            CartesianMotion(
+                "MOVE_TO_GRASP_HOVER", context.waypoints.approach, GripperAction.OPEN
+            ),
+        )
+    return approach + (
         CartesianMotion("DESCEND", context.waypoints.grasp, GripperAction.OPEN),
         CartesianMotion("CLOSE", context.waypoints.grasp, GripperAction.CLOSE),
     )

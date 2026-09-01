@@ -34,6 +34,28 @@ def test_accepts_legal_top_choice(post_processor: GraphStatePostProcessor) -> No
     assert decision.transition.variant == "TO_GRASP"
 
 
+def test_accepts_release_idle_regrasp_continuation(
+    skill_catalog, skill_graph, post_state_settings
+) -> None:
+    post_processor = GraphStatePostProcessor(
+        skill_catalog,
+        skill_graph,
+        post_state_settings,
+        transition_guard=lambda _transition: True,
+    )
+    post_processor.process(prediction(0.0, HOVER=0.8))
+    post_processor.process(prediction(0.1, GRASP=0.8))
+    post_processor.process(prediction(0.2, CARRY=0.8))
+    post_processor.process(prediction(0.3, RELEASE=0.8))
+    idle = post_processor.process(prediction(0.4, IDLE=0.8))
+    regrasp = post_processor.process(prediction(0.5, GRASP=0.8))
+
+    assert idle.accepted_skill == "IDLE"
+    assert regrasp.accepted_skill == "GRASP"
+    assert regrasp.transition is not None
+    assert regrasp.transition.variant == "CONTINUATION_REGRASP"
+
+
 def test_uses_second_choice_when_top_choice_is_illegal(
     post_processor: GraphStatePostProcessor,
 ) -> None:

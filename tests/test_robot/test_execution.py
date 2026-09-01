@@ -19,6 +19,7 @@ from mimic.robot.controller import ExecutionFailure, RobotController
 from mimic.robot.action_primitives import CartesianMotion
 from mimic.robot.factory import build_executor
 from mimic.robot.gripper import GripperAction, GripperLogic, GripperSettings
+from mimic.robot.presets import JointPreset
 from mimic.robot.state_machine import ExecutionSettings, SkillExecutor
 
 
@@ -62,6 +63,10 @@ class ScriptedIO:
         )
         self.state = replace(
             self.state,
+            joint_positions={
+                "x": (arm_targets["x"],),
+                "z": (arm_targets["z"],),
+            },
             tool_pose=next_pose,
             gripper=feedback,
             object_position=next_pose.position if self.grasping else self.state.object_position,
@@ -79,6 +84,22 @@ class ScriptedIK:
             {"x": target.position[0], "z": target.position[2]},
             0,
             0,
+            0,
+        )
+
+    def check_cartesian_arrival(self, target, state, dt_s):
+        return self.solve(target, state, dt_s)
+
+    def solve_joint_target(self, target, tolerances, state, dt_s):
+        arrived = all(
+            abs(state.joint_positions[name][0] - value) <= tolerances[name]
+            for name, value in target.items()
+        )
+        return IKResult(
+            IKStatus.AT_TARGET if arrived else IKStatus.VALID_STEP,
+            dict(target),
+            None,
+            None,
             0,
         )
 
@@ -110,6 +131,7 @@ def executor(io, ik=None):
                 placement_contact_confirmation_s=0.03,
             ),
             events.append,
+            preset_position_tolerances={"x": 0.001, "z": 0.001},
             support_contact=lambda: io.read().object_position[2] <= task().lower.position[2],
         ),
         events,
@@ -144,6 +166,16 @@ def test_all_phases_have_feedback_gated_subskills():
     assert placement["target_pose"]["position"] == pytest.approx((0.2, 0.0, 0.015))
     assert any(event["event"] == "placement_contact" for event in events)
     assert any(event["event"] == "placement_supported" for event in events)
+    captured = next(event for event in events if event["event"] == "retreat_joint_target_captured")
+    assert captured["joint_positions"] == {"x": pytest.approx(0.2), "z": pytest.approx(0.1)}
+    retreat = next(
+        event
+        for event in events
+        if event["event"] == "sample"
+        and event["skill"] == "RETREAT"
+        and "cartesian_validation" in event
+    )
+    assert retreat["cartesian_validation"]["status"] == "AT_TARGET"
 
 
 def test_guarded_lower_caps_continuous_cartesian_reference_speed():
@@ -274,6 +306,34 @@ def test_final_path_waypoint_still_requires_measured_arrival():
     assert not any(event["event"] == "transition" and event["skill"] == "LOWER" for event in events)
 
 
+def test_joint_retreat_still_requires_measured_cartesian_arrival():
+    class NeverValidateRetreatIK(ScriptedIK):
+        joint_returned = False
+
+        def solve(self, target, state, dt_s):
+            result = super().solve(target, state, dt_s)
+            if self.joint_returned and target == task().retreat:
+                return replace(result, status=IKStatus.VALID_STEP)
+            return result
+
+        def check_cartesian_arrival(self, target, state, dt_s):
+            return self.solve(target, state, dt_s)
+
+        def solve_joint_target(self, target, tolerances, state, dt_s):
+            result = super().solve_joint_target(target, tolerances, state, dt_s)
+            if result.status == IKStatus.AT_TARGET:
+                self.joint_returned = True
+            return result
+
+    runner, events = executor(ScriptedIO(), NeverValidateRetreatIK())
+
+    result = runner.run(task())
+
+    assert result.failure == "RETREAT: target not achieved before timeout"
+    assert not result.released
+    assert any(event["event"] == "retreat_joint_target_captured" for event in events)
+
+
 def test_empty_grasp_stops_before_lift_and_does_not_auto_release():
     io = ScriptedIO(empty=True)
     runner, events = executor(io)
@@ -320,6 +380,51 @@ def test_executor_initializes_simulated_object_at_grasp_pose():
     assert event["position"] == task().grasp.position
 
 
+def test_playback_runs_all_episodes_without_reinitializing_the_object():
+    io = ScriptedIO()
+    initialized = []
+
+    def initialize(position):
+        initialized.append(position)
+        io.state = replace(io.state, object_position=position)
+        return io.state
+
+    second = PickPlaceWaypoints(
+        pose(0.2, 0.1),
+        pose(0.2),
+        pose(0.2, 0.1),
+        (pose(0.0, 0.1),),
+        pose(0.0),
+        pose(0.0, 0.1),
+        (0.0, 0.0, 0.0),
+    )
+    runner, events = executor(io)
+    runner.initialize_object = initialize
+    runner.home_preset = JointPreset("home", {"x": 0.0, "z": 0.1})
+
+    result = runner.run_sequence((task(), second))
+
+    assert result.success
+    assert result.completed_episodes == result.total_episodes == 2
+    assert len(result.episode_reports) == 2
+    assert initialized == [task().grasp.position]
+    starts = [event for event in events if event["event"] == "episode_start"]
+    assert starts[1]["measured_object_position"] == pytest.approx(second.grasp.position)
+    assert len([event for event in events if event["event"] == "object_initialized"]) == 1
+    assert not any(
+        event["event"] == "transition" and event["skill"] == "MOVE_TO_HOME" for event in events
+    )
+    skills = [event["skill"] for event in events if event["event"] == "transition"]
+    assert skills.count("HOVER") == 2
+    assert events[-1] == {
+        "event": "playback_result",
+        "success": True,
+        "completed_episodes": 2,
+        "total_episodes": 2,
+        "failure": None,
+    }
+
+
 def test_no_progress_times_out_without_skipping_waypoint():
     class StalledIK:
         def solve(self, target, state, dt_s):
@@ -362,7 +467,7 @@ def test_existing_command_requires_declared_quaternion_order():
 def test_configuration_does_not_guess_unresolved_parameters():
     from pathlib import Path
 
-    config = Path(__file__).resolve().parents[2] / "configs/robots/panda.yaml"
+    config = Path(__file__).resolve().parents[2] / "configs/robots/panda/template.yaml"
     with pytest.raises(ValueError, match="Unresolved setting"):
         build_executor(config)
 

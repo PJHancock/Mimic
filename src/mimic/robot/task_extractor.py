@@ -37,6 +37,22 @@ class TaskExtractor:
         ActionPhase.IDLE,
     )
     EPISODES = (EPISODE_WITH_RETREAT, EPISODE_DIRECT_TO_IDLE)
+    CONTINUATION_WITH_RETREAT = (
+        ActionPhase.IDLE,
+        ActionPhase.GRASP,
+        ActionPhase.CARRY,
+        ActionPhase.RELEASE,
+        ActionPhase.HOVER,
+        ActionPhase.IDLE,
+    )
+    CONTINUATION_DIRECT_TO_IDLE = (
+        ActionPhase.IDLE,
+        ActionPhase.GRASP,
+        ActionPhase.CARRY,
+        ActionPhase.RELEASE,
+        ActionPhase.IDLE,
+    )
+    CONTINUATION_EPISODES = (CONTINUATION_WITH_RETREAT, CONTINUATION_DIRECT_TO_IDLE)
 
     def extract(
         self,
@@ -77,7 +93,8 @@ class TaskExtractor:
         cursor = 0
         while cursor < len(boundaries) - 1:
             episode = None
-            for expected in self.EPISODES:
+            expected_episodes = self.EPISODES + (self.CONTINUATION_EPISODES if episodes else ())
+            for expected in expected_episodes:
                 candidate = tuple(boundaries[cursor : cursor + len(expected)])
                 if tuple(boundary.phase for boundary in candidate) == expected:
                     episode = candidate
@@ -117,7 +134,12 @@ class TaskExtractor:
 
         tasks: List[ExtractedTask] = []
         for episode in episodes:
-            grasp_frame, release_frame = episode[2].frame_idx, episode[4].frame_idx
+            grasp_frame = next(
+                boundary.frame_idx for boundary in episode if boundary.phase == ActionPhase.GRASP
+            )
+            release_frame = next(
+                boundary.frame_idx for boundary in episode if boundary.phase == ActionPhase.RELEASE
+            )
             samples = tuple(
                 sample
                 for sample in detached_tracks

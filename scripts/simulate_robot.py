@@ -15,7 +15,7 @@ from typing import Callable, Optional, Sequence
 import imageio.v2 as imageio
 import mujoco
 
-from mimic.robot.factory import build_executor, read_waypoints
+from mimic.robot.factory import build_executor, read_waypoint_sequence
 from mimic.robot.simulation import MuJoCoAdapter
 
 _TIMESTAMPED_VIDEO = object()
@@ -218,7 +218,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         video_path = _resolve_video_path(args.video_out)
     except ValueError as exc:
         parser.error(str(exc))
-    task = read_waypoints(json.loads(args.waypoints.read_text()))
+    tasks = read_waypoint_sequence(json.loads(args.waypoints.read_text()))
     args.log.parent.mkdir(parents=True, exist_ok=True)
     with args.log.open("w") as stream:
 
@@ -242,7 +242,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         try:
             with _video_session(executor, video_path) as capture_frame:
                 with _viewer_session(executor, args.viewer, capture_frame) as viewer_handle:
-                    report = executor.run(task)
+                    report = (
+                        executor.run(tasks[0]) if len(tasks) == 1 else executor.run_sequence(tasks)
+                    )
                     print(json.dumps(asdict(report), indent=2, allow_nan=False))
                     if viewer_handle is not None and viewer_handle.is_running():
                         _wait_for_viewer_close(viewer_handle)

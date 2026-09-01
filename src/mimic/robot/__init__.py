@@ -45,6 +45,7 @@ _EXPORT_MODULES = {
     "RobotIO": "simulation",
     "ExecutionSettings": "state_machine",
     "SkillExecutor": "state_machine",
+    "PlaybackReport": "state_machine",
 }
 
 __all__ = list(_EXPORT_MODULES)

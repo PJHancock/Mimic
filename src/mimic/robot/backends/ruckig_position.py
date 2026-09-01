@@ -203,6 +203,10 @@ class RuckigPositionIK:
             stop_on_measured_arrival=True,
         )
 
+    def check_cartesian_arrival(self, target: ToolPose, state: RobotState, dt_s: float) -> IKResult:
+        """Evaluate measured Cartesian arrival without changing the Ruckig reference."""
+        return replace(self.solver.solve(target, state, dt_s), joint_targets={})
+
     def _solve_cartesian(
         self,
         target: ToolPose,

@@ -81,6 +81,22 @@ class RobotController:
         self._pending = ControlSample(state, result, self._gripper_result)
         return self._pending
 
+    def check_cartesian_arrival(self, target: ToolPose) -> IKResult:
+        """Check measured pose without replacing or advancing the active reference."""
+        if self._failed:
+            raise ExecutionFailure("Controller is stopped after failure; explicit reset required")
+        state = self.io.read()
+        check = getattr(self.ik, "check_cartesian_arrival", None)
+        if check is None:
+            raise ExecutionFailure(
+                "Configured motion backend does not support read-only Cartesian validation"
+            )
+        result = check(target, state, self.dt_s)
+        if not result.valid:
+            self._failed = True
+            raise ExecutionFailure(f"Cartesian validation {result.status.value}: {result.detail}")
+        return result
+
     def prepare_joint(
         self,
         target: Mapping[str, float],

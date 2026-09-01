@@ -17,8 +17,11 @@ from .action_results import (
 from .robot_pipeline import (
     RobotPipelineArtifacts,
     build_robot_pipeline,
+    build_robot_pipelines,
     load_calibrated_object_tracks,
     waypoint_payload,
+    waypoint_sequence_payload,
+    write_world_waypoint_sequence,
     write_world_waypoints,
 )
 from .task_input import (
@@ -54,8 +57,11 @@ __all__ = [
     "predictions_from_probabilities",
     "RobotPipelineArtifacts",
     "build_robot_pipeline",
+    "build_robot_pipelines",
     "load_calibrated_object_tracks",
     "waypoint_payload",
+    "waypoint_sequence_payload",
+    "write_world_waypoint_sequence",
     "write_world_waypoints",
     "write_results",
 ]

@@ -9,9 +9,11 @@ import yaml
 
 from mimic.integration.robot_pipeline import (
     build_robot_pipeline,
+    build_robot_pipelines,
     load_calibrated_object_tracks,
     main,
     waypoint_payload,
+    waypoint_sequence_payload,
 )
 from mimic.integration.task_input import load_demo_task_input
 from mimic.robot import PathProcessingSettings, WaypointConstructionSettings
@@ -82,6 +84,54 @@ def _task_input() -> dict:
     }
 
 
+def _continuation_task_input() -> dict:
+    task_input = _task_input()
+    phases = (
+        "IDLE",
+        "HOVER",
+        "GRASP",
+        "CARRY",
+        "RELEASE",
+        "IDLE",
+        "GRASP",
+        "CARRY",
+        "RELEASE",
+        "IDLE",
+    )
+    task_input["video"].update(frame_count=len(phases), duration_s=1.0)
+    task_input["resolved_actions"] = [
+        {
+            "frame_idx": index,
+            "timestamp_s": (index - 1) * 0.1,
+            "phase": phase,
+            "confidence": 0.9,
+            "decision_source": "model",
+        }
+        for index, phase in enumerate(phases, 1)
+    ]
+    positions = (
+        (10, 10),
+        (20, 20),
+        (100, 200),
+        (200, 300),
+        (300, 400),
+        (300, 400),
+        (300, 400),
+        (400, 300),
+        (500, 200),
+        (500, 200),
+    )
+    task_input["object_tracks"] = [
+        {
+            "frame_idx": index,
+            "timestamp_s": (index - 1) * 0.1,
+            "position": {"x": x, "y": y, "confidence": 0.8},
+        }
+        for index, (x, y) in enumerate(positions, 1)
+    ]
+    return task_input
+
+
 def _calibration() -> dict:
     return {
         "homography": [[0.001, 0, 0], [0, 0.001, 0], [0, 0, 1]],
@@ -148,6 +198,24 @@ def test_saved_pixels_are_calibrated_and_retargeted_into_world_waypoints() -> No
         rtol=0,
         atol=1e-7,
     )
+
+
+def test_pipeline_builds_every_continuation_episode_in_source_order() -> None:
+    artifacts = build_robot_pipelines(
+        task_input_source=_continuation_task_input(),
+        calibration_source=_calibration(),
+        retargeting_source=_retargeting(),
+        pipeline_config_source=_pipeline_config(),
+    )
+
+    assert [artifact.selected_episode for artifact in artifacts] == [1, 2]
+    assert [artifact.task.grasp_frame for artifact in artifacts] == [3, 7]
+    assert artifacts[0].waypoints.goal_position[:2] == pytest.approx(
+        artifacts[1].waypoints.grasp.position[:2]
+    )
+    payload = waypoint_sequence_payload(tuple(artifact.waypoints for artifact in artifacts))
+    assert payload["schema"] == "mimic.world_waypoint_sequence.v1"
+    assert len(payload["episodes"]) == 2
 
 
 def test_loader_skips_missing_detections_without_fabricating_coordinates() -> None:
@@ -252,6 +320,38 @@ def test_cli_writes_simulator_contract_without_importing_the_executor(tmp_path: 
         "retreat",
         "goal_position",
     }
+
+
+def test_cli_writes_all_complete_episodes_by_default(tmp_path: Path) -> None:
+    inputs = {
+        "task_input.json": _continuation_task_input(),
+        "calibration.json": _calibration(),
+    }
+    for name, payload in inputs.items():
+        (tmp_path / name).write_text(json.dumps(payload))
+    (tmp_path / "retargeting.yaml").write_text(yaml.safe_dump(_retargeting()))
+    (tmp_path / "pipeline.yaml").write_text(yaml.safe_dump(_pipeline_config()))
+    output = tmp_path / "world_waypoints.json"
+
+    result = main(
+        (
+            "--task-input",
+            str(tmp_path / "task_input.json"),
+            "--calibration",
+            str(tmp_path / "calibration.json"),
+            "--retargeting-config",
+            str(tmp_path / "retargeting.yaml"),
+            "--pipeline-config",
+            str(tmp_path / "pipeline.yaml"),
+            "--waypoints",
+            str(output),
+        )
+    )
+
+    assert result == 0
+    payload = json.loads(output.read_text())
+    assert payload["schema"] == "mimic.world_waypoint_sequence.v1"
+    assert len(payload["episodes"]) == 2
 
 
 def test_committed_panda_pipeline_config_is_complete() -> None:

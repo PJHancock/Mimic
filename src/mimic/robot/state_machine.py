@@ -100,6 +100,16 @@ class ExecutionReport:
     final_state: RobotState
 
 
+@dataclass(frozen=True)
+class PlaybackReport:
+    success: bool
+    completed_episodes: int
+    total_episodes: int
+    episode_reports: Tuple[ExecutionReport, ...]
+    failure: Optional[str]
+    final_state: RobotState
+
+
 class SkillExecutor:
     def __init__(
         self,
@@ -118,6 +128,44 @@ class SkillExecutor:
         self.support_contact = support_contact
         self.preset_position_tolerances = (
             dict(preset_position_tolerances) if preset_position_tolerances is not None else None
+        )
+
+    def _seeded_approach_joints(self, pose: ToolPose) -> Optional[dict]:
+        """Solve the hover pose from the saved home posture, not the live redundancy branch.
+
+        Differential IK follows the measured configuration. After a completed episode that
+        branch can still reach the next hover pose while being unable to descend or carry.
+        The home posture is only an IK seed; this does not command a return to home.
+        """
+        geometric = getattr(self.controller.ik, "solver", None)
+        settings = getattr(self.controller.ik, "settings", None)
+        if (
+            self.home_preset is None
+            or self.preset_position_tolerances is None
+            or geometric is None
+            or settings is None
+        ):
+            return None
+        observed = self.controller.io.read()
+        joints = dict(observed.joint_positions)
+        for name, value in self.home_preset.joint_positions.items():
+            joints[name] = (float(value),)
+        state = replace(observed, joint_positions=joints)
+        names = tuple(self.home_preset.joint_positions)
+        last = None
+        for _ in range(settings.maximum_planning_steps):
+            last = geometric.solve(pose, state, self.controller.dt_s)
+            if not last.valid:
+                raise ExecutionFailure(
+                    f"HOVER: seeded approach IK {last.status.value}: {last.detail}"
+                )
+            if last.status == IKStatus.AT_TARGET:
+                return {name: float(last.joint_targets[name]) for name in names}
+            for name in names:
+                joints[name] = (float(last.joint_targets[name]),)
+            state = replace(state, joint_positions=joints)
+        raise ExecutionFailure(
+            "HOVER: seeded approach IK did not converge within the configured step bound"
         )
 
     def return_home(self) -> RobotState:
@@ -146,8 +194,7 @@ class SkillExecutor:
                 return sample.state
             self.controller.commit(sample)
 
-    def run(self, task: PickPlaceWaypoints) -> ExecutionReport:
-        """Run one simulation attempt. A failure returns without further stepping/release."""
+    def _initialize_playback(self, task: PickPlaceWaypoints) -> None:
         if self.support_contact is None:
             raise ValueError("Guarded placement requires a support-contact observer")
         self.controller.reset()
@@ -160,6 +207,86 @@ class SkillExecutor:
                     "position": initialized.object_position,
                 }
             )
+
+    def run(self, task: PickPlaceWaypoints) -> ExecutionReport:
+        """Run one simulation attempt with reset-only object initialization."""
+
+        self._initialize_playback(task)
+        return self._run_episode(task)
+
+    def run_sequence(self, tasks: Tuple[PickPlaceWaypoints, ...]) -> PlaybackReport:
+        """Run every episode in one physical timeline without moving the object between them."""
+
+        episodes = tuple(tasks)
+        if not episodes:
+            raise ValueError("Playback requires at least one episode")
+        self._initialize_playback(episodes[0])
+        self.record({"event": "playback_start", "episode_count": len(episodes)})
+        reports = []
+        for episode_index, task in enumerate(episodes, 1):
+            observed = self.controller.io.read()
+            self.record(
+                {
+                    "event": "episode_start",
+                    "episode_index": episode_index,
+                    "episode_count": len(episodes),
+                    "timestamp_s": observed.timestamp_s,
+                    "measured_object_position": observed.object_position,
+                    "demonstrated_grasp_position": task.grasp.position,
+                }
+            )
+            report = self._run_episode(task, seed_hover_from_home=episode_index > 1)
+            reports.append(report)
+            self.record(
+                {
+                    "event": "episode_result",
+                    "episode_index": episode_index,
+                    "episode_count": len(episodes),
+                    "success": report.success,
+                    "failure": report.failure,
+                    "final_position_error_m": report.final_position_error_m,
+                }
+            )
+            if not report.success:
+                break
+            if episode_index < len(episodes):
+                self.record(
+                    {
+                        "event": "episode_handoff",
+                        "completed_episode": episode_index,
+                        "next_episode": episode_index + 1,
+                        "timestamp_s": self.controller.io.read().timestamp_s,
+                    }
+                )
+        completed = sum(report.success for report in reports)
+        success = completed == len(episodes)
+        failure = (
+            None if success else f"Episode {len(reports)}/{len(episodes)}: {reports[-1].failure}"
+        )
+        playback = PlaybackReport(
+            success,
+            completed,
+            len(episodes),
+            tuple(reports),
+            failure,
+            self.controller.io.read(),
+        )
+        self.record(
+            {
+                "event": "playback_result",
+                "success": playback.success,
+                "completed_episodes": playback.completed_episodes,
+                "total_episodes": playback.total_episodes,
+                "failure": playback.failure,
+            }
+        )
+        return playback
+
+    def _run_episode(
+        self, task: PickPlaceWaypoints, *, seed_hover_from_home: bool = False
+    ) -> ExecutionReport:
+        """Run one episode against the current physical state without initialization."""
+
         initial = self.controller.io.read()
         if initial.object_position is None:
             raise ValueError("Pick-and-place verification requires a named simulated object")
@@ -168,6 +295,8 @@ class SkillExecutor:
         grasp_offset = None
         contact_lost_at = None
         release_hold_pose = None
+        retreat_joint_target = None
+        retreat_joint_arrived = False
         failure = None
         self.record(
             {
@@ -192,6 +321,12 @@ class SkillExecutor:
                 previous_lower_timestamp = None
                 support_hold_pose = None
                 support_stable_since = None
+                seeded_hover_joints = (
+                    self._seeded_approach_joints(step.pose)
+                    if step.skill == "HOVER" and seed_hover_from_home
+                    else None
+                )
+                seeded_hover_arrived = seeded_hover_joints is None
                 waypoint_metadata = (
                     {
                         "waypoint_index": step.waypoint_index,
@@ -208,6 +343,11 @@ class SkillExecutor:
                         "skill": step.skill,
                         "step": step_index,
                         **waypoint_metadata,
+                        **(
+                            {"seeded_joint_targets": seeded_hover_joints}
+                            if seeded_hover_joints is not None
+                            else {}
+                        ),
                     }
                 )
                 while True:
@@ -292,15 +432,60 @@ class SkillExecutor:
                                     guarded_reference_z,
                                 ),
                             )
-                    sample = self.controller.prepare(
-                        target_pose,
-                        step.gripper_action,
-                        # These stationary manipulation poses must not inherit
-                        # residual reference motion after measured arrival. LOWER
-                        # is deliberately excluded because its guarded target moves.
-                        stop_on_measured_arrival=step.skill == "DESCEND",
+                    use_joint_retreat = (
+                        step.skill == "RETREAT"
+                        and retreat_joint_target is not None
+                        and not retreat_joint_arrived
                     )
+                    use_seeded_hover = (
+                        step.skill == "HOVER"
+                        and seeded_hover_joints is not None
+                        and not seeded_hover_arrived
+                    )
+                    if use_joint_retreat or use_seeded_hover:
+                        if self.preset_position_tolerances is None:
+                            raise ExecutionFailure(
+                                f"{step.skill}: named joint-arrival tolerances are required"
+                            )
+                        sample = self.controller.prepare_joint(
+                            (
+                                retreat_joint_target
+                                if use_joint_retreat
+                                else seeded_hover_joints
+                            ),
+                            self.preset_position_tolerances,
+                            step.gripper_action,
+                        )
+                        if sample.ik.status == IKStatus.AT_TARGET:
+                            if use_joint_retreat:
+                                retreat_joint_arrived = True
+                            else:
+                                seeded_hover_arrived = True
+                    else:
+                        sample = self.controller.prepare(
+                            target_pose,
+                            step.gripper_action,
+                            # These stationary manipulation poses must not inherit
+                            # residual reference motion after measured arrival. LOWER
+                            # is deliberately excluded because its guarded target moves.
+                            stop_on_measured_arrival=step.skill == "DESCEND"
+                            or (
+                                step.skill == "HOVER"
+                                and seeded_hover_joints is not None
+                                and seeded_hover_arrived
+                            )
+                            or (
+                                step.skill == "RETREAT"
+                                and retreat_joint_target is not None
+                                and retreat_joint_arrived
+                            ),
+                        )
                     state, grip = sample.state, sample.gripper
+                    retreat_cartesian_validation = (
+                        self.controller.check_cartesian_arrival(step.pose)
+                        if use_joint_retreat and sample.ik.status == IKStatus.AT_TARGET
+                        else None
+                    )
                     self.record(
                         {
                             "event": "sample",
@@ -311,10 +496,37 @@ class SkillExecutor:
                             "target_pose": asdict(target_pose),
                             **(
                                 {
+                                    "motion_mode": (
+                                        "JOINT_RETURN"
+                                        if use_joint_retreat
+                                        else "CARTESIAN_CORRECTION"
+                                    )
+                                }
+                                if step.skill == "RETREAT" and retreat_joint_target is not None
+                                else {}
+                            ),
+                            **(
+                                {
+                                    "motion_mode": (
+                                        "SEEDED_JOINT"
+                                        if use_seeded_hover
+                                        else "CARTESIAN_CORRECTION"
+                                    )
+                                }
+                                if step.skill == "HOVER" and seeded_hover_joints is not None
+                                else {}
+                            ),
+                            **(
+                                {
                                     "support_contact": support_observed,
                                     "measured_descent_speed_m_s": measured_descent_speed_m_s,
                                 }
                                 if step.skill == "LOWER"
+                                else {}
+                            ),
+                            **(
+                                {"cartesian_validation": asdict(retreat_cartesian_validation)}
+                                if retreat_cartesian_validation is not None
                                 else {}
                             ),
                             **asdict(sample),
@@ -328,6 +540,14 @@ class SkillExecutor:
                         if not (step.skill == "OPEN" and grip.action == GripperAction.CLOSE):
                             raise ExecutionFailure(f"{step.skill}: gripper {grip.status.value}")
                     at_target = sample.ik.status == IKStatus.AT_TARGET
+                    if use_joint_retreat:
+                        at_target = (
+                            at_target
+                            and retreat_cartesian_validation is not None
+                            and retreat_cartesian_validation.status == IKStatus.AT_TARGET
+                        )
+                    if use_seeded_hover:
+                        at_target = False
                     if state.object_position is None:
                         raise ExecutionFailure("Object observation disappeared")
                     object_position = np.array(state.object_position)
@@ -410,6 +630,30 @@ class SkillExecutor:
                                 )
                         elif complete:
                             transported = grasped
+                            if step.pose == task.retreat:
+                                if self.preset_position_tolerances is None:
+                                    raise ExecutionFailure(
+                                        "FOLLOW_PATH: named joint-arrival tolerances are required "
+                                        "to retain the retreat configuration"
+                                    )
+                                retreat_joint_target = {}
+                                for name in self.preset_position_tolerances:
+                                    coordinates = state.joint_positions.get(name)
+                                    if coordinates is None or len(coordinates) != 1:
+                                        raise ExecutionFailure(
+                                            "FOLLOW_PATH: measured arm-joint contract changed"
+                                        )
+                                    retreat_joint_target[name] = float(coordinates[0])
+                                self.record(
+                                    {
+                                        "event": "retreat_joint_target_captured",
+                                        "timestamp_s": state.timestamp_s,
+                                        "phase": step.phase.value,
+                                        "skill": step.skill,
+                                        "joint_positions": retreat_joint_target,
+                                        "target_pose": asdict(step.pose),
+                                    }
+                                )
                     elif step.skill == "LOWER":
                         complete = False
                         object_speed_m_s = float("inf")
@@ -484,7 +728,11 @@ class SkillExecutor:
             stable_since = None
             previous = self.controller.io.read()
             while True:
-                sample = self.controller.prepare(task.retreat, GripperAction.HOLD)
+                sample = self.controller.prepare(
+                    task.retreat,
+                    GripperAction.HOLD,
+                    stop_on_measured_arrival=retreat_joint_target is not None,
+                )
                 state = sample.state
                 elapsed = state.timestamp_s - previous.timestamp_s
                 speed = (

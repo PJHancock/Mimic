@@ -41,6 +41,12 @@ def test_graph_exposes_contextual_hover_edges(skill_graph: SkillGraph) -> None:
     assert skill_graph.transition("IDLE", "HOVER").variant == "TO_GRASP"
     assert skill_graph.transition("RELEASE", "HOVER").variant == "TO_HOME"
     assert skill_graph.transition("GRASP", "HOVER").guard == "grasp_empty"
+
+
+def test_graph_exposes_continuation_regrasp_edge(skill_graph: SkillGraph) -> None:
+    transition = skill_graph.transition("IDLE", "GRASP")
+    assert transition is not None
+    assert transition.variant == "CONTINUATION_REGRASP"
     assert skill_graph.transition("GRASP", "CARRY").guard_scope == "runtime"
 
 

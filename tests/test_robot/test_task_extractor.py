@@ -255,6 +255,52 @@ def test_multiple_episodes_are_extracted_from_one_timeline(task_predictions, tab
         extract_task(predictions, [*table_tracks, *second_tracks])
 
 
+def test_completed_episode_may_continue_idle_to_grasp(task_predictions, table_tracks):
+    second_predictions = [
+        ActionPrediction(
+            prediction.frame_idx + 14,
+            prediction.phase,
+            prediction.confidence,
+            None if prediction.timestamp is None else prediction.timestamp + 14,
+        )
+        for prediction in task_predictions
+        if prediction.phase not in (ActionPhase.IDLE, ActionPhase.HOVER)
+    ]
+    second_predictions.append(ActionPrediction(28, ActionPhase.IDLE, 0.9))
+    second_tracks = [
+        ObjectTrack(
+            track.frame_idx + 14,
+            track.table_xy_m,
+            confidence=track.confidence,
+            object_id=track.object_id,
+        )
+        for track in table_tracks
+        if track.frame_idx >= 3
+    ]
+
+    tasks = extract_tasks([*task_predictions, *second_predictions], [*table_tracks, *second_tracks])
+
+    assert len(tasks) == 2
+    assert [task.grasp_frame for task in tasks] == [3, 17]
+    assert tuple(boundary.phase for boundary in tasks[1].phase_boundaries) == (
+        ActionPhase.IDLE,
+        ActionPhase.GRASP,
+        ActionPhase.CARRY,
+        ActionPhase.RELEASE,
+        ActionPhase.IDLE,
+    )
+
+
+def test_first_episode_still_requires_hover(table_tracks):
+    predictions = [
+        ActionPrediction(index, phase, 0.9)
+        for index, phase in enumerate(("IDLE", "GRASP", "CARRY", "RELEASE", "IDLE"), 1)
+    ]
+
+    with pytest.raises(TaskExtractionError, match="one or more complete"):
+        extract_tasks(predictions, table_tracks)
+
+
 def test_old_pixel_keyword_cannot_silently_enter_table_contract():
     with pytest.raises(TypeError):
         ObjectTrack(frame_idx=1, center_2d=(10, 20))

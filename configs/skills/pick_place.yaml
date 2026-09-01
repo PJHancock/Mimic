@@ -13,6 +13,7 @@ skill_system:
     transitions:
       - {source: IDLE, target: IDLE}
       - {source: IDLE, target: HOVER, variant: TO_GRASP}
+      - {source: IDLE, target: GRASP, variant: CONTINUATION_REGRASP}
       - {source: HOVER, target: HOVER, variant: CONTINUE}
       - {source: HOVER, target: GRASP}
       - {source: HOVER, target: IDLE}

@@ -17,6 +17,7 @@ from scripts.simulate_robot import (
     _viewer_session,
     main as simulate_main,
 )
+from mimic.robot.factory import read_waypoint_sequence
 
 pytest_plugins = ("tests.test_robot.execution_fixtures",)
 
@@ -191,3 +192,67 @@ def test_simulation_log_replaces_existing_contents(
     assert result == 0
     assert "stale log contents" not in log.read_text()
     assert log.read_text().splitlines()[0] == '{"event": "configuration"}'
+
+
+def test_waypoint_sequence_reader_preserves_episode_order() -> None:
+    pose = {"position": [0, 0, 0], "quaternion_wxyz": [1, 0, 0, 0]}
+    first = {
+        **{name: pose for name in ("approach", "grasp", "lift", "lower", "retreat")},
+        "path": [pose],
+        "goal_position": [1, 0, 0],
+    }
+    second = {**first, "goal_position": [2, 0, 0]}
+
+    tasks = read_waypoint_sequence(
+        {
+            "schema": "mimic.world_waypoint_sequence.v1",
+            "episodes": [first, second],
+        }
+    )
+
+    assert [task.goal_position for task in tasks] == [(1.0, 0.0, 0.0), (2.0, 0.0, 0.0)]
+
+
+def test_simulation_main_dispatches_multiple_episodes_as_one_playback(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pose = {"position": [0, 0, 0], "quaternion_wxyz": [1, 0, 0, 0]}
+    episode = {
+        **{name: pose for name in ("approach", "grasp", "lift", "lower", "retreat")},
+        "path": [pose],
+        "goal_position": [0, 0, 0],
+    }
+    config = tmp_path / "robot.yaml"
+    task = tmp_path / "waypoints.json"
+    log = tmp_path / "execution.jsonl"
+    config.write_text("robot_execution: {}\n")
+    task.write_text(
+        json.dumps(
+            {
+                "schema": "mimic.world_waypoint_sequence.v1",
+                "episodes": [episode, episode],
+            }
+        )
+    )
+    received = []
+
+    @dataclass(frozen=True)
+    class FakePlayback:
+        success: bool = True
+
+    def fake_build_executor(_config, record):
+        record({"event": "configuration"})
+
+        def run_sequence(tasks):
+            received.extend(tasks)
+            return FakePlayback()
+
+        return SimpleNamespace(run_sequence=run_sequence)
+
+    monkeypatch.setattr("scripts.simulate_robot.build_executor", fake_build_executor)
+    monkeypatch.setattr("scripts.simulate_robot.importlib.metadata.version", lambda _name: "test")
+
+    result = simulate_main(("--config", str(config), "--waypoints", str(task), "--log", str(log)))
+
+    assert result == 0
+    assert len(received) == 2

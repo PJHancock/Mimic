@@ -162,13 +162,30 @@ class ExtractedTask:
             ActionPhase.RELEASE,
             ActionPhase.IDLE,
         )
+        continuation_with_retreat = (
+            ActionPhase.IDLE,
+            ActionPhase.GRASP,
+            ActionPhase.CARRY,
+            ActionPhase.RELEASE,
+            ActionPhase.HOVER,
+            ActionPhase.IDLE,
+        )
+        continuation_direct_to_idle = (
+            ActionPhase.IDLE,
+            ActionPhase.GRASP,
+            ActionPhase.CARRY,
+            ActionPhase.RELEASE,
+            ActionPhase.IDLE,
+        )
         if tuple(b.phase for b in boundaries) not in (
             complete_with_retreat,
             complete_direct_to_idle,
+            continuation_with_retreat,
+            continuation_direct_to_idle,
         ):
             raise ValueError(
-                "Task requires IDLE -> HOVER -> GRASP -> CARRY -> RELEASE, followed "
-                "by either HOVER -> IDLE or IDLE boundaries"
+                "Task requires a complete pick/place episode, optionally omitting the initial "
+                "HOVER for an extractor-approved continuation episode"
             )
         if any(a.frame_idx >= b.frame_idx for a, b in zip(boundaries, boundaries[1:])):
             raise ValueError("Phase boundaries must have strictly increasing frame IDs")
@@ -176,9 +193,9 @@ class ExtractedTask:
             a.frame_idx >= b.frame_idx for a, b in zip(samples, samples[1:])
         ):
             raise ValueError("Path requires strictly increasing frames and both endpoint samples")
-        if samples[0].frame_idx != boundaries[2].frame_idx or (
-            samples[-1].frame_idx != boundaries[4].frame_idx
-        ):
+        grasp = next(boundary for boundary in boundaries if boundary.phase == ActionPhase.GRASP)
+        release = next(boundary for boundary in boundaries if boundary.phase == ActionPhase.RELEASE)
+        if samples[0].frame_idx != grasp.frame_idx or samples[-1].frame_idx != release.frame_idx:
             raise ValueError("Path endpoints must exactly match GRASP and RELEASE onset frames")
         for sample in samples:
             expected_phase = next(
@@ -207,11 +224,19 @@ class ExtractedTask:
 
     @property
     def grasp_frame(self) -> int:
-        return self.phase_boundaries[2].frame_idx
+        return next(
+            boundary.frame_idx
+            for boundary in self.phase_boundaries
+            if boundary.phase == ActionPhase.GRASP
+        )
 
     @property
     def release_frame(self) -> int:
-        return self.phase_boundaries[4].frame_idx
+        return next(
+            boundary.frame_idx
+            for boundary in self.phase_boundaries
+            if boundary.phase == ActionPhase.RELEASE
+        )
 
     @property
     def carry_trajectory_xy_m(self) -> Tuple[Tuple[float, float], ...]:
