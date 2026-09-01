@@ -22,9 +22,9 @@ class ActionClassifierModel(nn.Module):
 
     Action classes:
         0: IDLE (no action, waiting)
-        1: APPROACH (moving towards object)
+        1: HOVER (moving without object)
         2: GRASP (grasping object)
-        3: MOVE (moving with object)
+        3: CARRY (moving with object)
         4: RELEASE (releasing object)
 
     Note: Treats each frame independently. Use ActionClassifierLSTM for sequential modeling.

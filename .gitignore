@@ -24,6 +24,7 @@ logs/
 # Experiments
 experiments/*/results/
 experiments/*/checkpoints/
+models/
 
 # Local config
 config.local.yaml

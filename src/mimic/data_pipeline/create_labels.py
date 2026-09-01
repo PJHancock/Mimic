@@ -17,15 +17,12 @@ STATE_ALIASES: Dict[str, str] = {
     "grab": "grasp",
     "grap": "grasp",
     "clasp": "grasp",
-    "hold": "grasp",
-    "shift": "move",
-    "carry": "move",
     "drop": "release",
-    "letgo": "release",
+    "move":"hover"
 }
 
 # Default vocabulary mapping for hand-object interaction states
-DEFAULT_LABELS = ["idle", "approach", "grasp", "move", "release"]
+DEFAULT_LABELS = ["idle", "hover", "grasp", "carry", "release"]
 
 
 def get_video_metadata(video_path: str) -> Tuple[float, int]:
