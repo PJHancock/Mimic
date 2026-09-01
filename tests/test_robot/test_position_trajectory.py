@@ -2,6 +2,7 @@
 
 from dataclasses import replace
 
+import mujoco
 import numpy as np
 import pytest
 
@@ -42,6 +43,35 @@ def test_trajectory_reaches_target_through_position_servo(small_robot):
     assert np.max(np.abs(velocity)) <= 0.5 + 1e-8
     assert np.max(np.abs(acceleration)) <= 1.0 + 1e-8
     assert np.max(np.abs(jerk)) <= 10.0 + 1e-6
+
+
+def test_measured_cartesian_arrival_stops_unfinished_reference(small_robot):
+    bindings, io, differential_ik = small_robot
+    solver = RuckigPositionIK(differential_ik, bindings, settings())
+    target = ToolPose((0.1, 0, 0.1), (1, 0, 0, 0))
+
+    first = solver.solve(target, io.read(), 0.01)
+    assert first.status == IKStatus.VALID_STEP
+    assert not solver._trajectory_finished
+
+    # Model a servo reaching the Cartesian target while the planned reference
+    # still has motion remaining. The elapsed time keeps the measured velocity
+    # inside the sourced limit; this is an observation, not a simulation reset.
+    io.data.qpos[bindings.qpos_ids] = (0.1, 0.1)
+    io.data.time = 0.2
+    mujoco.mj_forward(bindings.model, io.data)
+    measured = np.array(
+        [io.read().joint_positions[name][0] for name in bindings.profile.arm_joints]
+    )
+
+    arrived = solver.solve_stopping_at_measured_arrival(target, io.read(), 0.01)
+
+    assert arrived.status == IKStatus.AT_TARGET
+    assert np.array(list(arrived.joint_targets.values())) == pytest.approx(measured)
+    assert np.asarray(solver._input.current_position) == pytest.approx(measured)
+    assert np.asarray(solver._input.current_velocity) == pytest.approx(0)
+    assert np.asarray(solver._input.current_acceleration) == pytest.approx(0)
+    assert solver._trajectory_finished
 
 
 def test_saved_joint_target_uses_same_bounded_position_trajectory(small_robot):

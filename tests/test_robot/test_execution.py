@@ -201,7 +201,7 @@ def test_supported_object_uses_placement_gate_instead_of_airborne_slip_offset():
                 self.state = replace(self.state, object_position=task().goal_position)
 
     io = SupportedIO()
-    runner, _ = executor(io)
+    runner, events = executor(io)
 
     def support_contact():
         if io.read().tool_pose.position[2] <= 0.01495:
@@ -215,6 +215,20 @@ def test_supported_object_uses_placement_gate_instead_of_airborne_slip_offset():
 
     assert result.success
     assert result.released
+    supported_index = next(
+        index for index, event in enumerate(events) if event["event"] == "placement_supported"
+    )
+    supported_sample = next(
+        event
+        for event in reversed(events[:supported_index])
+        if event["event"] == "sample" and event["skill"] == "LOWER"
+    )
+    opening = next(
+        event for event in events if event["event"] == "sample" and event["skill"] == "OPEN"
+    )
+    assert opening["target_pose"]["position"] == pytest.approx(
+        supported_sample["state"]["tool_pose"]["position"]
+    )
 
 
 def test_intermediate_path_waypoint_hands_off_before_at_target():

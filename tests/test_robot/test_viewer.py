@@ -1,6 +1,8 @@
-"""Live viewing observes completed MuJoCo steps without owning physics."""
+"""Live viewing and recording observe simulation without owning physics."""
 
+from dataclasses import dataclass
 from datetime import datetime, timezone
+import json
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -13,6 +15,7 @@ from scripts.simulate_robot import (
     _timestamped_video_path,
     _video_session,
     _viewer_session,
+    main as simulate_main,
 )
 
 pytest_plugins = ("tests.test_robot.execution_fixtures",)
@@ -154,3 +157,37 @@ def test_video_session_samples_completed_steps_and_releases_resources(
 
     io.advance(0.01)
     assert rendered == pytest.approx([0.01, 0.04])
+
+
+def test_simulation_log_replaces_existing_contents(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    pose = {"position": [0, 0, 0], "quaternion_wxyz": [1, 0, 0, 0]}
+    waypoints = {
+        **{name: pose for name in ("approach", "grasp", "lift", "lower", "retreat")},
+        "path": [pose],
+        "goal_position": [0, 0, 0],
+    }
+    config = tmp_path / "robot.yaml"
+    task = tmp_path / "waypoints.json"
+    log = tmp_path / "execution.jsonl"
+    config.write_text("robot_execution: {}\n")
+    task.write_text(json.dumps(waypoints))
+    log.write_text("stale log contents\n")
+
+    @dataclass(frozen=True)
+    class FakeReport:
+        success: bool = True
+
+    def fake_build_executor(_config, record):
+        record({"event": "configuration"})
+        return SimpleNamespace(run=lambda _task: FakeReport())
+
+    monkeypatch.setattr("scripts.simulate_robot.build_executor", fake_build_executor)
+    monkeypatch.setattr("scripts.simulate_robot.importlib.metadata.version", lambda _name: "test")
+
+    result = simulate_main(("--config", str(config), "--waypoints", str(task), "--log", str(log)))
+
+    assert result == 0
+    assert "stale log contents" not in log.read_text()
+    assert log.read_text().splitlines()[0] == '{"event": "configuration"}'
