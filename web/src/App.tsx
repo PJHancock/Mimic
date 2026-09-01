@@ -136,8 +136,23 @@ export default function App() {
   const [pipelineJob, setPipelineJob] = useState<PipelineJob | null>(null); const [pipelineError, setPipelineError] = useState(''); const [artifactRevision, setArtifactRevision] = useState(0)
   const [phaseSync, setPhaseSync] = useState(false); const [syncPlaying, setSyncPlaying] = useState(false); const [syncRate, setSyncRate] = useState(1); const [syncPhase, setSyncPhase] = useState('—'); const [simDuration, setSimDuration] = useState(0)
   const [flowboxModal, setFlowboxModal] = useState<FlowboxInfo | null>(null)
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const videoRef = useRef<HTMLVideoElement>(null)
   const simVideoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
+    const initialTheme = savedTheme || 'dark'
+    setTheme(initialTheme)
+    document.documentElement.setAttribute('data-theme', initialTheme)
+  }, [])
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'dark' ? 'light' : 'dark'
+    setTheme(newTheme)
+    document.documentElement.setAttribute('data-theme', newTheme)
+    localStorage.setItem('theme', newTheme)
+  }
 
   useEffect(() => { fetch('/api/runs').then((r) => { if (!r.ok) throw new Error('Could not read results/'); return r.json() }).then((data: Run[]) => { setRuns(data); if (data[0]) setRunId(data[0].id); else { setLoading(false); setError('No result artifacts were found.') } }).catch((cause) => { setLoading(false); setError(String(cause)) }) }, [])
   useEffect(() => { Promise.all([fetch('/api/raw-videos').then((r) => r.json()), fetch('/api/robot-configs').then((r) => r.json()), fetch('/api/process').then((r) => r.json())]).then(([videos, configs, job]: [RawVideo[], RobotConfig[], PipelineJob]) => { setRawVideos(videos); setSelectedRaw((current) => current || videos[0]?.name || ''); setRobotConfigs(configs); setSelectedConfig((current) => current || configs.find((item) => item.default)?.id || configs[0]?.id || ''); setPipelineJob(job) }).catch((cause) => setPipelineError(String(cause))) }, [])
@@ -224,7 +239,7 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><button onClick={() => document.getElementById('section-overview')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>PROJECT OVERVIEW</button><i>→</i><button onClick={() => document.getElementById('section-pipeline')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>TECHNOLOGY PIPELINE</button><i>→</i><button onClick={() => document.getElementById('section-demo')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>DEMO</button></div></header>
+    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>INTERACTIVE PIPELINE</span></div></div><div className="pipeline"><button onClick={() => document.getElementById('section-overview')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>PROJECT OVERVIEW</button><i>→</i><button onClick={() => document.getElementById('section-pipeline')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>TECHNOLOGY PIPELINE</button><i>→</i><button onClick={() => document.getElementById('section-demo')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>DEMO</button></div><button onClick={toggleTheme} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: '0 8px', fontSize: '16px', display: 'flex', alignItems: 'center'}} title="Toggle theme">{theme === 'dark' ? '☀️' : '🌙'}</button></header>
 
     {/* Project Overview Section */}
     <div id="section-overview" className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
