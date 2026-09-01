@@ -83,6 +83,9 @@ Documentation = "https://mimic.readthedocs.io"
 Repository = "https://github.com/yourusername/Mimic.git"
 Issues = "https://github.com/yourusername/Mimic/issues"
 
+[project.scripts]
+mimic-video-pipeline = "mimic.integration.run_video_pipeline:main"
+
 [tool.uv.dependency-groups]
 robot = {requires-python = ">=3.10"}
 

@@ -68,6 +68,32 @@ python scripts/calibrate_camera.py --calibration-video data/raw/calibration.mp4
 
 ## Robot Pipeline
 
+### One-command video pipeline
+
+From the repository root, run tracking, embedding extraction, classification,
+graph-aware post-processing, and result export with:
+
+```bash
+uv run python -m mimic.integration.run_video_pipeline path/to/demo.mov
+```
+
+This defaults to `models/action_classifier_lstm.pt`,
+`configs/skills/pick_place.yaml`, CPU execution, a ±32-frame classifier context,
+and `results/<video-name>/`. Override any of those explicitly when needed:
+
+```bash
+uv run python -m mimic.integration.run_video_pipeline path/to/demo.mov \
+  --model path/to/classifier.pt \
+  --skill-config path/to/skills.yaml \
+  --device mps \
+  --output results/my_run
+```
+
+The optional `--simulate-robot` flag also requires `--robot-config`. Use
+`--dry-run` to validate inputs and print the delegated pipeline command without
+processing the video. After the project entry points are installed, the shorter
+equivalent is `uv run mimic-video-pipeline path/to/demo.mov`.
+
 ### inference_action_classifier.py
 
 Run classifier inference, graph-aware post-processing, and export separate
