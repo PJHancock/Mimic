@@ -33,3 +33,15 @@ under `data/raw/` or `data/videos/`. When a source video was not retained, the
 main player clearly labels and uses the run's `.mimic.mp4` simulation recording
 as a presentation fallback. Robot outcome metrics come from the execution log,
 not from visual appearance.
+
+## GitHub Pages
+
+The production build is a static, read-only showcase of the tracked `IMG_2067`
+run. It packages that run's compact artifact data, source demonstration, and
+MuJoCo recording; the local development server remains the only mode that can
+start new pipeline jobs.
+
+Push changes to `main` or run the **Deploy website to GitHub Pages** workflow
+manually. In the repository's **Settings → Pages**, set the source to **GitHub
+Actions**. The workflow builds `web/` with the repository subpath and deploys
+`web/dist/`.

@@ -7,6 +7,7 @@ import { defineConfig, type Plugin } from 'vite'
 
 const projectRoot = resolve(import.meta.dirname, '..')
 const resultsRoot = join(projectRoot, 'results')
+const showcaseRunId = 'IMG_2067'
 type Json = Record<string, any>
 
 type PipelineJob = {
@@ -336,8 +337,43 @@ function artifactsPlugin(): Plugin {
   } }
 }
 
+function staticShowcasePlugin(): Plugin {
+  return {
+    name: 'mimic-static-showcase',
+    apply: 'build',
+    generateBundle() {
+      const run = runRecords().find((item) => item.id === showcaseRunId)
+      const detail = runDetail(showcaseRunId)
+      const simulationPath = join(resultsRoot, showcaseRunId, `${showcaseRunId}.mimic.mp4`)
+      if (!run || !detail || !existsSync(simulationPath)) {
+        throw new Error(`Static showcase artifacts for ${showcaseRunId} are incomplete.`)
+      }
+      this.emitFile({ type: 'asset', fileName: 'demo/runs.json', source: JSON.stringify([run]) })
+      this.emitFile({
+        type: 'asset',
+        fileName: `demo/runs/${showcaseRunId}.json`,
+        source: JSON.stringify({
+          ...detail,
+          source_video_url: 'input-demo.webm',
+          simulation_video_url: `demo/${showcaseRunId}.mimic.mp4`,
+          playback_video_url: 'input-demo.webm',
+          playback_kind: 'source',
+        }),
+      })
+      this.emitFile({
+        type: 'asset',
+        fileName: `demo/${showcaseRunId}.mimic.mp4`,
+        source: readFileSync(simulationPath),
+      })
+    },
+  }
+}
+
+const repositoryName = process.env.GITHUB_REPOSITORY?.split('/').at(-1)
+
 export default defineConfig({
-  plugins: [react(), artifactsPlugin()],
+  base: repositoryName ? `/${repositoryName}/` : '/',
+  plugins: [react(), artifactsPlugin(), staticShowcasePlugin()],
   server: { port: 4173, strictPort: false },
   preview: { port: 4173, strictPort: false },
 })
