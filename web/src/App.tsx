@@ -224,7 +224,7 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><button onClick={() => document.getElementById('section-demonstration')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>DEMONSTRATION</button><i>→</i><button onClick={() => document.getElementById('section-skill-model')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>SKILL MODEL</button><i>→</i><button onClick={() => document.getElementById('section-retarget')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>RETARGET</button><i>→</i><button onClick={() => document.getElementById('section-panda')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>PANDA</button></div></header>
+    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><button onClick={() => document.getElementById('section-demonstration')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>VIDEO INPUT</button><i>→</i><button onClick={() => document.getElementById('section-skill-model')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>TEMPORAL CLASSIFIER</button><i>→</i><button onClick={() => document.getElementById('section-retarget')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>POST PROCESSING</button><i>→</i><button onClick={() => document.getElementById('section-panda')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>MUJOCO</button></div></header>
 
     {/* Job Description Section */}
     <div className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
@@ -323,6 +323,9 @@ export default function App() {
             <text x="500" y="515" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">📤 STATE PROBABILITIES</text>
           </g>
 
+          {/* RETARGET ANCHOR */}
+          <foreignObject x="0" y="580" width="0" height="0"><div id="section-retarget" style={{ visibility: 'hidden' }} /></foreignObject>
+
           {/* POST PROCESSING & SKILL GRAPH (combined) */}
           <line x1="500" y1="540" x2="500" y2="580" stroke="var(--cyan)" strokeWidth="2" />
           <g onClick={() => setFlowboxModal(flowboxData.postproc)} style={{ cursor: 'pointer' }}>
@@ -330,9 +333,6 @@ export default function App() {
             <text x="500" y="615" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">📋 POST PROC & SKILL</text>
             <text x="500" y="633" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">GRAPH</text>
           </g>
-
-          {/* RETARGET ANCHOR */}
-          <foreignObject x="0" y="690" width="0" height="0"><div id="section-retarget" style={{ visibility: 'hidden' }} /></foreignObject>
 
           {/* TASK EXTRACTION */}
           <line x1="500" y1="650" x2="500" y2="690" stroke="var(--cyan)" strokeWidth="2" />
@@ -355,9 +355,6 @@ export default function App() {
             <text x="500" y="855" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">🛤️ PATH PROCESSING</text>
           </g>
 
-          {/* PANDA ANCHOR */}
-          <foreignObject x="0" y="920" width="0" height="0"><div id="section-panda" style={{ visibility: 'hidden' }} /></foreignObject>
-
           {/* SKILL EXPANDER */}
           <line x1="500" y1="880" x2="500" y2="920" stroke="var(--cyan)" strokeWidth="2" />
           <g onClick={() => setFlowboxModal(flowboxData.skillexp)} style={{ cursor: 'pointer' }}>
@@ -371,6 +368,9 @@ export default function App() {
             <rect x="375" y="1030" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
             <text x="500" y="1065" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">🔧 IK / MOTOR CTRL</text>
           </g>
+
+          {/* PANDA ANCHOR */}
+          <foreignObject x="0" y="1140" width="0" height="0"><div id="section-panda" style={{ visibility: 'hidden' }} /></foreignObject>
 
           {/* MUJOCO */}
           <line x1="500" y1="1100" x2="500" y2="1140" stroke="var(--cyan)" strokeWidth="2" />
