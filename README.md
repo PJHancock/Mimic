@@ -2,6 +2,26 @@
 
 A system that learns robot manipulation skills from human video demonstrations and executes them with a simulated Franka Panda robot.
 
+---
+
+## 🌐 Interactive Dashboard
+
+**[View the Live Dashboard](https://pjhancock.github.io/Mimic/)** ← Start here to explore the project!
+
+The interactive dashboard provides:
+- 📊 **Visual Pipeline** — Click through each stage to see what the system is doing
+- 🎬 **Live Video Processing** — Watch videos flow through the complete pipeline in real-time
+- 📈 **Expandable Visualizations** — Inspect loss curves and detailed analysis
+- 🤖 **Execution Results** — See the robot simulation playback and movement tracking
+- ⚙️ **Interactive Controls** — Run your own videos through the pipeline
+
+**Run locally:**
+```bash
+cd web && npm install && npm run dev
+```
+
+---
+
 ## 🚀 Quick Start
 
 ```bash
@@ -14,22 +34,6 @@ uv run --group robot mimic --video data/raw/demo.mp4 --robot panda
 ```
 
 Results are saved to `results/demo/` including simulation video and task artifacts.
-
-## 📊 Interactive Dashboard
-
-Visualize the pipeline and inspect results:
-
-```bash
-cd web && npm install && npm run dev
-```
-
-**View the live dashboard:** https://pjhancock.github.io/Mimic/
-
-The dashboard shows:
-- Interactive technology pipeline flowchart
-- Real-time video processing through each stage
-- Execution results and simulation playback
-- Expandable visualizations and loss curves
 
 ## 🏗️ Project Structure
 
