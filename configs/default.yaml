@@ -51,7 +51,7 @@ tracking:
 
 # Robot-independent path geometry. Direct preserves the former endpoint-only default.
 path_processing:
-  interpolation: direct  # direct | corners_only | none | cubic
+  interpolation: cubic  # direct | corners_only | none | cubic
   corner_max_deviation_m: null       # Required by corners_only and cubic
   output_spacing_m: null              # Required by cubic
   maximum_spline_deviation_m: null    # Required by cubic
