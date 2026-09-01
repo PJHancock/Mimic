@@ -32,7 +32,7 @@ def task():
 
 
 class Driver:
-    open_width_m, closed_width_m = 0.1, 0
+    open_width_m, open_command_width_m, closed_width_m = 0.1, 0.1, 0
     actuator_names = ("grip",)
 
     def controls(self, width_m):

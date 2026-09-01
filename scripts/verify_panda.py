@@ -2,8 +2,8 @@
 
 This scene uses a 4 cm cube (30 g), a table at z=0, and a tool point at the
 center height of the standard model's principal fingertip pads. All settings
-below are fixed test assumptions. The separately logged measured-gripper tolerance
-is the sole user-authorized change from the original diagnostic fixture.
+below are fixed test assumptions. Its measured-state allowance, motion generator,
+safe gripper-open command, and slip criterion are logged for reproducibility.
 """
 
 import argparse
@@ -18,6 +18,7 @@ import mujoco
 from mimic.common.types import PickPlaceWaypoints, ToolPose
 from mimic.robot.backends.mink_ik import MinkIKSolver
 from mimic.robot.backends.panda_gripper import PandaGripperDriver
+from mimic.robot.backends.ruckig_position import PositionTrajectorySettings, RuckigPositionIK
 from mimic.robot.controller import RobotController
 from mimic.robot.gripper import GripperLogic, GripperSettings
 from mimic.robot.inverse_kinematics import IKSettings
@@ -60,19 +61,29 @@ def main() -> int:
         (0.8, 0.4, 0.5),
     )
     bindings = ModelBindings(model, profile)
-    driver = PandaGripperDriver(model)
+    driver = PandaGripperDriver(model, open_command_width_m=0.0799)
     io = MuJoCoAdapter(bindings, driver.observe, driver.actuator_names, "object")
     state = io.reset("home")
     settings = IKSettings(1e-4, 1e-4, 1, 1, 0, 1e-4, 1)
     gripper_settings = GripperSettings(0.001, 0.002, 0.1, 0.1, 2)
-    execution_settings = ExecutionSettings(10, 0.05, 0.01, 0.1, 0.25, 0.01, 0.01)
+    # Previous fixture maximum_slip_m was 0.01. Measured stable in-gripper settling
+    # reached 0.01219 m; 0.015 retains loss detection with 2.81 mm fixture headroom.
+    execution_settings = ExecutionSettings(10, 0.05, 0.015, 0.1, 0.25, 0.01, 0.01)
     measured_gripper_tolerances_m = {model.joint(joint).name: 1e-5 for joint in driver.joint_ids}
-    solver = MinkIKSolver(
+    differential_ik = MinkIKSolver(
         bindings,
         settings,
         {n: state.joint_positions[n][0] for n in profile.arm_joints},
         measured_gripper_tolerances_m=measured_gripper_tolerances_m,
     )
+    trajectory_settings = PositionTrajectorySettings(
+        (2.175, 2.175, 2.175, 2.175, 2.61, 2.61, 2.61),
+        (15, 7.5, 10, 12.5, 15, 20, 20),
+        (7500, 3750, 5000, 6250, 7500, 10000, 10000),
+        (0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
+        2000,
+    )
+    solver = RuckigPositionIK(differential_ik, bindings, trajectory_settings)
     controller = RobotController(io, solver, GripperLogic(driver, gripper_settings), 100, 10)
 
     # World z is up; this fixture points local tool z down with fixed world x rotation.
@@ -102,13 +113,15 @@ def main() -> int:
                 "profile": asdict(profile),
                 "ik": asdict(settings),
                 "gripper": asdict(gripper_settings),
+                "gripper_open_command_width_m": driver.open_command_width_m,
+                "trajectory": asdict(trajectory_settings),
                 "measured_gripper_tolerances_m": measured_gripper_tolerances_m,
                 "waypoints": asdict(waypoints),
                 "arm_control_hz": 100,
                 "gripper_control_hz": 10,
                 "versions": {
                     n: importlib.metadata.version(n)
-                    for n in ("mink", "mujoco", "qpsolvers", "daqp")
+                    for n in ("mink", "mujoco", "qpsolvers", "daqp", "ruckig")
                 },
             }
         )

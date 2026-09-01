@@ -11,7 +11,7 @@ pytest_plugins = ("tests.test_robot.execution_fixtures",)
 class OtherGripper:
     """Independent driver fixture: different opening, actuator name, and control scale."""
 
-    open_width_m, closed_width_m = 0.1, 0
+    open_width_m, open_command_width_m, closed_width_m = 0.1, 0.09, 0
     actuator_names = ("other_motor",)
 
     def controls(self, width_m):
@@ -56,6 +56,22 @@ def test_repeated_requests_do_not_reset_timeout(logic):
     assert logic.update(GripperAction.CLOSE, 1.1, feedback).status == GripperStatus.TIMEOUT
 
 
+def test_completed_grasp_does_not_reactivate_movement_timeout(logic):
+    feedback = GripperFeedback(0.05, 0, (1, 1))
+    logic.update(GripperAction.CLOSE, 0, feedback)
+    assert logic.update(GripperAction.HOLD, 0.2, feedback).status == GripperStatus.CANDIDATE_GRASP
+    assert (
+        logic.update(GripperAction.HOLD, 1.2, GripperFeedback(0.05, 0, (0, 0))).status
+        == GripperStatus.MOVING
+    )
+
+
+def test_open_uses_driver_safe_command_below_hard_stop(logic):
+    result = logic.update(GripperAction.OPEN, 0, GripperFeedback(0.09, 0, (0, 0)))
+    assert result.status == GripperStatus.OPEN
+    assert result.actuator_targets["other_motor"] == pytest.approx(0.9)
+
+
 def test_hold_requires_command_and_reset_clears_lifecycle(logic):
     with pytest.raises(ValueError, match="earlier"):
         logic.update(GripperAction.HOLD, 0, GripperFeedback(0.1, 0, (0, 0)))
@@ -64,7 +80,7 @@ def test_hold_requires_command_and_reset_clears_lifecycle(logic):
         logic.update(GripperAction.OPEN, 1, GripperFeedback(0.1, 0, (0, 0)))
     logic.reset()
     assert (
-        logic.update(GripperAction.OPEN, 0, GripperFeedback(0.1, 0, (0, 0))).status
+        logic.update(GripperAction.OPEN, 0, GripperFeedback(0.09, 0, (0, 0))).status
         == GripperStatus.OPEN
     )
 
@@ -73,6 +89,7 @@ def test_panda_mapping_and_rejection(panda):
     bindings, _, _, driver = panda
     for width, expected in [(0, 0), (0.04, 127.5), (0.08, 255)]:
         assert driver.controls(width)["actuator8"] == pytest.approx(expected)
+    assert driver.open_command_width_m == pytest.approx(0.0799)
     for width in [-0.01, 0.09, float("nan")]:
         with pytest.raises(ValueError):
             driver.controls(width)
@@ -89,7 +106,7 @@ def test_panda_actual_finger_motion(panda):
     closed = io.read().gripper
     assert closed.width_m < 0.005
     assert closed.finger_contact_forces_n == (0, 0)
-    io.apply(arm, driver.controls(0.08))
+    io.apply(arm, driver.controls(driver.open_command_width_m))
     io.advance(0.5)
     opened = io.read().gripper
     assert opened.width_m > 0.075

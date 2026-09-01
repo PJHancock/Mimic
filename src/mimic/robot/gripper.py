@@ -12,6 +12,7 @@ from mimic.common.types import GripperFeedback
 class GripperDriver(Protocol):
     actuator_names: Tuple[str, ...]
     open_width_m: float
+    open_command_width_m: float
     closed_width_m: float
 
     def controls(self, width_m: float) -> Mapping[str, float]:
@@ -69,6 +70,7 @@ class GripperLogic:
     def reset(self):
         self._action = None
         self._started = self._last_time = self._contact_started = None
+        self._completed = False
 
     def update(
         self, action: GripperAction, time_s: float, feedback: GripperFeedback
@@ -86,8 +88,9 @@ class GripperLogic:
             action = self._action
         if action != self._action:
             self._action, self._started, self._contact_started = action, time_s, None
+            self._completed = False
         opening = action == GripperAction.OPEN
-        target = self.driver.open_width_m if opening else self.driver.closed_width_m
+        target = self.driver.open_command_width_m if opening else self.driver.closed_width_m
         status = GripperStatus.MOVING
         forces = feedback.finger_contact_forces_n
         candidate = (
@@ -107,8 +110,11 @@ class GripperLogic:
             self._contact_started = None
             if feedback.width_m <= self.settings.empty_width_m:
                 status = GripperStatus.EMPTY
+        if status in (GripperStatus.OPEN, GripperStatus.CANDIDATE_GRASP):
+            self._completed = True
         if (
             status == GripperStatus.MOVING
+            and not self._completed
             and time_s - self._started >= self.settings.movement_timeout_s
         ):
             status = GripperStatus.TIMEOUT

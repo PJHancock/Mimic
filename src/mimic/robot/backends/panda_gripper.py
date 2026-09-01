@@ -25,8 +25,16 @@ class PandaGripperDriver:
         model: mujoco.MjModel,
         actuator_name: str = "actuator8",
         finger_joint_names: tuple[str, str] = ("finger_joint1", "finger_joint2"),
+        open_command_width_m: float = 0.0799,
     ):
         self.model = model
+        if (
+            isinstance(open_command_width_m, bool)
+            or not np.isfinite(open_command_width_m)
+            or not self.closed_width_m < open_command_width_m <= self.open_width_m
+        ):
+            raise ValueError("Panda open command must lie within nominal finger travel")
+        self.open_command_width_m = float(open_command_width_m)
         self.actuator_names = (actuator_name,)
         a = model.actuator(actuator_name).id
         self.joint_ids = [model.joint(name).id for name in finger_joint_names]

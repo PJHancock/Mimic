@@ -82,5 +82,5 @@ class CoordinateRetargeter:
 def retarget_task(
     task: ExtractedTask, mapping_config: Union[MappingConfig, Mapping[str, object]]
 ) -> RetargetedTask:
-    """Retarget every retained sample; DIRECT selection never discards geometry."""
+    """Retarget every retained sample without selecting or processing a path."""
     return CoordinateRetargeter(mapping_config).retarget(task)

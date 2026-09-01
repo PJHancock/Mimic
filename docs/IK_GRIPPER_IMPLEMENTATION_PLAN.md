@@ -1,6 +1,9 @@
 # IK and gripper implementation plan
 
-Status: implementation requested and added on 2026-08-31. See `docs/ROBOT_EXECUTION.md` for actual interfaces, required configuration, verification, and the retained Panda simulation failure. The sections below preserve the original proposal; unresolved physical settings were not silently selected.
+Status: implemented and physically stepped in MuJoCo on 2026-08-31. See
+`docs/ROBOT_EXECUTION.md` for the authoritative interfaces, configuration, and
+successful fixed-fixture verification. This document preserves the planning
+rationale and records where measured behavior required a controller correction.
 
 Recommend **Mink with its DAQP solver backend, the standard MuJoCo Menagerie Panda model, and a small model-specific gripper adapter**. Keep semantic execution and solver interfaces independent of Panda joint counts, actuator indices, and upstream perception.
 
@@ -29,8 +32,13 @@ The linked [RoboDK Panda page](https://robodk.com/robot/Franka/Emika-Panda) retu
 | [Mink dependency specification](https://github.com/kevinzakka/mink/blob/main/pyproject.toml) | DAQP through `qpsolvers` | Use the backend included by the selected Mink release; do not implement numerical optimization. |
 | [MuJoCo Menagerie Panda](https://github.com/google-deepmind/mujoco_menagerie/tree/main/franka_emika_panda) | Robot, hand, collision geometry, and actuator definitions | Reuse the standard `panda.xml` model and its physical gripper mechanism. Preserve its license and provenance. |
 | [Mink Panda example](https://github.com/kevinzakka/mink/blob/main/examples/arm_panda.py) | Reference for task setup and solver integration | Useful starting point, but it uses an MJX scene. Do not copy its actuator slicing or numerical settings into this project. |
+| [Ruckig](https://docs.ruckig.com/index.html) | Persistent position-reference motion generation | Reuses a maintained online trajectory generator with explicit velocity, acceleration, and jerk constraints. |
+| [Franka FER limits](https://frankarobotics.github.io/docs/robot_specifications.html#limits-for-franka-emika-robot-fer) | Hardware velocity, acceleration, and jerk ceilings | Supplies values absent from the Menagerie MJCF; the simulation operating speed remains lower and explicit. |
 
-Mink 1.3.0 is a candidate, not an installed or tested dependency. Its inspected metadata requires Python >=3.10, MuJoCo >=3.10.0, and `qpsolvers[daqp]>=4.12.0`; Mimic currently declares Python >=3.9 and MuJoCo >=3.0.0. The [published release](https://pypi.org/project/mink/1.3.0/) provides macOS ARM64 wheels. First resolve the supported Python version, then verify a compatible dependency set using the existing `uv` workflow and commit its lockfile. Do not silently raise the project minimum or conceal unsupported Python versions behind dependency markers.
+Mink 1.3.0 and Ruckig 0.19.4 are pinned in the Python >=3.10 `robot`
+dependency group and resolved in `uv.lock`. The base package's Python >=3.9
+declaration is unchanged. The selected set was imported and exercised on macOS
+ARM64; Linux remains unverified.
 
 Prefer a pinned Menagerie asset snapshot containing only the required model/assets, with source revision and license recorded. Keep the table, object, and any explicit tool-site addition in a local scene composition. Avoid runtime downloads and changes to upstream gains, limits, friction, or collision behavior.
 
@@ -47,13 +55,15 @@ flowchart TD
     S -->|Open / close / hold| G[GripperLogic]
     I --> M[Mink backend]
     G --> D[GripperDriver protocol]
-    M -->|Named arm targets| C[RobotController]
+    M --> OTG[Ruckig position-reference layer]
+    OTG -->|Named arm targets| C[RobotController]
     D -->|Gripper actuator targets| C
     C --> A[MuJoCoAdapter]
     A -->|Measured state and contacts| S
-    R[RobotProfile] --> M
-    R --> D
-    R --> A
+    RP[RobotProfile] --> M
+    RP --> OTG
+    RP --> D
+    RP --> A
 ```
 
 Suggested implementation locations, retaining the existing documented module names where practical:
@@ -64,6 +74,7 @@ Suggested implementation locations, retaining the existing documented module nam
 | `robot/model.py` | `RobotProfile` and validation of model bindings. |
 | `robot/inverse_kinematics.py` | Robot-independent `IKSolver` protocol and result semantics. |
 | `robot/backends/mink_ik.py` | Mink implementation; only this module exposes Mink internals. |
+| `robot/backends/ruckig_position.py` | Position-actuator trajectory layer; only this module exposes Ruckig internals. |
 | `robot/gripper.py` | Generic open/close/hold lifecycle, feedback interpretation, and `GripperDriver` protocol. |
 | `robot/backends/panda_gripper.py` | Panda actuator conversion and finger/contact bindings. |
 | `robot/state_machine.py` | `SkillExecutor`: sequencing and completion/failure gates. |
@@ -74,21 +85,31 @@ Load a proposed `configs/robots/panda.yaml` through the existing configuration s
 
 Positions and limits come from the loaded model where it defines them. Velocity limits and execution settings require explicit sources/configuration; joint position ranges alone do not supply speed limits. Reject unsupported actuator modes rather than interpreting torque controls as joint positions.
 
-Proposed contracts:
+Implemented contracts:
 
 - **Robot state:** timestamp, named arm positions/velocities, actual tool pose, gripper feedback; simulation-specific object/contact observations are available to evaluation through the adapter.
 - **IK input:** validated world-space tool pose, current state, and control interval in seconds. It never accepts normalized human coordinates or phase scores.
-- **IK result:** status (`VALID_STEP`, `AT_TARGET`, `INVALID_INPUT`, `LIMIT_VIOLATION`, `SOLVER_FAILED`, or `NO_PROGRESS`), ordered joint names/targets when valid, position/orientation errors, and elapsed solve time. Numerical progress is not proof of global reachability.
-- **Gripper input/output:** semantic open/close/hold request, optional supported width in meters, measured status, and named actuator targets. Unsupported capabilities produce explicit errors. A close command is not a successful grasp.
+- **IK result:** status (`VALID_STEP`, `AT_TARGET`, `INVALID_INPUT`, `LIMIT_VIOLATION`, or `SOLVER_FAILED`), named joint targets when valid, position/orientation errors, and elapsed solve time. Numerical progress is not proof of global reachability.
+- **Gripper input/output:** semantic open/close/hold request, measured status, and named actuator targets. Robot-specific nominal and safe-open widths stay in the injected driver. A close command is not a successful grasp.
 - **Robot IO:** state observation, application of validated targets, and simulation stepping. Live MuJoCo objects never escape into skill logic.
 
-The `RobotCommand` adapter supplies an explicitly configured world frame and orientation convention. Proposed quaternion convention: `(w, x, y, z)` throughout the robot boundary, with a tested conversion for any different external convention. An omitted orientation means the approved fixed downward orientation, not an identity quaternion. This convention and the hand-to-tool transform require agreement before implementation.
+The `RobotCommand` adapter requires an explicitly configured world frame and
+orientation convention. The robot boundary uses `(w, x, y, z)`, with a tested
+conversion for a declared external convention. An omitted orientation means the
+configured fixed downward orientation, not an identity quaternion. The exact
+downward yaw and hand-to-tool transform remain scene-specific.
 
 A different fixed-base arm using compatible position actuators should require a new profile and, if necessary, a new gripper driver. A torque-controlled arm requires a different controller adapter. Mobile bases and dexterous hands are not promised to be configuration-only substitutions. None of these changes should affect temporal predictions, tracking, or task semantics.
 
 ## IK behavior
 
-The proposed online method is differential IK: ask Mink for one constrained velocity step per arm-control interval, then integrate that step in a **private kinematic configuration** to obtain position targets. Reinitialize that configuration from measured simulation state each tick. The real arm moves only through actuators.
+The implemented method separates geometric IK from position-actuator command
+generation. Mink is seeded from measured state and iterated only in private state
+to obtain a pose endpoint correction. Ruckig advances a persistent named joint
+reference toward that endpoint with explicit per-joint motion limits. When the
+reference finishes but measured Cartesian error remains, a new correction is
+planned. The real arm moves only through actuators, and measured state remains
+authoritative for arrival and safety gates.
 
 Mink provides frame objectives, limits, equality constraints, and a velocity-valued solve result. Use its API instead of duplicating Jacobians, pose-error mathematics, or the optimizer. [Solver API](https://kevinzakka.github.io/mink/api/inverse_kinematics.html), [limits](https://kevinzakka.github.io/mink/api/limits.html).
 
@@ -98,7 +119,9 @@ Mink provides frame objectives, limits, equality constraints, and a velocity-val
 4. Use strict out-of-limit handling and report solver failures. Validate the resulting arm targets against model/actuator limits and the permitted per-tick change. Map only arm results to arm actuators.
 5. Determine actual arrival using measured tool pose, with separate translation and rotation tolerances. Track target error over time and stop phase progression on timeout or lack of progress. Local nonconvergence does not prove that no solution exists.
 
-Do not run many virtual IK time steps and send their accumulated displacement as a single physical control tick. An optional offline waypoint check can iterate in private state, but it is only a kinematic diagnostic, not evidence of dynamic execution or grasp success.
+Private endpoint iteration is never sent as one physical control tick. Its result
+is passed to Ruckig and advanced at the real control interval. Endpoint validity
+alone remains only a kinematic result; measured simulation state gates execution.
 
 Collision avoidance is separate from pose convergence. Preserve all simulation collisions. If adding Mink collision constraints, explicitly define protected pairs and margins, including the intended finger–object contact exception; do not disable physical contacts. Global planning remains outside this step. A kinematically valid solution is not automatically collision-free or dynamically trackable.
 
@@ -121,14 +144,17 @@ Proposed execution sequence:
 
 Candidate grasp and confirmed transport must remain separate observations. Empty closure, one-sided contact, and contact with the table must not count as a successful grasp. All contact duration, lift, slip, settling, and placement thresholds need explicit definitions before acceptance tests.
 
-Proposed failure policy: abort the execution attempt, stop simulation stepping, and retain a diagnostic snapshot on IK, grasp, or transport failure. Do not advance to MOVE after a failed grasp, or automatically open a held object after an arm failure. This policy requires approval because failure behavior is a protected design decision.
+The implemented failure policy aborts the execution attempt, stops simulation
+stepping, and retains a diagnostic snapshot on IK, grasp, or transport failure.
+It does not advance to MOVE after a failed grasp or automatically open a held
+object after an arm failure.
 
-## Implementation order and acceptance checks
+## Implementation record and acceptance checks
 
-Each increment should be reviewable independently:
+The implementation followed these reviewable increments:
 
 1. **Settle contracts and dependency compatibility.** Record Python support, model revision, tool transform/orientation, rates, and acceptance parameters. Validate a pinned dependency set on the target Mac and Linux environment. Add no upstream ML dependencies to robot imports.
-2. **Load the scene and bind the profile.** Start with the standard Panda, table, and one explicitly defined graspable object. Validate names, addresses, transmissions, joint/actuator limits, and home pose. Step headlessly without task execution. This is a prerequisite currently absent from the repository.
+2. **Load the scene and bind the profile.** The standard Panda diagnostic adds a table and one explicitly defined graspable object, validates names, addresses, transmissions, joint/actuator limits, and home pose, and steps headlessly.
 3. **Exercise the gripper in isolation.** Hold a known arm target; command open/close through the real tendon actuator. Check measured finger movement, direction, and limits. Test intermediate widths and ensure arm commands remain untouched.
 4. **Add Mink IK and arm actuation.** Test poses produced by forward kinematics from known valid configurations, a short smooth Cartesian path, limit-adjacent inputs, invalid poses, and a deliberately unreachable target. Compare achieved poses, not exact joint vectors: Panda is redundant. Verify the solver cannot mutate live state or command fingers/object joints.
 5. **Integrate skills using a manual task.** Use the canonical manually constructed pick-and-place task; supply already retargeted/processed waypoints at this block's boundary. No vision dependency. Verify descent before closure, lift before transport, lowering before opening, and guarded failure transitions.
@@ -138,16 +164,19 @@ Add focused tests under `tests/test_robot/`, using the established `uv run pytes
 
 Record simulation timestamps, skill transitions, model/library versions, full parameter snapshot, IK status/error/latency, commanded and observed arm/gripper state, contacts, grasp/transport/release evidence, final placement error in meters, and success under the explicitly configured tolerance. Measure solver latency against the configured control interval; do not change the rate to make a slow implementation pass.
 
-## Decisions still required
+## Remaining integration decisions
 
-This proposal does not change the authoritative project contract. Before implementation, resolve:
+The fixed diagnostic is runnable, but the general Panda configuration still
+requires:
 
-- Python 3.10+ support for current Mink versus retaining Python 3.9 with a separately verified compatible release.
 - Exact world/table/tool frames, quaternion convention, fixed downward orientation including yaw, and initial scene/object geometry.
-- Which existing height configuration is authoritative, plus explicit velocity limits, posture preference, and IK solver parameters.
+- Which height configuration is authoritative, plus posture preference and IK solver parameters.
 - IK arrival and failure criteria; grasp, slip, release, settling, and final-placement acceptance tolerances.
-- Approval of the proposed simulation failure policy and any optional collision-avoidance policy.
+- Any optional collision-aware/global planning policy.
 
 Document accepted conventions in the configuration and `AGENTS.md` before use. No numerical tuning, frame flips, safety-limit changes, or task-interface redesign should be used to hide a failed experiment.
 
-Review performed: repository source/configuration/documentation inspection and upstream library/model source review. Not performed: installation, import/build checks, IK execution, simulation, grasp tests, or end-to-end validation.
+Verification performed: dependency/import checks, focused robot tests, Panda IK
+and finger motion, a second two-axis robot fixture, and a successful simulated
+Panda pick-and-place using a manually constructed task. Not performed: Linux,
+upstream perception integration, varied-object calibration, or hardware execution.

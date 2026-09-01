@@ -19,8 +19,7 @@ def test_known_origin_rotation_and_centimeter_conversion(extracted_task, mapping
     assert result.source_task is extracted_task
     np.testing.assert_allclose(result.start_xy_m, (0.8, -1.9), rtol=0, atol=1e-14)
     np.testing.assert_allclose(result.goal_xy_m, (0.7, -1.4), rtol=0, atol=1e-14)
-    np.testing.assert_allclose(result.get_path(), ((0.8, -1.9), (0.7, -1.4)))
-    assert len(result.get_path("FOLLOW")) == 7
+    assert len(result.path_xy_m) == 7
     np.testing.assert_allclose(result.move_trajectory_xy_m, ((0.5, -1.7), (0.4, -1.6), (0.6, -1.5)))
 
 
@@ -44,23 +43,20 @@ def test_configured_arbitrary_rotation_round_trip(extracted_task, mapping_config
     config = MappingConfig.model_validate(mapping_config_values)
     result = CoordinateRetargeter(config).retarget(extracted_task)
     axes = np.column_stack((config.table_x_axis_target_xy, config.table_y_axis_target_xy))
-    recovered = (np.asarray(result.get_path("FOLLOW")) - config.table_origin_target_xy_m) @ axes
-    np.testing.assert_allclose(
-        recovered * 100, extracted_task.get_path("FOLLOW"), rtol=0, atol=1e-12
-    )
+    recovered = (np.asarray(result.path_xy_m) - config.table_origin_target_xy_m) @ axes
+    np.testing.assert_allclose(recovered * 100, extracted_task.path_xy_cm, rtol=0, atol=1e-12)
 
 
-def test_modes_keep_path_frames_phases_and_source_unchanged(extracted_task, mapping_config_values):
-    original = extracted_task.get_path("FOLLOW")
+def test_mapping_keeps_path_frames_phases_and_source_unchanged(
+    extracted_task, mapping_config_values
+):
+    original = extracted_task.path_xy_cm
     result = retarget_task(extracted_task, mapping_config_values)
-    full = result.get_path("FOLLOW")
+    full = result.path_xy_m
     for _ in range(3):
-        assert len(result.get_path()) == 2
-        assert result.get_path("FOLLOW") == full
-        assert extracted_task.get_path("FOLLOW") == original
+        assert result.path_xy_m == full
+        assert extracted_task.path_xy_cm == original
     assert result.source_task.phase_boundaries == extracted_task.phase_boundaries
-    with pytest.raises(ValueError):
-        result.get_path("UNKNOWN")
 
 
 @pytest.mark.parametrize(
@@ -165,7 +161,13 @@ def test_geometry_imports_do_not_load_robot_or_model_backends():
     code = """
 import sys
 from mimic.common import ActionPrediction, ExtractedTask
-from mimic.robot import TaskExtractor, CoordinateRetargeter, MappingConfig
+from mimic.robot import (
+    CoordinateRetargeter,
+    MappingConfig,
+    PathProcessor,
+    TaskExtractor,
+    WaypointBuilder,
+)
 assert not any(name.split('.')[0] in {'mujoco', 'mink', 'torch'} for name in sys.modules)
 import mimic.robot
 assert 'TaskExtractor' in dir(mimic.robot)

@@ -48,6 +48,9 @@ class RobotController:
         self._gripper_result = None
         self._pending = None
         self._failed = False
+        reset_ik = getattr(self.ik, "reset", None)
+        if reset_ik is not None:
+            reset_ik()
         self.gripper.reset()
 
     def prepare(self, target: ToolPose, action: GripperAction) -> ControlSample:

@@ -216,6 +216,10 @@ class MinkIKSolver:
                     safety_break=True,
                     limits=self.limits,
                     constraints=self.constraints,
+                    # Match the explicit step postcondition below. DAQP's
+                    # looser default can otherwise report a slightly
+                    # velocity-infeasible solution as successful.
+                    primal_tol=1e-9,
                 )
                 if not np.all(np.isfinite(velocity)):
                     raise ValueError("Solver returned nonfinite velocity")
@@ -223,8 +227,15 @@ class MinkIKSolver:
                 values = self.configuration.q[self.bindings.qpos_ids]
                 step = np.abs(values - q[self.bindings.qpos_ids])
                 # 1e-9 is a numerical comparison allowance, not a widened model limit.
-                if np.any(step > np.array(self.bindings.profile.velocity_limits) * dt_s + 1e-9):
-                    raise ValueError("Solver step exceeds configured velocity limit")
+                maximum_step = np.array(self.bindings.profile.velocity_limits) * dt_s
+                exceeded = step > maximum_step + 1e-9
+                if np.any(exceeded):
+                    index = int(np.argmax(step - maximum_step))
+                    name = self.bindings.profile.arm_joints[index]
+                    raise ValueError(
+                        f"Solver step for {name} ({step[index]:.9g}) exceeds the "
+                        f"configured interval limit ({maximum_step[index]:.9g})"
+                    )
                 self.bindings.validate_arm(values)
                 status = IKStatus.VALID_STEP
             return result(status, dict(zip(self.bindings.profile.arm_joints, map(float, values))))

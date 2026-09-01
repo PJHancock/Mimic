@@ -10,6 +10,7 @@ from mimic.common.types import PickPlaceWaypoints, ToolPose
 from mimic.config import Config
 from mimic.robot.backends.mink_ik import MinkIKSolver
 from mimic.robot.backends.panda_gripper import PandaGripperDriver
+from mimic.robot.backends.ruckig_position import PositionTrajectorySettings, RuckigPositionIK
 from mimic.robot.controller import RobotController
 from mimic.robot.gripper import GripperLogic, GripperSettings
 from mimic.robot.inverse_kinematics import IKSettings
@@ -80,11 +81,14 @@ def build_executor(
     bindings = ModelBindings(model, profile)
     if cfg["gripper_driver"] != "panda_standard_tendon":
         raise ValueError("Unsupported gripper driver; inject a compatible driver explicitly")
-    driver = PandaGripperDriver(model)
+    gripper_config = dict(cfg["gripper"])
+    driver = PandaGripperDriver(
+        model, open_command_width_m=gripper_config.pop("open_command_width_m")
+    )
     io = MuJoCoAdapter(bindings, driver.observe, driver.actuator_names, cfg["object_body"])
     state = io.reset(cfg["home_keyframe"])
     reference = {name: state.joint_positions[name][0] for name in profile.arm_joints}
-    solver = MinkIKSolver(
+    differential_ik = MinkIKSolver(
         bindings,
         IKSettings(**cfg["ik"]),
         reference,
@@ -93,10 +97,15 @@ def build_executor(
             for joint in driver.joint_ids
         },
     )
+    solver = RuckigPositionIK(
+        differential_ik,
+        bindings,
+        PositionTrajectorySettings(**cfg["trajectory"]),
+    )
     controller = RobotController(
         io,
         solver,
-        GripperLogic(driver, GripperSettings(**cfg["gripper"])),
+        GripperLogic(driver, GripperSettings(**gripper_config)),
         cfg["arm_control_hz"],
         cfg["gripper_control_hz"],
     )

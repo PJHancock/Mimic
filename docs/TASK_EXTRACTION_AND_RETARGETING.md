@@ -1,6 +1,6 @@
-# Offline task extraction and coordinate retargeting
+# Offline task extraction, coordinate retargeting, and path processing
 
-This is the user-approved contract for pipeline steps 2 and 3 on the robot
+This is the user-approved contract for pipeline steps 2 through 4 on the robot
 environment branch. It supersedes older descriptions of normalized tracking
 coordinates and mandatory second-based timing at these two boundaries.
 
@@ -9,9 +9,10 @@ coordinates and mandatory second-based timing at these two boundaries.
 - Input: one complete, already labeled, single-object demonstration.
 - Step 2: `TaskExtractor` recovers task geometry and phase boundaries.
 - Step 3: `CoordinateRetargeter` maps source geometry into a named target frame.
+- Step 4: `PathProcessor` explicitly selects or interpolates mapped XY geometry.
 - State post-processing is deferred. Invalid phase sequences are rejected, not repaired.
-- No robot actuation, IK, collision planning, trajectory smoothing, heights,
-  velocities, or demonstration-speed replay happens here.
+- No robot actuation, IK, collision planning, heights, velocities, or
+  demonstration-speed replay happens here.
 
 ## Input contract
 
@@ -49,7 +50,7 @@ with no new rejection threshold.
 ## Task extraction
 
 ```python
-from mimic.common import ActionPhase, ActionPrediction, ObjectTrack, PathMode
+from mimic.common import ActionPhase, ActionPrediction, ObjectTrack
 from mimic.robot import extract_task
 
 predictions = [
@@ -68,8 +69,9 @@ tracks = [
 task = extract_task(predictions, tracks)
 assert task.grasp_frame == 10
 assert task.release_frame == 40
-assert task.get_path() == ((10.0, 20.0), (30.0, 20.0))
-assert len(task.get_path(PathMode.FOLLOW)) == 4
+assert task.path_xy_cm == (
+    (10.0, 20.0), (12.0, 22.0), (20.0, 30.0), (30.0, 20.0)
+)
 ```
 
 The first GRASP frame and first RELEASE frame define the endpoints. Both require
@@ -89,7 +91,7 @@ classification or a claim that missing observations were reconstructed.
 `move_trajectory_xy_cm` exposes only MOVE-phase observations, maintaining the
 distinction between the canonical MOVE trajectory and the full handled interval.
 Interior tracking gaps remain visible in frame IDs. No gaps are filled; the
-MOVE-only subset can be empty. Downstream FOLLOW execution must decide whether
+MOVE-only subset can be empty. Downstream path processing must decide whether
 the available geometry is sufficient before generating a safe trajectory.
 
 The legacy `TaskRepresentation` type still describes normalized workspace
@@ -137,9 +139,7 @@ from mimic.robot import retarget_task
 # Deliberately raises validation errors until the deployment values are supplied.
 mapping = Config("configs/retargeting.yaml").get("retargeting")
 target_task = retarget_task(task, mapping)
-
-direct_xy_m = target_task.get_path()          # two transport endpoints
-follow_xy_m = target_task.get_path("FOLLOW") # all retained mapped samples
+mapped_xy_m = target_task.path_xy_m  # all retained samples, one-for-one
 ```
 
 `RetargetedTask` retains its immutable `source_task`, a named `target_frame`, and
@@ -147,21 +147,85 @@ one target XY point per source observation. Frame IDs/phases/confidence are
 available through that source task. A mapping does not move the simulated object,
 adapt to its current position, or prove robot reachability.
 
-## Path selection and downstream integration
+## Path processing and downstream integration
 
-Both source and target tasks support `get_path(mode=PathMode.DIRECT)`:
+`ExtractedTask.path_xy_cm` and `RetargetedTask.path_xy_m` always expose the full
+retained geometry. Selection and interpolation happen only after retargeting:
 
-- `DIRECT`: endpoints of a straight-line object transport path.
-- `FOLLOW`: preserved geometric samples including the same endpoints.
+```python
+from mimic.robot import process_path
 
-Selection never overwrites the stored demonstration. No file serialization is
-required by this milestone. An unknown mode raises `ValueError`.
+direct = process_path(target_task, {"interpolation": "direct"})
+exact = process_path(target_task, {"interpolation": "none"})
+corners = process_path(
+    target_task,
+    {"interpolation": "corners_only", "corner_max_deviation_m": 0.005},
+)
+cubic = process_path(
+    target_task,
+    {
+        "interpolation": "cubic",
+        "corner_max_deviation_m": 0.005,
+        "output_spacing_m": 0.01,
+        "maximum_spline_deviation_m": 0.01,
+    },
+)
+```
 
-`DIRECT` is not an arm-home-to-goal command, and `FOLLOW` does not assign human
-timing to a robot. The later Path Processor must produce suitable trajectories,
-script vertical motion, and supply tool orientation. The existing execution-side
-`PickPlaceWaypoints` expects full tool poses and cannot consume these XY tasks
-directly. No implicit adapter or guessed height/orientation is introduced.
+The numerical values above demonstrate the API and are not deployment tuning.
+The supported policies are:
+
+| `interpolation` | Geometry |
+|---|---|
+| `direct` | Exact grasp and release endpoints; the former default behavior |
+| `none` | Every mapped sample, unchanged and in source order |
+| `corners_only` | Ramer-Douglas-Peucker simplification using a required metre tolerance |
+| `cubic` | Natural parametric SciPy cubic through retained corners, sampled by spatial spacing |
+
+`none` means exact following of the available piecewise-linear samples; it cannot
+recover unobserved continuous human motion. `corners_only` returns only original
+samples, always including the exact endpoints. `cubic` uses cumulative chord
+length rather than frame index, so irregular video sampling does not set spline
+shape or robot speed. It rejects a zero-length path or a curve exceeding the
+configured maximum distance from the observed polyline rather than falling back
+to another mode. Arc length and maximum deviation are evaluated on a dense,
+deterministic numerical sampling of the spline; this is a validation approximation,
+not a proof over every point on the continuous curve.
+
+`ProcessedPath` retains the `RetargetedTask`, interpolation choice, control
+points, and their original source indices. Processing never overwrites source or
+mapped geometry. Lowercase configuration values are intentional; old `DIRECT`
+and `FOLLOW` values fail validation. The old `FOLLOW` behavior maps to `none`.
+
+Path processing does not assign human timing to the robot. `WaypointBuilder`
+converts a `ProcessedPath` into the existing `PickPlaceWaypoints` contract only
+when the caller supplies every world-Z coordinate, the object-goal Z coordinate,
+and a fixed unit `wxyz` tool quaternion:
+
+```python
+from mimic.robot import build_waypoints
+
+waypoints = build_waypoints(
+    cubic,
+    {
+        "approach_z_m": 0.20,
+        "grasp_z_m": 0.03,
+        "lift_z_m": 0.20,
+        "transport_z_m": 0.20,
+        "lower_z_m": 0.03,
+        "retreat_z_m": 0.20,
+        "object_goal_z_m": 0.02,
+        "tool_quaternion_wxyz": (0.0, 1.0, 0.0, 0.0),
+    },
+)
+```
+
+These values only illustrate the API; they are not deployment calibration.
+The builder preserves every processed XY point and never derives height or
+orientation from a Panda model. Complete tool poses are subsequently checked
+against the selected robot profile by the execution stack. The internal executor
+skill label remains `FOLLOW_PATH`; it is execution metadata rather than a
+path-processing option.
 
 The package exposes extraction/retargeting without importing MuJoCo, Mink, or
 Torch. Existing execution exports load their dependencies only when requested.
@@ -169,11 +233,13 @@ Torch. Existing execution exports load their dependencies only when requested.
 ## Verification
 
 ```bash
-uv run pytest tests/test_robot/test_task_extractor.py tests/test_robot/test_coordinate_retargeter.py
+uv run pytest tests/test_robot/test_task_extractor.py tests/test_robot/test_coordinate_retargeter.py tests/test_robot/test_path_processing.py tests/test_robot/test_waypoint_builder.py
 ```
 
 Tests use synthetic mappings, not deployment defaults. They check exact onset
 matching, invalid input rejection, sampling-rate independence, explicit axis
 rotation/reflection, cm-to-m conversion, round trips, immutable source retention,
-unset configuration rejection, and backend-independent imports. These checks do
-not demonstrate simulation success or physical robot safety.
+unset configuration rejection, all four path policies, strict mode-specific
+settings, endpoint preservation, deviation rejection, and backend-independent
+imports. These checks do not demonstrate simulation success or physical robot
+safety.

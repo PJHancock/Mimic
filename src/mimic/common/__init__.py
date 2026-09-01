@@ -6,7 +6,6 @@ from .types import *
 __all__ = [
     "ActionPhase",
     "ActionPrediction",
-    "PathMode",
     "PhaseBoundary",
     "TablePathSample",
     "ExtractedTask",

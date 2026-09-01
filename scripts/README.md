@@ -86,7 +86,7 @@ Use `fetch_panda_model.py` for the one-time pinned asset download. Use
 `verify_panda.py --output outputs/robot_verification/new_attempt` with `uv run --group robot`
 for the fixed diagnostic fixture. These entry points require explicit arguments,
 not the general default config. See [Robot Execution](../docs/ROBOT_EXECUTION.md)
-for unresolved settings and the observed physical limit-check failure.
+for unresolved general configuration and the successful fixed-fixture result.
 
 ## Utilities
 

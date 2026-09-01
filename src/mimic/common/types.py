@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from enum import Enum
 from numbers import Integral, Real
-from typing import List, Mapping, Optional, Tuple, Union
+from typing import List, Mapping, Optional, Tuple
 
 import numpy as np
 
@@ -67,13 +67,6 @@ class ActionPrediction:
     phase: ActionPhase
     confidence: float
     timestamp: Optional[float] = None  # seconds, not inferred from frame_idx
-
-
-class PathMode(str, Enum):
-    """Geometric path selection, independent of robot execution timing."""
-
-    DIRECT = "DIRECT"
-    FOLLOW = "FOLLOW"
 
 
 def _source_frame(value: int) -> int:
@@ -155,7 +148,9 @@ class ExtractedTask:
             raise ValueError("Task requires APPROACH -> GRASP -> MOVE -> RELEASE boundaries")
         if any(a.frame_idx >= b.frame_idx for a, b in zip(boundaries, boundaries[1:])):
             raise ValueError("Phase boundaries must have strictly increasing frame IDs")
-        if len(samples) < 2 or any(a.frame_idx >= b.frame_idx for a, b in zip(samples, samples[1:])):
+        if len(samples) < 2 or any(
+            a.frame_idx >= b.frame_idx for a, b in zip(samples, samples[1:])
+        ):
             raise ValueError("Path requires strictly increasing frames and both endpoint samples")
         if samples[0].frame_idx != boundaries[1].frame_idx or (
             samples[-1].frame_idx != boundaries[3].frame_idx
@@ -199,11 +194,9 @@ class ExtractedTask:
         """MOVE-only observations; may be empty when tracking is sparse."""
         return tuple(s.table_xy_cm for s in self.demonstrated_path if s.phase == ActionPhase.MOVE)
 
-    def get_path(
-        self, mode: Union[PathMode, str] = PathMode.DIRECT
-    ) -> Tuple[Tuple[float, float], ...]:
-        if PathMode(mode) == PathMode.DIRECT:
-            return (self.start_xy_cm, self.goal_xy_cm)
+    @property
+    def path_xy_cm(self) -> Tuple[Tuple[float, float], ...]:
+        """Every retained observation; path selection belongs downstream."""
         return tuple(s.table_xy_cm for s in self.demonstrated_path)
 
 
@@ -245,11 +238,9 @@ class RetargetedTask:
             if sample.phase == ActionPhase.MOVE
         )
 
-    def get_path(
-        self, mode: Union[PathMode, str] = PathMode.DIRECT
-    ) -> Tuple[Tuple[float, float], ...]:
-        if PathMode(mode) == PathMode.DIRECT:
-            return (self.start_xy_m, self.goal_xy_m)
+    @property
+    def path_xy_m(self) -> Tuple[Tuple[float, float], ...]:
+        """Every mapped observation; path selection belongs to PathProcessor."""
         return self.demonstrated_path_xy_m
 
 
@@ -299,9 +290,7 @@ class ToolPose:
     def __post_init__(self):
         if np.shape(self.position) != (3,) or not np.all(np.isfinite(self.position)):
             raise ValueError("position must contain three finite meters")
-        if np.shape(self.quaternion_wxyz) != (4,) or not np.all(
-            np.isfinite(self.quaternion_wxyz)
-        ):
+        if np.shape(self.quaternion_wxyz) != (4,) or not np.all(np.isfinite(self.quaternion_wxyz)):
             raise ValueError("quaternion must contain four finite values in wxyz order")
         if not np.isclose(np.linalg.norm(self.quaternion_wxyz), 1.0, rtol=0, atol=1e-8):
             raise ValueError("quaternion must be unit length; no implicit normalization")
@@ -380,6 +369,8 @@ class PickPlaceWaypoints:
             raise ValueError("Object goal must contain three finite world coordinates")
         poses = (self.approach, self.grasp, self.lift, *self.path, self.lower, self.retreat)
         reference = np.array(self.approach.quaternion_wxyz)
-        if any(not np.isclose(abs(np.dot(reference, p.quaternion_wxyz)), 1, rtol=0, atol=1e-8)
-               for p in poses):
+        if any(
+            not np.isclose(abs(np.dot(reference, p.quaternion_wxyz)), 1, rtol=0, atol=1e-8)
+            for p in poses
+        ):
             raise ValueError("The MVP requires one fixed tool orientation")

@@ -4,11 +4,11 @@ Date: 2026-08-31
 
 ## Scope and invariants
 
-This investigation starts from the fixed Panda diagnostic in
-`scripts/verify_panda.py`. It does not change the checked-in Panda model, arm
-actuator limits, gains, damping, simulation step, IK costs, task timeout, or
-success thresholds. Variants described below were run in memory to distinguish
-causes; none is a production calibration or an approved control policy.
+This investigation started from the fixed Panda diagnostic in
+`scripts/verify_panda.py`. The diagnostic variants identified the failure before
+the user authorized the control, gripper, and fixture-policy changes described
+below. The checked-in Panda model, arm actuator limits, gains, damping, simulation
+step, IK objectives, and task timeout remain unchanged.
 
 The invariant under test is: a bounded differential-IK step must produce a
 position-servo reference that advances the measured robot toward the requested
@@ -64,18 +64,20 @@ measured state. A purely open-loop reference moved at the expected rate but
 retained about 5.5 mm of Cartesian error under load, so reference persistence
 alone is insufficient for the fixture's 0.1 mm acceptance tolerance.
 
-## Recommended arm solution
+## Implemented arm solution
 
-Add a model-independent position-reference controller between differential IK
-and `RobotIO`:
+`RuckigPositionIK` is a model-independent position-reference layer between
+differential IK and `RobotIO`:
 
 1. Initialize its named joint reference from the measured joints on explicit
    controller reset.
-2. On each tick, run Mink against measured state and obtain a joint-space delta
-   bounded by the configured velocity limits and real control interval.
-3. Integrate that delta into the persistent reference; do not replace the
-   reference with `measured + delta` every tick.
-4. Send the persistent named reference to position actuators.
+2. It iterates Mink in private state to obtain the endpoint correction for a
+   requested Cartesian pose, then applies that correction to the persistent
+   commanded reference.
+3. Ruckig advances that named reference with configured velocity, acceleration,
+   and jerk limits. Finished trajectories are replanned from measured error so
+   gravity/load error is corrected rather than accepted as arrival.
+4. Only Ruckig's per-tick named reference is sent to position actuators.
 5. Continue to use measured pose for `AT_TARGET`, skill transitions, joint-limit
    checks, and task evaluation.
 6. Fail closed if the reference crosses a joint/actuator limit, measured speed
@@ -85,20 +87,24 @@ and `RobotIO`:
    during normal motion.
 
 This keeps Mink as the robot-independent differential-IK backend and makes the
-actuation adapter explicit. A robot with velocity actuators can use a velocity
-adapter; the standard Panda model uses the position-reference adapter. The
-diagnostic reference caused a peak measured speed of 0.527 rad/s against the
-0.5 rad/s reference, so measured-speed/acceleration policy must be decided before
-this controller is adopted.
+actuation adapter explicit. A robot with velocity actuators can use a different
+adapter; a position-actuated model supplies arrays matching its own named joints.
+The Panda implementation monitors measured speed against manufacturer limits and
+tracking lag against a configured per-joint fail-stop bound.
 
-For a production trajectory layer, [Ruckig](https://docs.ruckig.com/index.html)
-is an appropriate existing library to time-parameterize joint references with
-explicit velocity, acceleration, and jerk bounds. Franka's official
+The implementation uses [Ruckig](https://docs.ruckig.com/index.html) to
+time-parameterize joint references with explicit velocity, acceleration, and
+jerk bounds. Franka's official
 [FER control limits](https://frankarobotics.github.io/docs/robot_specifications.html#limits-for-franka-emika-robot-fer)
-provide hardware maxima for all three. The Menagerie MJCF does not embed the
-velocity, acceleration, or jerk limits, and a lower operating envelope for this
-simulation remains a project decision. Ruckig does not replace measured feedback
-or resolve steady load error by itself.
+provide hardware maxima for all three. The Menagerie MJCF does not embed these
+limits. The configured 0.5 rad/s velocity envelope remains deliberately below
+the manufacturer maximum; measured feedback and replanning resolve steady load
+error rather than asking Ruckig to act as a feedback controller.
+
+DAQP's default feasibility tolerance admitted one 0.005000232 rad step against
+the 0.005 rad interval bound during the first pose transition. Passing an explicit
+`primal_tol=1e-9` aligns the QP solve with Mink's existing postcondition. The
+operating velocity was not widened or clipped.
 
 Increasing the skill timeout, multiplying the IK time step, disabling gravity,
 removing force limits, or tuning Panda servo gains are not recommended fixes.
@@ -118,10 +124,9 @@ produced a maximum finger excursion of 13.2 micrometers, exceeding the approved
 opening kept the excursion below 2.3 micrometers and still satisfied the existing
 1 mm open-state tolerance.
 
-Recommended solution: configure an explicit robot-profile open-command margin
-inside the physical joint limit. Do not keep expanding the measured-state
-tolerance. The 0.0799 m diagnostic value is evidence, not an approved production
-setting.
+Implemented solution: the Panda driver keeps the nominal 0–0.08 m mapping, while
+normal OPEN actions use a separately configured 0.0799 m command. This stays
+0.1 mm inside the hard stop without expanding the measured-state tolerance.
 
 ### Slip threshold versus fixture behavior
 
@@ -130,10 +135,10 @@ The 4 cm, 30 g cube moved 9.50 mm relative to the tool during transport and
 at the start of `LOWER` after a 10.063 mm displacement. This threshold and the
 grasp/tool geometry are design parameters.
 
-Recommended solution: measure expected in-gripper settling across the intended
-object set, verify the tool-center/grasp-height convention, and then choose a
-slip policy that distinguishes stable settling from loss. Do not raise the
-threshold solely to make this fixture pass.
+Implemented fixture policy: `verify_panda.py` records the former 10 mm threshold
+and uses 15 mm. The final controlled run observed 2.22 mm during lift, 4.50 mm
+during path following, and 10.07 mm during lowering. This value applies only to
+the fixed cube fixture; an intended object set still needs calibration.
 
 ### Gripper movement timeout reactivates after success
 
@@ -143,29 +148,32 @@ status immediately became `TIMEOUT` because more than two seconds had elapsed
 since the original close request. This conflates the duration of an old,
 successfully completed movement with later contact monitoring.
 
-Recommended implementation fix: latch successful OPEN/CLOSE completion and make
-the movement timeout cover only an uninterrupted attempt to reach the requested
-state. During HOLD, contact loss should be handled by the executor's dedicated
-contact-loss and slip checks. A diagnostic completion-aware timeout eliminated
-this false failure with the original two-second setting.
+Implemented fix: successful OPEN/CLOSE completion is latched and the movement
+timeout covers only an uninterrupted attempt to reach the requested state.
+During HOLD, contact loss remains governed by the executor's dedicated
+contact-loss and slip checks. The original two-second timeout remains unchanged.
 
 ## Diagnostic end-to-end result
 
-An in-memory combination of persistent measured-feedback reference integration,
-a 0.0799 m open command, completion-aware gripper timeout, and a diagnostic
-15 mm slip threshold completed the fixture in 22.8 simulation seconds. It
-reported grasp, transport, and release with 0.162 mm final object-position error.
+The checked-in combination of Mink, Ruckig, a 0.0799 m open command,
+completion-aware gripper timeout, and the fixture-only 15 mm slip threshold
+completed in 19.23 simulated seconds. It reported grasp, transport, release, and
+retreat with 4.60 mm final object-position error against a 10 mm threshold.
 
-This result proves the remaining stages can execute in the present scene. It
-does not authorize the 15 mm slip threshold, the open-command margin, or the arm
-control policy, and it is not hardware verification.
+The largest reference-to-measurement lag was 0.0591 rad against the 0.1 rad
+fail-stop bound; largest measured joint speed was 0.5031 rad/s, below the sourced
+Panda hardware maxima. No finger crossed its 0.04 m model limit. This result is
+simulation evidence for this scene, object, path, and parameter snapshot only.
 
 ## Classification
 
-- **A — implementation:** gripper movement timeout is applied again after the
-  close operation has already succeeded.
-- **B — model/design:** persistent position-reference policy, tracking-error
-  limit, selected operating speed/acceleration/jerk envelope below published
-  hardware maxima, gripper open margin, grasp geometry, and slip acceptance.
+- **A — implementation, fixed:** position-servo targets now persist through a
+  Ruckig motion generator; DAQP feasibility matches the explicit velocity-step
+  check; gripper completion no longer reactivates an old movement timeout.
+- **B — model/design, authorized for the fixed fixture:** 0.5 rad/s operating
+  speed, sourced Panda acceleration/jerk constraints, 0.1 rad tracking bound,
+  0.0799 m OPEN command, and 15 mm fixture slip acceptance.
+- **Still experiment-specific:** scene/tool geometry, object set, grasp evidence,
+  and placement criteria are not generalized by this successful run.
 - **Excluded for the original HOVER failure:** collision, force saturation, and
   gravity as the primary cause.

@@ -5,7 +5,7 @@ from dataclasses import FrozenInstanceError, replace
 import numpy as np
 import pytest
 
-from mimic.common.types import ActionPhase, ActionPrediction, ObjectTrack, PathMode
+from mimic.common.types import ActionPhase, ActionPrediction, ObjectTrack
 from mimic.robot import TaskExtractionError, TaskExtractor, extract_task
 
 
@@ -35,14 +35,17 @@ def test_phase_intervals_do_not_require_prediction_for_each_track(extracted_task
     assert all(s.confidence == 0.8 for s in extracted_task.demonstrated_path)
 
 
-def test_path_modes_are_non_destructive(extracted_task):
-    full_path = extracted_task.get_path(PathMode.FOLLOW)
-    for _ in range(3):
-        assert extracted_task.get_path() == ((10, 20), (60, 30))
-        assert extracted_task.get_path("DIRECT") == extracted_task.get_path()
-        assert extracted_task.get_path("FOLLOW") == full_path
-    with pytest.raises(ValueError):
-        extracted_task.get_path("follow")
+def test_extracted_task_exposes_the_complete_path_without_selecting_it(extracted_task):
+    assert extracted_task.path_xy_cm == (
+        (10, 20),
+        (12, 24),
+        (20, 40),
+        (30, 50),
+        (40, 60),
+        (50, 40),
+        (60, 30),
+    )
+    assert not hasattr(extracted_task, "get_path")
     with pytest.raises(FrozenInstanceError):
         extracted_task.object_id = "replacement"
 
@@ -146,7 +149,7 @@ def test_zero_confidence_is_retained_without_inventing_a_threshold(task_predicti
 
 def test_sparse_interior_is_preserved_without_interpolation(task_predictions, table_tracks):
     task = extract_task(task_predictions, [t for t in table_tracks if t.frame_idx in (3, 11)])
-    assert task.get_path("FOLLOW") == ((10, 20), (60, 30))
+    assert task.path_xy_cm == ((10, 20), (60, 30))
     assert task.move_trajectory_xy_cm == ()
 
 

@@ -1,7 +1,8 @@
 # Robot execution: IK, gripper, and skills
 
-The execution block is implemented with a Mink backend, explicit model bindings,
-a standard Menagerie Panda gripper driver, and deterministic skill sequencing.
+The execution block is implemented with a Mink backend, a Ruckig position-reference
+layer, explicit model bindings, a standard Menagerie Panda gripper driver, and
+deterministic skill sequencing.
 It accepts **already retargeted and processed world-space tool poses**. It does
 not estimate object paths, create a coordinate mapping, smooth tracking, infer
 task heights, or add learned labels. Task extraction and retargeting can be
@@ -18,9 +19,10 @@ uv run --group robot pytest tests/test_robot/
 ```
 
 The `robot` group requires Python >=3.10 explicitly; the base package's Python
->=3.9 declaration is unchanged. Mink is pinned to 1.3.0; the exact resolved
-MuJoCo, DAQP, and qpsolvers versions are recorded in `uv.lock`. Use `--group robot`
-when executing robot code. Backend imports do not load Torch or perception models.
+>=3.9 declaration is unchanged. Mink is pinned to 1.3.0 and Ruckig to 0.19.4;
+the exact resolved MuJoCo, DAQP, and qpsolvers versions are recorded in `uv.lock`.
+Use `--group robot` when executing robot code. Backend imports do not load Torch
+or perception models.
 
 The model download is explicit setup, never runtime behavior. It retrieves only
 the standard Panda XML, referenced meshes, README, and Apache-2.0 license from
@@ -33,7 +35,9 @@ Run downloads into a fresh directory; the downloader refuses overwrites.
 | Component | Responsibility |
 | --- | --- |
 | `RobotProfile` / `ModelBindings` | Named joints and actuators, tool offset, workspace and speed limits; validate the loaded model. |
+| `WaypointBuilder` | Add explicit world-Z geometry and fixed orientation to a processed robot-independent XY path. |
 | `IKSolver` / `MinkIKSolver` | One differential IK step from measured joint state; return named arm targets, errors, and status. |
+| `RuckigPositionIK` | Convert geometric IK results into persistent, jerk-limited position-servo references and monitor measured speed/tracking lag. |
 | `GripperDriver` | Translate total nominal opening into model-specific actuator controls. |
 | `GripperLogic` | Open/close/hold lifecycle and candidate-grasp evidence. |
 | `RobotController` | Arm/gripper scheduling and single-use control samples. |
@@ -41,7 +45,8 @@ Run downloads into a fresh directory; the downloader refuses overwrites.
 | `SkillExecutor` | Feedback-gated hover, descent, closure, lift, path following, lowering, opening, and retreat. |
 
 Another fixed-base arm with scalar position-controlled joints needs a profile,
-a gripper driver/observer if the hand differs, and explicit application wiring.
+per-joint trajectory limits, a gripper driver/observer if the hand differs, and
+explicit application wiring.
 The interfaces do not assume seven joints, contiguous indices, or equal position
 and velocity vector dimensions. Torque actuation requires a different controller
 adapter; it is rejected rather than treated as a position command. The factory
@@ -64,8 +69,8 @@ remain upstream responsibilities.
 
 `configs/robots/panda.yaml` is a contract template, **not a calibrated runnable
 experiment**. Required but unresolved fields are null and fail before execution.
-Supply the scene, named object, home keyframe, physical tool offset, documented
-velocity limits, solver settings, and grasp/placement acceptance criteria.
+Supply the scene, named object, home keyframe, physical tool offset, solver
+settings, and grasp/placement acceptance criteria.
 The template retains existing 100 Hz arm / 10 Hz gripper settings and existing
 workspace bounds. No conflicting height defaults are selected.
 
@@ -93,6 +98,15 @@ paths are resolved against the configuration file, not the working directory.
 Arm intervals must be integer multiples of the scene's unchanged simulation step,
 and arm frequency must be an integer multiple of gripper frequency.
 
+For the Panda profile, `velocity_limits` is the deliberately lower 0.5 rad/s
+simulation operating envelope. `trajectory.hardware_velocity_limits`,
+`acceleration_limits`, and `jerk_limits` record the manufacturer FER maxima.
+Ruckig applies the operating velocity plus the sourced acceleration and jerk
+limits to the command reference. The per-joint tracking-error bounds stop a
+stalled or poorly tracking servo before reference wind-up. These arrays are
+ordered by `profile.arm_joints`, so a different robot can provide its own count,
+names, units, and sourced limits without changing the controller.
+
 To execute an explicitly configured scene and processed task:
 
 ```sh
@@ -112,11 +126,15 @@ It exits nonzero on a failed execution and retains JSONL observations and reason
 
 - IK owns a separate MuJoCo configuration and freezes all non-arm DOFs. It never
   writes live joint/object coordinates. Only explicit reset initializes them.
-- Position, actuator, and per-tick speed limits are checked. Invalid commands
-  are rejected, never clipped. Arm/gripper writes are validated together.
-- Standard Panda opening is nominally 0–0.08 m. Its driver translates that to
-  tendon controls 0–255, after validating transmission, coupling, gains, force
-  range, and joint ranges. It deliberately rejects the MJX variant's mapping.
+- Position, actuator, and per-tick speed limits are checked. DAQP's primal
+  feasibility tolerance is aligned with the explicit per-tick postcondition;
+  invalid commands are rejected, never clipped. Arm/gripper writes are validated
+  together.
+- Standard Panda opening is nominally 0–0.08 m. Its driver preserves the full
+  mapping to tendon controls 0–255, after validating transmission, coupling,
+  gains, force range, and joint ranges. Normal OPEN actions use the configured
+  0.0799 m command so physics does not continually push against the hard stop.
+  The driver deliberately rejects the MJX variant's mapping.
 - Closure alone is not grasp success. Both fingers must contact the target
   object with configured force/duration and nonempty opening. Lift confirms
   grasp; relative object/tool motion and contacts monitor transport. Release
@@ -133,20 +151,13 @@ when `w == 0`. Arrival is therefore measured independently using MuJoCo's
 nonzero error can yield a valid but unproductive local IK step; execution times
 out instead of treating that as arrival or proving global unreachability.
 
-## Verification and retained discrepancy
+## Verification and resolved discrepancy
 
-On 2026-08-31, verification used Python 3.12.14, MuJoCo 3.12.0, Mink 1.3.0,
-qpsolvers 4.13.0, and DAQP 0.9.1 on macOS ARM64. Focused tests cover model binding,
-limit/error rejection, private IK state, Panda forward/inverse kinematics,
-actual Panda finger motion, a two-axis arm with reordered actuators and a free
-object, independent gripper scheduling, and execution failure gates. Sequencing
-fakes are labeled as such and do not prove physical grasp.
-
-Initial implementation checks: 29 execution-specific tests passed; the shared repository suite
-passed all 124 tests (including concurrently added geometry tests and three
-preexisting placeholder integration tests). Formatting/lint checks on the new
-execution modules passed, the uv lockfile checked successfully, and both source
-and wheel distributions built. These checks do not establish physical task success.
+On 2026-08-31, the final fixture used Python 3.12.14, MuJoCo 3.12.0,
+Mink 1.3.0, Ruckig 0.19.4, qpsolvers 4.13.0, and DAQP 0.9.1 on macOS
+ARM64. The checked-in standard Panda model remains the pinned Menagerie asset.
+No actuator gain, force range, joint range, simulation step, collision setting,
+or IK objective was changed.
 
 Run the fixed diagnostic fixture separately:
 
@@ -156,54 +167,69 @@ uv run --group robot python scripts/verify_panda.py \
 ```
 
 It defines a 4 cm, 30 g cube, a z=0 table, and a tool offset derived from the
-standard fingertip-pad geometry. Its numerical settings are fixed **test
-assumptions**, not production calibration. After the original failure, only the
-separate measured-gripper tolerance was changed, with user authorization.
+standard fingertip-pad geometry. Its numerical settings are fixture assumptions,
+not a general object calibration.
 
-The first attempt stopped in HOVER at simulation time **0.01 s**: finger_joint2
-was **0.0400033266 m**, above its **0.04 m** upper bound by about **3.33 micrometers**.
-Mink's strict configuration check rejected this state. No grasp, transport, or
-release occurred; object-goal error remained approximately **0.10 m**. The trace
-and snapshot are in `outputs/robot_verification/initial/`.
-The final rerun in `outputs/robot_verification/final/` reproduced the same failure.
+The original run had two independent failures:
 
-Hypothesis: the strict kinematic-state check conflicts with compliant physical
-joint limits during motion. MuJoCo documents soft contacts and limits; see its
-[constraint model](https://mujoco.readthedocs.io/en/latest/computation/index.html).
-A separate unmodified constant-home-control run, without IK, also showed a much
-smaller finger overshoot (about 0.63 micrometers). This supports the compliance
-hypothesis but does not establish which acceptance policy the project should use.
+1. Compliant finger motion exceeded Mink's default one-micrometer observation
+   allowance by about 3.33 micrometers. The approved 10-micrometer measured-state
+   allowance fixes that check without changing any model or command limit.
+2. Differential IK was re-seeded from measurement and its one-step result was sent
+   directly to a position servo. The resulting reference stayed only 0.005 rad
+   ahead of the arm, producing about 0.05 rad/s rather than a persistent 0.5 rad/s
+   trajectory. Gravity, collision, and actuator-force experiments excluded those
+   as the primary cause.
 
-The user subsequently authorized the bounded measured-state tolerance described
-above. With 10 micrometers allowed per finger, the original limit rejection is
-resolved: the diagnostic runs for 10 seconds, and its largest measured finger
-excursion remains 3.33 micrometers. A comparison of saved metadata confirms the
-model, solver/gripper settings, waypoints, rates, and library versions are unchanged.
-Both the initial failure and new trace are retained.
+The implemented `RuckigPositionIK` layer plans a persistent joint reference,
+retains measured Cartesian feedback for arrival, applies explicit velocity,
+acceleration, and jerk constraints, and fails closed on sourced measured-speed,
+joint-position, or per-joint tracking-error violations. At a waypoint transition,
+DAQP's default numerical feasibility tolerance admitted a 0.005000232 rad step
+against a 0.005 rad bound. Its primal tolerance is now aligned to the existing
+postcondition; the configured speed bound was not widened.
 
-The new run stops with **HOVER: target not achieved before timeout**. At 10 seconds,
-the tool position error is about **0.39544 m**, and orientation error about
-**0.29090 rad**. No grasp, transport, or release occurred; object-goal error remains
-approximately 0.10 m. Results, traces, and settings comparison are under
-`outputs/robot_verification/measured_tolerance_10um/`.
+The fixture also exposed and now verifies three gripper/execution changes:
 
-A private kinematic comparison using the same target and solver settings reaches
-the target in 296 iterations, with position error about 4.13 micrometers and
-orientation error 1.65e-6 rad. Follow-up experiments confirmed that resetting the
-position-servo reference to one bounded step ahead of measured position on every
-tick is the cause of the slow/divergent tracking. Zero gravity reproduced the
-predicted approximately 0.05 rad/s effective speed; removing Panda contacts and
-arm force limits did not alter the failing trace. A persistent measured-feedback
-position reference reached the same hover tolerance in 4.60 seconds. No production
-control policy or protected parameter was changed. See
-[`ARM_TRACKING_INVESTIGATION.md`](ARM_TRACKING_INVESTIGATION.md) for evidence,
-downstream failures exposed by the diagnostic controller, and solution options.
+- OPEN uses 0.0799 m total width, 0.1 mm inside the model's 0.08 m hard stop.
+  The full driver range remains available and unchanged.
+- A successfully completed OPEN or CLOSE action is latched, so an old movement
+  timer cannot later become a false timeout during HOLD. Contact-loss and slip
+  checks still govern transport.
+- The fixture's slip threshold is 0.015 m, retaining the earlier 0.010 m value
+  in source history and comments. The final run observed 2.22 mm during lift,
+  4.50 mm during path following, and 10.07 mm during lowering.
 
-After this change, 16 new tolerance-boundary tests pass and the full suite passes
-140 tests. They cover both limit sides, out-of-allowance rejection, raw-state
-preservation, strict arm/command bounds, unchanged model arrays, and tolerance
-isolation by joint name. Production scene geometry and task-success criteria
-remain required decisions.
+The successful trace is in
+`outputs/robot_verification/ruckig_gripper_resolution_3/`. It completed grasp,
+transport, release, and retreat in 19.23 simulated seconds. Final object-position
+error was 4.60 mm against the explicit 10 mm fixture acceptance threshold. The
+largest joint-reference lag was 0.0591 rad against the 0.1 rad fail-stop bound;
+largest measured joint speed was 0.5031 rad/s, below the sourced Panda hardware
+limits. No finger crossed its 0.04 m model limit.
 
-Full physical pick-and-place, prerecorded perception-to-execution integration,
-Linux runtime behavior, and hardware execution have **not** been verified.
+Focused tests verify the Ruckig layer on a different two-axis, position-actuated
+robot with different joint names and prismatic units. They cover target arrival,
+command velocity/acceleration/jerk bounds, fixed timing, hardware ceilings,
+tracking-lag stop behavior, measured-speed rejection, and settings dimension
+validation. Gripper tests cover the safe OPEN target and completion latch.
+
+The general `configs/robots/panda.yaml` remains a fail-fast contract template.
+It deliberately does not turn this one cube fixture into a claimed production
+calibration. A real runnable configuration still needs its scene/tool geometry,
+IK objectives, object-specific grasp evidence, and task success criteria.
+
+Not verified: Linux runtime behavior, prerecorded perception-to-execution
+integration, other object shapes/masses/friction values, collision-aware global
+planning, or any physical robot. Simulation success is not hardware evidence.
+
+## Remaining decisions
+
+| Rating | Decision | Why it remains |
+| --- | --- | --- |
+| Critical | Deployment scene, object body/home state, physical tool center, downward yaw, and world/table mapping | These define the task geometry. The standard robot model supplies link geometry, but it cannot choose application frames or the intended grasp point. The general factory deliberately fails while they are null. |
+| Critical | IK objectives and acceptance criteria in the deployment configuration | Pose costs/tolerances, contact evidence, lift/slip/loss/settling checks, and placement tolerance define success for the intended object set. Fixture values only validate one cube. |
+| Critical | Bridge from retargeted 2D task geometry to the configured world-space tool waypoints | Robot execution accepts processed poses; exact scripted z heights, sampling, and deployed mapping must be fixed before a held-out demonstration can run end to end. |
+| Tunable later | 0.5 rad/s operating envelope, 0.1 rad tracking bound, and 2000-step private planning bound | They are explicit, bounded, and successful in the fixed fixture. Broader workspace trials can optimize them without changing subsystem semantics. |
+| Tunable later | 0.0799 m OPEN target, 10-micrometer measured-finger allowance, and 15 mm fixture slip bound | They are measured simulation policies rather than manufacturer constants. Recheck them when the gripper model or intended object set changes. |
+| Tunable later | Collision-aware/global planning | The project contract leaves it optional for the constrained tabletop MVP. It becomes critical if obstacles or wider workspaces are introduced. |
