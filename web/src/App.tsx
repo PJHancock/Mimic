@@ -224,10 +224,10 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><button onClick={() => document.getElementById('section-demonstration')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>VIDEO INPUT</button><i>→</i><button onClick={() => document.getElementById('section-skill-model')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>TEMPORAL CLASSIFIER</button><i>→</i><button onClick={() => document.getElementById('section-retarget')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>POST PROCESSING</button><i>→</i><button onClick={() => document.getElementById('section-panda')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>MUJOCO</button></div></header>
+    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><button onClick={() => document.getElementById('section-overview')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>PROJECT OVERVIEW</button><i>→</i><button onClick={() => document.getElementById('section-pipeline')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>TECHNOLOGY PIPELINE</button><i>→</i><button onClick={() => document.getElementById('section-demo')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>DEMO</button></div></header>
 
-    {/* Job Description Section */}
-    <div className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
+    {/* Project Overview Section */}
+    <div id="section-overview" className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
       <div className="job-header">
         <div className="job-title">MIMIC</div>
         <div className="job-company">Robot Skill Learning System</div>
@@ -239,10 +239,9 @@ export default function App() {
       </div>
 
       {/* Interactive Flowchart */}
-      <div className="flowchart-section">
+      <div id="section-pipeline" className="flowchart-section">
         <div className="flowchart-title">TECHNOLOGY PIPELINE</div>
         <div className="flowchart-subtitle">Click any box to learn more about that stage</div>
-        <div id="section-demonstration" style={{ position: 'absolute', visibility: 'hidden' }} />
 
         <svg viewBox="0 0 1000 1300" style={{ width: '100%', maxWidth: '1000px', margin: '40px auto', display: 'block' }}>
           <defs>
@@ -290,9 +289,6 @@ export default function App() {
           </g>
           <line x1="160" y1="230" x2="160" y2="310" stroke="var(--cyan)" strokeWidth="2" />
 
-          {/* SKILL MODEL ANCHOR */}
-          <foreignObject x="0" y="310" width="0" height="0"><div id="section-skill-model" style={{ visibility: 'hidden' }} /></foreignObject>
-
           {/* MIDDLE: CLASSIFIER */}
           <g onClick={() => setFlowboxModal(flowboxData.classifier)} style={{ cursor: 'pointer' }}>
             <rect x="375" y="310" width="250" height="70" fill="#0f0822" stroke="#4c1d95" strokeWidth="2" rx="4" />
@@ -322,9 +318,6 @@ export default function App() {
             <rect x="375" y="470" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
             <text x="500" y="515" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">📤 STATE PROBABILITIES</text>
           </g>
-
-          {/* RETARGET ANCHOR */}
-          <foreignObject x="0" y="580" width="0" height="0"><div id="section-retarget" style={{ visibility: 'hidden' }} /></foreignObject>
 
           {/* POST PROCESSING & SKILL GRAPH (combined) */}
           <line x1="500" y1="540" x2="500" y2="580" stroke="var(--cyan)" strokeWidth="2" />
@@ -369,9 +362,6 @@ export default function App() {
             <text x="500" y="1065" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">🔧 IK / MOTOR CTRL</text>
           </g>
 
-          {/* PANDA ANCHOR */}
-          <foreignObject x="0" y="1140" width="0" height="0"><div id="section-panda" style={{ visibility: 'hidden' }} /></foreignObject>
-
           {/* MUJOCO */}
           <line x1="500" y1="1100" x2="500" y2="1140" stroke="var(--cyan)" strokeWidth="2" />
           <g onClick={() => setFlowboxModal(flowboxData.mujoco)} style={{ cursor: 'pointer' }}>
@@ -384,7 +374,7 @@ export default function App() {
       {/* Modal */}
       <FlowboxModal info={flowboxModal} onClose={() => setFlowboxModal(null)} />
     </div>
-    <main>
+    <main id="section-demo">
       <section className="panel process-panel"><PanelTitle eyebrow="Local pipeline" title="Process raw demonstration" end={<span className={`job-status ${pipelineJob?.status ?? 'idle'}`}><i />{pipelineJob?.status ?? 'IDLE'}</span>} /><div className="process-body"><div className="process-controls"><label><span>RAW VIDEO</span><select value={selectedRaw} onChange={(event) => setSelectedRaw(event.target.value)} disabled={pipelineJob?.status === 'running'}>{rawVideos.map((video) => <option key={video.name} value={video.name}>{video.name}{video.has_results ? ' · processed' : ' · new'}</option>)}</select></label><label><span>ROBOT CONFIG</span><select value={selectedConfig} onChange={(event) => setSelectedConfig(event.target.value)} disabled={pipelineJob?.status === 'running'}>{robotConfigs.map((config) => <option key={config.id} value={config.id}>{config.name}{config.default ? ' · default' : ''}</option>)}</select></label><label><span>INFERENCE DEVICE</span><select value={device} onChange={(event) => setDevice(event.target.value)} disabled={pipelineJob?.status === 'running'}><option value="cpu">CPU</option><option value="mps">Apple MPS</option><option value="cuda">CUDA</option></select></label><button type="button" onClick={startProcessing} disabled={!selectedRaw || !selectedConfig || pipelineJob?.status === 'running'}>{pipelineJob?.status === 'running' ? 'PROCESSING…' : selectedVideo?.has_results ? 'REPROCESS RUN' : 'PROCESS VIDEO'}<b>▶</b></button></div><div className="process-monitor"><div><strong>{pipelineJob?.stage ?? 'Ready'}</strong><span>{pipelineJob?.progress ?? 0}%</span></div><div className={`process-progress ${pipelineJob?.status ?? 'idle'}`}><i style={{ width: `${pipelineJob?.progress ?? 0}%` }} /></div><small>{pipelineError || pipelineJob?.message || 'Select a video from data/raw/.'}</small></div></div></section>
       {loading && <div className="loading"><i />INDEXING RUN ARTIFACTS…</div>}{error && <div className="error-state">{error}<small>Start with <code>npm run dev</code> from web/.</small></div>}
       {!loading && detail && <>
