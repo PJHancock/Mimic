@@ -54,7 +54,7 @@ mimic/
 ## 📋 System Pipeline
 
 1. **Video Input** → Extract raw frames
-2. **Visual Embeddings** → V-JEPA self-supervised features
+2. **Visual Embeddings** → ResNet50 self-supervised features (V-JEPA functionality included)
 3. **Temporal Classifier** → LSTM predicts manipulation phases
 4. **Object Tracking** → HSV detection of target object
 5. **Task Extraction** → Combine predictions and coordinates
