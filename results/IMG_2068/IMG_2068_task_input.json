@@ -1,0 +1,4503 @@
+{
+  "schema": "mimic.demo_task_input.v1",
+  "video": {
+    "created_at": "2026-09-01T01:41:46.081109-06:00",
+    "fps": 29.98387963460505,
+    "frame_count": 279,
+    "duration_s": 9.305,
+    "tracking_coordinate_frame": "image_pixels",
+    "image_width_px": 1920,
+    "image_height_px": 1080
+  },
+  "catalog": {
+    "schema_version": 2,
+    "fingerprint": "85407b9fabd71de6404a20183342162ec1363009453cee1f396616c7aa4ef8fa",
+    "labels": [
+      "IDLE",
+      "HOVER",
+      "GRASP",
+      "CARRY",
+      "RELEASE"
+    ]
+  },
+  "checkpoint_sha256": "08762e8599146de68fb2e0ef40b2c7f530e386715dfddb0f73b8f75004e82979",
+  "postprocessing": {
+    "fingerprint": "fd956da630153b9411651ecf4f71e85f51f30dcea4ffed4864dd63f2a123141a",
+    "settings": {
+      "minimum_confidence": 0.5,
+      "minimum_transition_margin": 0.1,
+      "maximum_second_choice_gap": 0.2,
+      "required_consecutive_observations": 1,
+      "missing_detection_timeout_s": 0.5
+    },
+    "guard_policy": "defer_runtime_guards_to_execution"
+  },
+  "resolved_actions": [
+    {
+      "frame_idx": 1,
+      "timestamp_s": 0.0,
+      "phase": "IDLE",
+      "confidence": 9.623283403925598e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 2,
+      "timestamp_s": 0.03335125448028674,
+      "phase": "IDLE",
+      "confidence": 7.599389277856972e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 3,
+      "timestamp_s": 0.06670250896057348,
+      "phase": "IDLE",
+      "confidence": 7.181845376180718e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 4,
+      "timestamp_s": 0.10005376344086023,
+      "phase": "IDLE",
+      "confidence": 1.8568772475191508e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 5,
+      "timestamp_s": 0.13340501792114695,
+      "phase": "IDLE",
+      "confidence": 2.2404867650038796e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 6,
+      "timestamp_s": 0.1667562724014337,
+      "phase": "IDLE",
+      "confidence": 2.317137386853574e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 7,
+      "timestamp_s": 0.20010752688172045,
+      "phase": "IDLE",
+      "confidence": 2.137330739060417e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 8,
+      "timestamp_s": 0.23345878136200718,
+      "phase": "IDLE",
+      "confidence": 1.8258248246638686e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 9,
+      "timestamp_s": 0.2668100358422939,
+      "phase": "IDLE",
+      "confidence": 1.8007796143137966e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 10,
+      "timestamp_s": 0.30016129032258065,
+      "phase": "IDLE",
+      "confidence": 1.9856424842146225e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 11,
+      "timestamp_s": 0.3335125448028674,
+      "phase": "IDLE",
+      "confidence": 2.02846558750025e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 12,
+      "timestamp_s": 0.36686379928315416,
+      "phase": "IDLE",
+      "confidence": 2.0310908439569175e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 13,
+      "timestamp_s": 0.4002150537634409,
+      "phase": "IDLE",
+      "confidence": 2.5558433662808966e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 14,
+      "timestamp_s": 0.4335663082437276,
+      "phase": "IDLE",
+      "confidence": 8.411250746576115e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 15,
+      "timestamp_s": 0.46691756272401436,
+      "phase": "IDLE",
+      "confidence": 2.9353486752370372e-05,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 16,
+      "timestamp_s": 0.500268817204301,
+      "phase": "HOVER",
+      "confidence": 0.9988321661949158,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 17,
+      "timestamp_s": 0.5336200716845878,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 18,
+      "timestamp_s": 0.5669713261648746,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 19,
+      "timestamp_s": 0.6003225806451613,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 20,
+      "timestamp_s": 0.6336738351254481,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 21,
+      "timestamp_s": 0.6670250896057348,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 22,
+      "timestamp_s": 0.7003763440860216,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 23,
+      "timestamp_s": 0.7337275985663083,
+      "phase": "HOVER",
+      "confidence": 0.9999998807907104,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 24,
+      "timestamp_s": 0.7670788530465951,
+      "phase": "HOVER",
+      "confidence": 0.9999773502349854,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 25,
+      "timestamp_s": 0.8004301075268818,
+      "phase": "HOVER",
+      "confidence": 0.9995670914649963,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 26,
+      "timestamp_s": 0.8337813620071685,
+      "phase": "HOVER",
+      "confidence": 0.9999258518218994,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 27,
+      "timestamp_s": 0.8671326164874552,
+      "phase": "HOVER",
+      "confidence": 0.9999510049819946,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 28,
+      "timestamp_s": 0.900483870967742,
+      "phase": "HOVER",
+      "confidence": 0.9999086856842041,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 29,
+      "timestamp_s": 0.9338351254480287,
+      "phase": "HOVER",
+      "confidence": 0.9999967813491821,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 30,
+      "timestamp_s": 0.9671863799283155,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 31,
+      "timestamp_s": 1.000537634408602,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 32,
+      "timestamp_s": 1.0338888888888889,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 33,
+      "timestamp_s": 1.0672401433691756,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 34,
+      "timestamp_s": 1.1005913978494624,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 35,
+      "timestamp_s": 1.1339426523297491,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 36,
+      "timestamp_s": 1.1672939068100359,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 37,
+      "timestamp_s": 1.2006451612903226,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 38,
+      "timestamp_s": 1.2339964157706094,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 39,
+      "timestamp_s": 1.2673476702508961,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 40,
+      "timestamp_s": 1.3006989247311829,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 41,
+      "timestamp_s": 1.3340501792114696,
+      "phase": "HOVER",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 42,
+      "timestamp_s": 1.3674014336917564,
+      "phase": "HOVER",
+      "confidence": 0.9999997615814209,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 43,
+      "timestamp_s": 1.4007526881720431,
+      "phase": "HOVER",
+      "confidence": 0.9999980926513672,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 44,
+      "timestamp_s": 1.4341039426523299,
+      "phase": "HOVER",
+      "confidence": 0.9999171495437622,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 45,
+      "timestamp_s": 1.4674551971326166,
+      "phase": "HOVER",
+      "confidence": 0.9991090893745422,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 46,
+      "timestamp_s": 1.5008064516129034,
+      "phase": "HOVER",
+      "confidence": 0.9553695321083069,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 47,
+      "timestamp_s": 1.5341577060931901,
+      "phase": "GRASP",
+      "confidence": 0.9934614896774292,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 48,
+      "timestamp_s": 1.5675089605734769,
+      "phase": "GRASP",
+      "confidence": 0.9999997615814209,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 49,
+      "timestamp_s": 1.6008602150537636,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 50,
+      "timestamp_s": 1.6342114695340502,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 51,
+      "timestamp_s": 1.667562724014337,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 52,
+      "timestamp_s": 1.7009139784946237,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 53,
+      "timestamp_s": 1.7342652329749104,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 54,
+      "timestamp_s": 1.7676164874551972,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 55,
+      "timestamp_s": 1.800967741935484,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 56,
+      "timestamp_s": 1.8343189964157707,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 57,
+      "timestamp_s": 1.8676702508960574,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 58,
+      "timestamp_s": 1.9010215053763442,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 59,
+      "timestamp_s": 1.934372759856631,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 60,
+      "timestamp_s": 1.9677240143369177,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 61,
+      "timestamp_s": 2.001075268817204,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 62,
+      "timestamp_s": 2.034426523297491,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 63,
+      "timestamp_s": 2.0677777777777777,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 64,
+      "timestamp_s": 2.1011290322580645,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 65,
+      "timestamp_s": 2.134480286738351,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 66,
+      "timestamp_s": 2.167831541218638,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 67,
+      "timestamp_s": 2.2011827956989247,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 68,
+      "timestamp_s": 2.2345340501792115,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 69,
+      "timestamp_s": 2.2678853046594982,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 70,
+      "timestamp_s": 2.301236559139785,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 71,
+      "timestamp_s": 2.3345878136200717,
+      "phase": "GRASP",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 72,
+      "timestamp_s": 2.3679390681003585,
+      "phase": "GRASP",
+      "confidence": 0.9999997615814209,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 73,
+      "timestamp_s": 2.4012903225806452,
+      "phase": "GRASP",
+      "confidence": 0.9999982118606567,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 74,
+      "timestamp_s": 2.434641577060932,
+      "phase": "GRASP",
+      "confidence": 0.9999692440032959,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 75,
+      "timestamp_s": 2.4679928315412187,
+      "phase": "CARRY",
+      "confidence": 0.9899869561195374,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 76,
+      "timestamp_s": 2.5013440860215055,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 77,
+      "timestamp_s": 2.5346953405017922,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 78,
+      "timestamp_s": 2.568046594982079,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 79,
+      "timestamp_s": 2.6013978494623657,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 80,
+      "timestamp_s": 2.6347491039426525,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 81,
+      "timestamp_s": 2.6681003584229392,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 82,
+      "timestamp_s": 2.701451612903226,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 83,
+      "timestamp_s": 2.7348028673835127,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 84,
+      "timestamp_s": 2.7681541218637995,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 85,
+      "timestamp_s": 2.8015053763440863,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 86,
+      "timestamp_s": 2.834856630824373,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 87,
+      "timestamp_s": 2.8682078853046598,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 88,
+      "timestamp_s": 2.9015591397849465,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 89,
+      "timestamp_s": 2.9349103942652333,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 90,
+      "timestamp_s": 2.96826164874552,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 91,
+      "timestamp_s": 3.0016129032258068,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 92,
+      "timestamp_s": 3.0349641577060935,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 93,
+      "timestamp_s": 3.0683154121863803,
+      "phase": "CARRY",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 94,
+      "timestamp_s": 3.101666666666667,
+      "phase": "CARRY",
+      "confidence": 0.9999897480010986,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 95,
+      "timestamp_s": 3.1350179211469538,
+      "phase": "CARRY",
+      "confidence": 0.9905520677566528,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 96,
+      "timestamp_s": 3.1683691756272405,
+      "phase": "RELEASE",
+      "confidence": 0.9688262343406677,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 97,
+      "timestamp_s": 3.2017204301075273,
+      "phase": "RELEASE",
+      "confidence": 0.999970555305481,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 98,
+      "timestamp_s": 3.235071684587814,
+      "phase": "RELEASE",
+      "confidence": 0.9999996423721313,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 99,
+      "timestamp_s": 3.2684229390681003,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 100,
+      "timestamp_s": 3.301774193548387,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 101,
+      "timestamp_s": 3.335125448028674,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 102,
+      "timestamp_s": 3.3684767025089606,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 103,
+      "timestamp_s": 3.4018279569892473,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 104,
+      "timestamp_s": 3.435179211469534,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 105,
+      "timestamp_s": 3.468530465949821,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 106,
+      "timestamp_s": 3.5018817204301076,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 107,
+      "timestamp_s": 3.5352329749103943,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 108,
+      "timestamp_s": 3.568584229390681,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 109,
+      "timestamp_s": 3.601935483870968,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 110,
+      "timestamp_s": 3.6352867383512546,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 111,
+      "timestamp_s": 3.6686379928315414,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 112,
+      "timestamp_s": 3.701989247311828,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 113,
+      "timestamp_s": 3.735340501792115,
+      "phase": "RELEASE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 114,
+      "timestamp_s": 3.7686917562724016,
+      "phase": "RELEASE",
+      "confidence": 0.9999997615814209,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 115,
+      "timestamp_s": 3.8020430107526884,
+      "phase": "RELEASE",
+      "confidence": 0.9999890327453613,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 116,
+      "timestamp_s": 3.835394265232975,
+      "phase": "RELEASE",
+      "confidence": 0.9996167421340942,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 117,
+      "timestamp_s": 3.868745519713262,
+      "phase": "RELEASE",
+      "confidence": 0.9871942400932312,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 118,
+      "timestamp_s": 3.9020967741935486,
+      "phase": "RELEASE",
+      "confidence": 0.7897425889968872,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 119,
+      "timestamp_s": 3.9354480286738354,
+      "phase": "IDLE",
+      "confidence": 0.7673839926719666,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 120,
+      "timestamp_s": 3.968799283154122,
+      "phase": "IDLE",
+      "confidence": 0.9464896321296692,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 121,
+      "timestamp_s": 4.002150537634408,
+      "phase": "IDLE",
+      "confidence": 0.99517822265625,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 122,
+      "timestamp_s": 4.035501792114696,
+      "phase": "IDLE",
+      "confidence": 0.9973762035369873,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 123,
+      "timestamp_s": 4.068853046594982,
+      "phase": "IDLE",
+      "confidence": 0.9986786246299744,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 124,
+      "timestamp_s": 4.102204301075269,
+      "phase": "IDLE",
+      "confidence": 0.9988840222358704,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 125,
+      "timestamp_s": 4.135555555555555,
+      "phase": "IDLE",
+      "confidence": 0.9988993406295776,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 126,
+      "timestamp_s": 4.168906810035843,
+      "phase": "IDLE",
+      "confidence": 0.9989006519317627,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 127,
+      "timestamp_s": 4.202258064516129,
+      "phase": "IDLE",
+      "confidence": 0.9986714124679565,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 128,
+      "timestamp_s": 4.235609318996416,
+      "phase": "IDLE",
+      "confidence": 0.9988417029380798,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 129,
+      "timestamp_s": 4.268960573476702,
+      "phase": "IDLE",
+      "confidence": 0.9988574981689453,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 130,
+      "timestamp_s": 4.30231182795699,
+      "phase": "IDLE",
+      "confidence": 0.9991205334663391,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 131,
+      "timestamp_s": 4.335663082437276,
+      "phase": "IDLE",
+      "confidence": 0.9993746876716614,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 132,
+      "timestamp_s": 4.369014336917563,
+      "phase": "IDLE",
+      "confidence": 0.9994346499443054,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 133,
+      "timestamp_s": 4.402365591397849,
+      "phase": "IDLE",
+      "confidence": 0.9993093013763428,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 134,
+      "timestamp_s": 4.435716845878137,
+      "phase": "IDLE",
+      "confidence": 0.999036431312561,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 135,
+      "timestamp_s": 4.469068100358423,
+      "phase": "IDLE",
+      "confidence": 0.9990562796592712,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 136,
+      "timestamp_s": 4.50241935483871,
+      "phase": "IDLE",
+      "confidence": 0.9990315437316895,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 137,
+      "timestamp_s": 4.5357706093189964,
+      "phase": "IDLE",
+      "confidence": 0.9988609552383423,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 138,
+      "timestamp_s": 4.569121863799284,
+      "phase": "IDLE",
+      "confidence": 0.9984323382377625,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 139,
+      "timestamp_s": 4.60247311827957,
+      "phase": "IDLE",
+      "confidence": 0.9978500604629517,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 140,
+      "timestamp_s": 4.635824372759857,
+      "phase": "IDLE",
+      "confidence": 0.9975093603134155,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 141,
+      "timestamp_s": 4.6691756272401435,
+      "phase": "IDLE",
+      "confidence": 0.997463583946228,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 142,
+      "timestamp_s": 4.702526881720431,
+      "phase": "IDLE",
+      "confidence": 0.9978324770927429,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 143,
+      "timestamp_s": 4.735878136200717,
+      "phase": "IDLE",
+      "confidence": 0.9978975057601929,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 144,
+      "timestamp_s": 4.769229390681004,
+      "phase": "IDLE",
+      "confidence": 0.9977242350578308,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 145,
+      "timestamp_s": 4.8025806451612905,
+      "phase": "IDLE",
+      "confidence": 0.997668445110321,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 146,
+      "timestamp_s": 4.835931899641578,
+      "phase": "IDLE",
+      "confidence": 0.9976078271865845,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 147,
+      "timestamp_s": 4.869283154121864,
+      "phase": "IDLE",
+      "confidence": 0.9979578256607056,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 148,
+      "timestamp_s": 4.902634408602151,
+      "phase": "IDLE",
+      "confidence": 0.9979838132858276,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 149,
+      "timestamp_s": 4.9359856630824375,
+      "phase": "IDLE",
+      "confidence": 0.997365415096283,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 150,
+      "timestamp_s": 4.969336917562725,
+      "phase": "IDLE",
+      "confidence": 0.9967862367630005,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 151,
+      "timestamp_s": 5.002688172043011,
+      "phase": "IDLE",
+      "confidence": 0.9967639446258545,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 152,
+      "timestamp_s": 5.036039426523298,
+      "phase": "IDLE",
+      "confidence": 0.9966002106666565,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 153,
+      "timestamp_s": 5.0693906810035845,
+      "phase": "IDLE",
+      "confidence": 0.99623042345047,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 154,
+      "timestamp_s": 5.102741935483872,
+      "phase": "IDLE",
+      "confidence": 0.9957542419433594,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 155,
+      "timestamp_s": 5.136093189964158,
+      "phase": "IDLE",
+      "confidence": 0.9955724477767944,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 156,
+      "timestamp_s": 5.169444444444445,
+      "phase": "IDLE",
+      "confidence": 0.995478093624115,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 157,
+      "timestamp_s": 5.2027956989247315,
+      "phase": "IDLE",
+      "confidence": 0.9955701231956482,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 158,
+      "timestamp_s": 5.236146953405018,
+      "phase": "IDLE",
+      "confidence": 0.9953179359436035,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 159,
+      "timestamp_s": 5.269498207885305,
+      "phase": "IDLE",
+      "confidence": 0.9951661825180054,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 160,
+      "timestamp_s": 5.302849462365591,
+      "phase": "IDLE",
+      "confidence": 0.9954728484153748,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 161,
+      "timestamp_s": 5.3362007168458785,
+      "phase": "IDLE",
+      "confidence": 0.9959352016448975,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 162,
+      "timestamp_s": 5.369551971326165,
+      "phase": "IDLE",
+      "confidence": 0.9963065385818481,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 163,
+      "timestamp_s": 5.402903225806452,
+      "phase": "IDLE",
+      "confidence": 0.9963944554328918,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 164,
+      "timestamp_s": 5.436254480286738,
+      "phase": "IDLE",
+      "confidence": 0.9965517520904541,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 165,
+      "timestamp_s": 5.4696057347670255,
+      "phase": "IDLE",
+      "confidence": 0.996972918510437,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 166,
+      "timestamp_s": 5.502956989247312,
+      "phase": "IDLE",
+      "confidence": 0.9967929720878601,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 167,
+      "timestamp_s": 5.536308243727599,
+      "phase": "IDLE",
+      "confidence": 0.9965147376060486,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 168,
+      "timestamp_s": 5.569659498207885,
+      "phase": "IDLE",
+      "confidence": 0.9958518743515015,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 169,
+      "timestamp_s": 5.6030107526881725,
+      "phase": "IDLE",
+      "confidence": 0.9957600235939026,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 170,
+      "timestamp_s": 5.636362007168459,
+      "phase": "IDLE",
+      "confidence": 0.9955636262893677,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 171,
+      "timestamp_s": 5.669713261648746,
+      "phase": "IDLE",
+      "confidence": 0.9954636693000793,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 172,
+      "timestamp_s": 5.703064516129032,
+      "phase": "IDLE",
+      "confidence": 0.9953874945640564,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 173,
+      "timestamp_s": 5.7364157706093195,
+      "phase": "IDLE",
+      "confidence": 0.99580317735672,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 174,
+      "timestamp_s": 5.769767025089606,
+      "phase": "IDLE",
+      "confidence": 0.9961589574813843,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 175,
+      "timestamp_s": 5.803118279569893,
+      "phase": "IDLE",
+      "confidence": 0.9968482851982117,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 176,
+      "timestamp_s": 5.836469534050179,
+      "phase": "IDLE",
+      "confidence": 0.999251663684845,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 177,
+      "timestamp_s": 5.8698207885304665,
+      "phase": "IDLE",
+      "confidence": 0.901839017868042,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 178,
+      "timestamp_s": 5.903172043010753,
+      "phase": "IDLE",
+      "confidence": 0.846495509147644,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 179,
+      "timestamp_s": 5.93652329749104,
+      "phase": "IDLE",
+      "confidence": 0.8700117468833923,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 180,
+      "timestamp_s": 5.969874551971326,
+      "phase": "IDLE",
+      "confidence": 0.24347183108329773,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 181,
+      "timestamp_s": 6.0032258064516135,
+      "phase": "IDLE",
+      "confidence": 0.0014988986076787114,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 182,
+      "timestamp_s": 6.0365770609319,
+      "phase": "IDLE",
+      "confidence": 6.722139460180188e-06,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 183,
+      "timestamp_s": 6.069928315412187,
+      "phase": "IDLE",
+      "confidence": 9.315640170370898e-08,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 184,
+      "timestamp_s": 6.103279569892473,
+      "phase": "IDLE",
+      "confidence": 1.33957689385511e-09,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 185,
+      "timestamp_s": 6.1366308243727605,
+      "phase": "IDLE",
+      "confidence": 3.159210393288703e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 186,
+      "timestamp_s": 6.169982078853047,
+      "phase": "IDLE",
+      "confidence": 1.7970611977669027e-12,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 187,
+      "timestamp_s": 6.203333333333334,
+      "phase": "IDLE",
+      "confidence": 2.564486437876129e-13,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 188,
+      "timestamp_s": 6.23668458781362,
+      "phase": "IDLE",
+      "confidence": 6.813966708582586e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 189,
+      "timestamp_s": 6.2700358422939075,
+      "phase": "IDLE",
+      "confidence": 3.435137713018489e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 190,
+      "timestamp_s": 6.303387096774194,
+      "phase": "IDLE",
+      "confidence": 2.9873296897168014e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 191,
+      "timestamp_s": 6.336738351254481,
+      "phase": "IDLE",
+      "confidence": 3.490970397956525e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 192,
+      "timestamp_s": 6.370089605734767,
+      "phase": "IDLE",
+      "confidence": 3.493928237008337e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 193,
+      "timestamp_s": 6.4034408602150545,
+      "phase": "IDLE",
+      "confidence": 3.611533679536913e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 194,
+      "timestamp_s": 6.436792114695341,
+      "phase": "IDLE",
+      "confidence": 5.3555812941970954e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 195,
+      "timestamp_s": 6.470143369175628,
+      "phase": "IDLE",
+      "confidence": 9.895616227481585e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 196,
+      "timestamp_s": 6.503494623655914,
+      "phase": "IDLE",
+      "confidence": 1.4381788674463353e-13,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 197,
+      "timestamp_s": 6.536845878136201,
+      "phase": "IDLE",
+      "confidence": 2.3830939934084416e-13,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 198,
+      "timestamp_s": 6.570197132616488,
+      "phase": "IDLE",
+      "confidence": 4.4413241530663616e-13,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 199,
+      "timestamp_s": 6.603548387096774,
+      "phase": "IDLE",
+      "confidence": 9.253407502046729e-13,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 200,
+      "timestamp_s": 6.636899641577061,
+      "phase": "IDLE",
+      "confidence": 2.9904683330334025e-12,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 201,
+      "timestamp_s": 6.670250896057348,
+      "phase": "IDLE",
+      "confidence": 1.6114444847947773e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 202,
+      "timestamp_s": 6.703602150537635,
+      "phase": "IDLE",
+      "confidence": 3.6403735581558294e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 203,
+      "timestamp_s": 6.736953405017921,
+      "phase": "IDLE",
+      "confidence": 3.2212152945021444e-08,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 204,
+      "timestamp_s": 6.770304659498208,
+      "phase": "IDLE",
+      "confidence": 3.0213226409614435e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 205,
+      "timestamp_s": 6.803655913978495,
+      "phase": "IDLE",
+      "confidence": 2.3840695462240546e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 206,
+      "timestamp_s": 6.837007168458782,
+      "phase": "IDLE",
+      "confidence": 1.938862626005289e-09,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 207,
+      "timestamp_s": 6.870358422939068,
+      "phase": "IDLE",
+      "confidence": 4.249910902256841e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 208,
+      "timestamp_s": 6.903709677419355,
+      "phase": "IDLE",
+      "confidence": 4.797422663078523e-19,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 209,
+      "timestamp_s": 6.937060931899642,
+      "phase": "IDLE",
+      "confidence": 1.4760895468065987e-23,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 210,
+      "timestamp_s": 6.970412186379929,
+      "phase": "IDLE",
+      "confidence": 5.365834342503651e-26,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 211,
+      "timestamp_s": 7.003763440860215,
+      "phase": "IDLE",
+      "confidence": 1.6109612427592085e-27,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 212,
+      "timestamp_s": 7.037114695340502,
+      "phase": "IDLE",
+      "confidence": 8.013805933804333e-29,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 213,
+      "timestamp_s": 7.070465949820789,
+      "phase": "IDLE",
+      "confidence": 2.2354954977045334e-29,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 214,
+      "timestamp_s": 7.103817204301076,
+      "phase": "IDLE",
+      "confidence": 2.351321887524954e-28,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 215,
+      "timestamp_s": 7.137168458781362,
+      "phase": "IDLE",
+      "confidence": 8.715587192518464e-27,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 216,
+      "timestamp_s": 7.170519713261649,
+      "phase": "IDLE",
+      "confidence": 2.3550160426402323e-24,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 217,
+      "timestamp_s": 7.203870967741936,
+      "phase": "IDLE",
+      "confidence": 1.1172302018750397e-20,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 218,
+      "timestamp_s": 7.237222222222223,
+      "phase": "IDLE",
+      "confidence": 7.588287760223621e-18,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 219,
+      "timestamp_s": 7.270573476702509,
+      "phase": "IDLE",
+      "confidence": 4.566751665341959e-16,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 220,
+      "timestamp_s": 7.303924731182796,
+      "phase": "IDLE",
+      "confidence": 4.49873216682036e-15,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 221,
+      "timestamp_s": 7.337275985663083,
+      "phase": "IDLE",
+      "confidence": 1.33113785700514e-14,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 222,
+      "timestamp_s": 7.37062724014337,
+      "phase": "IDLE",
+      "confidence": 3.908242273645973e-13,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 223,
+      "timestamp_s": 7.403978494623656,
+      "phase": "IDLE",
+      "confidence": 3.3125103354736396e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 224,
+      "timestamp_s": 7.437329749103943,
+      "phase": "IDLE",
+      "confidence": 8.205680024353512e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 225,
+      "timestamp_s": 7.47068100358423,
+      "phase": "IDLE",
+      "confidence": 1.4881457843785029e-08,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 226,
+      "timestamp_s": 7.504032258064517,
+      "phase": "IDLE",
+      "confidence": 1.3457771785851946e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 227,
+      "timestamp_s": 7.537383512544803,
+      "phase": "IDLE",
+      "confidence": 5.438198513729731e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 228,
+      "timestamp_s": 7.57073476702509,
+      "phase": "IDLE",
+      "confidence": 3.7813024391653016e-05,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 229,
+      "timestamp_s": 7.604086021505377,
+      "phase": "IDLE",
+      "confidence": 3.65501364285592e-05,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 230,
+      "timestamp_s": 7.637437275985664,
+      "phase": "IDLE",
+      "confidence": 5.044990416536166e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 231,
+      "timestamp_s": 7.67078853046595,
+      "phase": "IDLE",
+      "confidence": 1.994772524938071e-08,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 232,
+      "timestamp_s": 7.704139784946237,
+      "phase": "IDLE",
+      "confidence": 2.51885978741484e-09,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 233,
+      "timestamp_s": 7.737491039426524,
+      "phase": "IDLE",
+      "confidence": 3.224134292878489e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 234,
+      "timestamp_s": 7.770842293906811,
+      "phase": "IDLE",
+      "confidence": 1.3675716115102432e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 235,
+      "timestamp_s": 7.804193548387097,
+      "phase": "IDLE",
+      "confidence": 8.37390434771379e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 236,
+      "timestamp_s": 7.8375448028673835,
+      "phase": "IDLE",
+      "confidence": 1.7117630923824123e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 237,
+      "timestamp_s": 7.870896057347671,
+      "phase": "IDLE",
+      "confidence": 3.0073107892825135e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 238,
+      "timestamp_s": 7.904247311827957,
+      "phase": "IDLE",
+      "confidence": 1.6378993994425883e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 239,
+      "timestamp_s": 7.937598566308244,
+      "phase": "IDLE",
+      "confidence": 1.2428841289491288e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 240,
+      "timestamp_s": 7.9709498207885305,
+      "phase": "IDLE",
+      "confidence": 6.120639411966167e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 241,
+      "timestamp_s": 8.004301075268817,
+      "phase": "IDLE",
+      "confidence": 1.5727020380440493e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 242,
+      "timestamp_s": 8.037652329749104,
+      "phase": "IDLE",
+      "confidence": 1.1508328144615998e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 243,
+      "timestamp_s": 8.071003584229391,
+      "phase": "IDLE",
+      "confidence": 3.266464876361397e-11,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 244,
+      "timestamp_s": 8.104354838709678,
+      "phase": "IDLE",
+      "confidence": 2.2560435464225037e-10,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 245,
+      "timestamp_s": 8.137706093189964,
+      "phase": "IDLE",
+      "confidence": 3.26649929327516e-09,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 246,
+      "timestamp_s": 8.171057347670251,
+      "phase": "IDLE",
+      "confidence": 1.8008019253556995e-07,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 247,
+      "timestamp_s": 8.204408602150538,
+      "phase": "IDLE",
+      "confidence": 2.441669494146481e-05,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 248,
+      "timestamp_s": 8.237759856630825,
+      "phase": "IDLE",
+      "confidence": 0.023036295548081398,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 249,
+      "timestamp_s": 8.27111111111111,
+      "phase": "IDLE",
+      "confidence": 0.9195070862770081,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 250,
+      "timestamp_s": 8.304462365591398,
+      "phase": "IDLE",
+      "confidence": 0.9999980926513672,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 251,
+      "timestamp_s": 8.337813620071685,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 252,
+      "timestamp_s": 8.371164874551972,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 253,
+      "timestamp_s": 8.404516129032258,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 254,
+      "timestamp_s": 8.437867383512545,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 255,
+      "timestamp_s": 8.471218637992832,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 256,
+      "timestamp_s": 8.50456989247312,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 257,
+      "timestamp_s": 8.537921146953405,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 258,
+      "timestamp_s": 8.571272401433692,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 259,
+      "timestamp_s": 8.60462365591398,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 260,
+      "timestamp_s": 8.637974910394266,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 261,
+      "timestamp_s": 8.671326164874552,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 262,
+      "timestamp_s": 8.704677419354839,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 263,
+      "timestamp_s": 8.738028673835126,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 264,
+      "timestamp_s": 8.771379928315413,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 265,
+      "timestamp_s": 8.804731182795699,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 266,
+      "timestamp_s": 8.838082437275986,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 267,
+      "timestamp_s": 8.871433691756273,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 268,
+      "timestamp_s": 8.90478494623656,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 269,
+      "timestamp_s": 8.938136200716846,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 270,
+      "timestamp_s": 8.971487455197133,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 271,
+      "timestamp_s": 9.00483870967742,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 272,
+      "timestamp_s": 9.038189964157707,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 273,
+      "timestamp_s": 9.071541218637993,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 274,
+      "timestamp_s": 9.10489247311828,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 275,
+      "timestamp_s": 9.138243727598567,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 276,
+      "timestamp_s": 9.171594982078853,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 277,
+      "timestamp_s": 9.20494623655914,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 278,
+      "timestamp_s": 9.238297491039427,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    },
+    {
+      "frame_idx": 279,
+      "timestamp_s": 9.271648745519714,
+      "phase": "IDLE",
+      "confidence": 1.0,
+      "decision_source": "model"
+    }
+  ],
+  "object_tracks": [
+    {
+      "frame_idx": 1,
+      "timestamp_s": 0.0,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 2,
+      "timestamp_s": 0.03335125448028674,
+      "position": {
+        "x": 349.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 3,
+      "timestamp_s": 0.06670250896057348,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 4,
+      "timestamp_s": 0.10005376344086023,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 5,
+      "timestamp_s": 0.13340501792114695,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 6,
+      "timestamp_s": 0.1667562724014337,
+      "position": {
+        "x": 349.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 7,
+      "timestamp_s": 0.20010752688172045,
+      "position": {
+        "x": 349.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 8,
+      "timestamp_s": 0.23345878136200718,
+      "position": {
+        "x": 349.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 9,
+      "timestamp_s": 0.2668100358422939,
+      "position": {
+        "x": 349.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 10,
+      "timestamp_s": 0.30016129032258065,
+      "position": {
+        "x": 349.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 11,
+      "timestamp_s": 0.3335125448028674,
+      "position": {
+        "x": 349.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 12,
+      "timestamp_s": 0.36686379928315416,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 13,
+      "timestamp_s": 0.4002150537634409,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 14,
+      "timestamp_s": 0.4335663082437276,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 15,
+      "timestamp_s": 0.46691756272401436,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 16,
+      "timestamp_s": 0.500268817204301,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 17,
+      "timestamp_s": 0.5336200716845878,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 18,
+      "timestamp_s": 0.5669713261648746,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 19,
+      "timestamp_s": 0.6003225806451613,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 20,
+      "timestamp_s": 0.6336738351254481,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 21,
+      "timestamp_s": 0.6670250896057348,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 22,
+      "timestamp_s": 0.7003763440860216,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 23,
+      "timestamp_s": 0.7337275985663083,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 24,
+      "timestamp_s": 0.7670788530465951,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 25,
+      "timestamp_s": 0.8004301075268818,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 26,
+      "timestamp_s": 0.8337813620071685,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 27,
+      "timestamp_s": 0.8671326164874552,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 28,
+      "timestamp_s": 0.900483870967742,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 29,
+      "timestamp_s": 0.9338351254480287,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 30,
+      "timestamp_s": 0.9671863799283155,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 31,
+      "timestamp_s": 1.000537634408602,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 32,
+      "timestamp_s": 1.0338888888888889,
+      "position": {
+        "x": 348.0,
+        "y": 451.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 33,
+      "timestamp_s": 1.0672401433691756,
+      "position": {
+        "x": 348.0,
+        "y": 451.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 34,
+      "timestamp_s": 1.1005913978494624,
+      "position": {
+        "x": 363.0,
+        "y": 455.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 35,
+      "timestamp_s": 1.1339426523297491,
+      "position": {
+        "x": 389.5,
+        "y": 493.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 36,
+      "timestamp_s": 1.1672939068100359,
+      "position": {
+        "x": 394.0,
+        "y": 487.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 37,
+      "timestamp_s": 1.2006451612903226,
+      "position": {
+        "x": 395.0,
+        "y": 481.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 38,
+      "timestamp_s": 1.2339964157706094,
+      "position": {
+        "x": 395.0,
+        "y": 478.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 39,
+      "timestamp_s": 1.2673476702508961,
+      "position": {
+        "x": 405.5,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 40,
+      "timestamp_s": 1.3006989247311829,
+      "position": {
+        "x": 405.5,
+        "y": 477.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 41,
+      "timestamp_s": 1.3340501792114696,
+      "position": {
+        "x": 406.5,
+        "y": 475.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 42,
+      "timestamp_s": 1.3674014336917564,
+      "position": {
+        "x": 406.0,
+        "y": 475.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 43,
+      "timestamp_s": 1.4007526881720431,
+      "position": {
+        "x": 406.0,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 44,
+      "timestamp_s": 1.4341039426523299,
+      "position": {
+        "x": 406.0,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 45,
+      "timestamp_s": 1.4674551971326166,
+      "position": {
+        "x": 405.5,
+        "y": 475.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 46,
+      "timestamp_s": 1.5008064516129034,
+      "position": {
+        "x": 406.0,
+        "y": 475.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 47,
+      "timestamp_s": 1.5341577060931901,
+      "position": {
+        "x": 405.5,
+        "y": 475.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 48,
+      "timestamp_s": 1.5675089605734769,
+      "position": {
+        "x": 405.5,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 49,
+      "timestamp_s": 1.6008602150537636,
+      "position": {
+        "x": 406.0,
+        "y": 473.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 50,
+      "timestamp_s": 1.6342114695340502,
+      "position": {
+        "x": 383.0,
+        "y": 471.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 51,
+      "timestamp_s": 1.667562724014337,
+      "position": {
+        "x": 378.0,
+        "y": 469.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 52,
+      "timestamp_s": 1.7009139784946237,
+      "position": {
+        "x": 380.5,
+        "y": 468.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 53,
+      "timestamp_s": 1.7342652329749104,
+      "position": {
+        "x": 379.0,
+        "y": 469.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 54,
+      "timestamp_s": 1.7676164874551972,
+      "position": {
+        "x": 378.0,
+        "y": 469.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 55,
+      "timestamp_s": 1.800967741935484,
+      "position": {
+        "x": 373.0,
+        "y": 470.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 56,
+      "timestamp_s": 1.8343189964157707,
+      "position": {
+        "x": 370.0,
+        "y": 473.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 57,
+      "timestamp_s": 1.8676702508960574,
+      "position": {
+        "x": 367.0,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 58,
+      "timestamp_s": 1.9010215053763442,
+      "position": {
+        "x": 363.5,
+        "y": 475.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 59,
+      "timestamp_s": 1.934372759856631,
+      "position": {
+        "x": 360.0,
+        "y": 475.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 60,
+      "timestamp_s": 1.9677240143369177,
+      "position": {
+        "x": 359.0,
+        "y": 475.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 61,
+      "timestamp_s": 2.001075268817204,
+      "position": {
+        "x": 359.0,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 62,
+      "timestamp_s": 2.034426523297491,
+      "position": {
+        "x": 358.0,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 63,
+      "timestamp_s": 2.0677777777777777,
+      "position": {
+        "x": 357.0,
+        "y": 473.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 64,
+      "timestamp_s": 2.1011290322580645,
+      "position": {
+        "x": 357.0,
+        "y": 473.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 65,
+      "timestamp_s": 2.134480286738351,
+      "position": {
+        "x": 358.0,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 66,
+      "timestamp_s": 2.167831541218638,
+      "position": {
+        "x": 358.0,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 67,
+      "timestamp_s": 2.2011827956989247,
+      "position": {
+        "x": 358.0,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 68,
+      "timestamp_s": 2.2345340501792115,
+      "position": {
+        "x": 358.0,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 69,
+      "timestamp_s": 2.2678853046594982,
+      "position": {
+        "x": 358.0,
+        "y": 475.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 70,
+      "timestamp_s": 2.301236559139785,
+      "position": {
+        "x": 359.0,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 71,
+      "timestamp_s": 2.3345878136200717,
+      "position": {
+        "x": 359.0,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 72,
+      "timestamp_s": 2.3679390681003585,
+      "position": {
+        "x": 359.5,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 73,
+      "timestamp_s": 2.4012903225806452,
+      "position": {
+        "x": 362.0,
+        "y": 473.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 74,
+      "timestamp_s": 2.434641577060932,
+      "position": {
+        "x": 367.0,
+        "y": 472.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 75,
+      "timestamp_s": 2.4679928315412187,
+      "position": {
+        "x": 380.0,
+        "y": 474.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 76,
+      "timestamp_s": 2.5013440860215055,
+      "position": {
+        "x": 401.0,
+        "y": 474.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 77,
+      "timestamp_s": 2.5346953405017922,
+      "position": {
+        "x": 436.0,
+        "y": 475.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 78,
+      "timestamp_s": 2.568046594982079,
+      "position": {
+        "x": 481.0,
+        "y": 478.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 79,
+      "timestamp_s": 2.6013978494623657,
+      "position": {
+        "x": 540.0,
+        "y": 489.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 80,
+      "timestamp_s": 2.6347491039426525,
+      "position": {
+        "x": 610.0,
+        "y": 501.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 81,
+      "timestamp_s": 2.6681003584229392,
+      "position": {
+        "x": 678.0,
+        "y": 520.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 82,
+      "timestamp_s": 2.701451612903226,
+      "position": {
+        "x": 749.0,
+        "y": 542.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 83,
+      "timestamp_s": 2.7348028673835127,
+      "position": {
+        "x": 822.0,
+        "y": 566.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 84,
+      "timestamp_s": 2.7681541218637995,
+      "position": {
+        "x": 895.0,
+        "y": 593.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 85,
+      "timestamp_s": 2.8015053763440863,
+      "position": {
+        "x": 967.0,
+        "y": 622.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 86,
+      "timestamp_s": 2.834856630824373,
+      "position": {
+        "x": 1027.5,
+        "y": 649.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 87,
+      "timestamp_s": 2.8682078853046598,
+      "position": {
+        "x": 1067.5,
+        "y": 654.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 88,
+      "timestamp_s": 2.9015591397849465,
+      "position": {
+        "x": 1098.0,
+        "y": 664.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 89,
+      "timestamp_s": 2.9349103942652333,
+      "position": {
+        "x": 1118.0,
+        "y": 672.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 90,
+      "timestamp_s": 2.96826164874552,
+      "position": {
+        "x": 1132.0,
+        "y": 676.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 91,
+      "timestamp_s": 3.0016129032258068,
+      "position": {
+        "x": 1141.0,
+        "y": 680.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 92,
+      "timestamp_s": 3.0349641577060935,
+      "position": {
+        "x": 1145.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 93,
+      "timestamp_s": 3.0683154121863803,
+      "position": {
+        "x": 1143.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 94,
+      "timestamp_s": 3.101666666666667,
+      "position": {
+        "x": 1140.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 95,
+      "timestamp_s": 3.1350179211469538,
+      "position": {
+        "x": 1136.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 96,
+      "timestamp_s": 3.1683691756272405,
+      "position": {
+        "x": 1131.0,
+        "y": 679.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 97,
+      "timestamp_s": 3.2017204301075273,
+      "position": {
+        "x": 1128.0,
+        "y": 676.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 98,
+      "timestamp_s": 3.235071684587814,
+      "position": {
+        "x": 1126.0,
+        "y": 675.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 99,
+      "timestamp_s": 3.2684229390681003,
+      "position": {
+        "x": 1123.5,
+        "y": 672.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 100,
+      "timestamp_s": 3.301774193548387,
+      "position": {
+        "x": 1129.5,
+        "y": 672.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 101,
+      "timestamp_s": 3.335125448028674,
+      "position": {
+        "x": 1129.5,
+        "y": 672.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 102,
+      "timestamp_s": 3.3684767025089606,
+      "position": {
+        "x": 1126.0,
+        "y": 673.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 103,
+      "timestamp_s": 3.4018279569892473,
+      "position": {
+        "x": 1127.5,
+        "y": 675.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 104,
+      "timestamp_s": 3.435179211469534,
+      "position": {
+        "x": 1129.0,
+        "y": 675.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 105,
+      "timestamp_s": 3.468530465949821,
+      "position": {
+        "x": 1129.0,
+        "y": 675.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 106,
+      "timestamp_s": 3.5018817204301076,
+      "position": {
+        "x": 1129.0,
+        "y": 676.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 107,
+      "timestamp_s": 3.5352329749103943,
+      "position": {
+        "x": 1128.0,
+        "y": 679.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 108,
+      "timestamp_s": 3.568584229390681,
+      "position": {
+        "x": 1127.5,
+        "y": 677.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 109,
+      "timestamp_s": 3.601935483870968,
+      "position": {
+        "x": 1121.5,
+        "y": 681.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 110,
+      "timestamp_s": 3.6352867383512546,
+      "position": {
+        "x": 1119.0,
+        "y": 687.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 111,
+      "timestamp_s": 3.6686379928315414,
+      "position": {
+        "x": 1117.0,
+        "y": 688.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 112,
+      "timestamp_s": 3.701989247311828,
+      "position": {
+        "x": 1114.0,
+        "y": 681.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 113,
+      "timestamp_s": 3.735340501792115,
+      "position": {
+        "x": 1112.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 114,
+      "timestamp_s": 3.7686917562724016,
+      "position": {
+        "x": 1110.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 115,
+      "timestamp_s": 3.8020430107526884,
+      "position": {
+        "x": 1110.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 116,
+      "timestamp_s": 3.835394265232975,
+      "position": {
+        "x": 1110.0,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 117,
+      "timestamp_s": 3.868745519713262,
+      "position": {
+        "x": 1111.0,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 118,
+      "timestamp_s": 3.9020967741935486,
+      "position": {
+        "x": 1111.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 119,
+      "timestamp_s": 3.9354480286738354,
+      "position": {
+        "x": 1110.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 120,
+      "timestamp_s": 3.968799283154122,
+      "position": {
+        "x": 1110.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 121,
+      "timestamp_s": 4.002150537634408,
+      "position": {
+        "x": 1109.0,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 122,
+      "timestamp_s": 4.035501792114696,
+      "position": {
+        "x": 1109.0,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 123,
+      "timestamp_s": 4.068853046594982,
+      "position": {
+        "x": 1108.0,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 124,
+      "timestamp_s": 4.102204301075269,
+      "position": {
+        "x": 1108.0,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 125,
+      "timestamp_s": 4.135555555555555,
+      "position": {
+        "x": 1108.0,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 126,
+      "timestamp_s": 4.168906810035843,
+      "position": {
+        "x": 1106.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 127,
+      "timestamp_s": 4.202258064516129,
+      "position": {
+        "x": 1106.5,
+        "y": 681.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 128,
+      "timestamp_s": 4.235609318996416,
+      "position": {
+        "x": 1106.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 129,
+      "timestamp_s": 4.268960573476702,
+      "position": {
+        "x": 1107.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 130,
+      "timestamp_s": 4.30231182795699,
+      "position": {
+        "x": 1104.0,
+        "y": 678.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 131,
+      "timestamp_s": 4.335663082437276,
+      "position": {
+        "x": 1107.0,
+        "y": 688.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 132,
+      "timestamp_s": 4.369014336917563,
+      "position": {
+        "x": 1106.0,
+        "y": 688.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 133,
+      "timestamp_s": 4.402365591397849,
+      "position": {
+        "x": 1107.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 134,
+      "timestamp_s": 4.435716845878137,
+      "position": {
+        "x": 1105.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 135,
+      "timestamp_s": 4.469068100358423,
+      "position": {
+        "x": 1105.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 136,
+      "timestamp_s": 4.50241935483871,
+      "position": {
+        "x": 1104.0,
+        "y": 680.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 137,
+      "timestamp_s": 4.5357706093189964,
+      "position": {
+        "x": 1105.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 138,
+      "timestamp_s": 4.569121863799284,
+      "position": {
+        "x": 1105.0,
+        "y": 682.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 139,
+      "timestamp_s": 4.60247311827957,
+      "position": {
+        "x": 1104.5,
+        "y": 683.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 140,
+      "timestamp_s": 4.635824372759857,
+      "position": {
+        "x": 1101.5,
+        "y": 683.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 141,
+      "timestamp_s": 4.6691756272401435,
+      "position": {
+        "x": 1104.5,
+        "y": 682.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 142,
+      "timestamp_s": 4.702526881720431,
+      "position": {
+        "x": 1105.0,
+        "y": 681.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 143,
+      "timestamp_s": 4.735878136200717,
+      "position": {
+        "x": 1104.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 144,
+      "timestamp_s": 4.769229390681004,
+      "position": {
+        "x": 1101.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 145,
+      "timestamp_s": 4.8025806451612905,
+      "position": {
+        "x": 1102.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 146,
+      "timestamp_s": 4.835931899641578,
+      "position": {
+        "x": 1101.5,
+        "y": 682.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 147,
+      "timestamp_s": 4.869283154121864,
+      "position": {
+        "x": 1101.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 148,
+      "timestamp_s": 4.902634408602151,
+      "position": {
+        "x": 1101.5,
+        "y": 682.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 149,
+      "timestamp_s": 4.9359856630824375,
+      "position": {
+        "x": 1101.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 150,
+      "timestamp_s": 4.969336917562725,
+      "position": {
+        "x": 1105.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 151,
+      "timestamp_s": 5.002688172043011,
+      "position": {
+        "x": 1104.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 152,
+      "timestamp_s": 5.036039426523298,
+      "position": {
+        "x": 1104.0,
+        "y": 681.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 153,
+      "timestamp_s": 5.0693906810035845,
+      "position": {
+        "x": 1101.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 154,
+      "timestamp_s": 5.102741935483872,
+      "position": {
+        "x": 1101.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 155,
+      "timestamp_s": 5.136093189964158,
+      "position": {
+        "x": 1102.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 156,
+      "timestamp_s": 5.169444444444445,
+      "position": {
+        "x": 1105.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 157,
+      "timestamp_s": 5.2027956989247315,
+      "position": {
+        "x": 1105.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 158,
+      "timestamp_s": 5.236146953405018,
+      "position": {
+        "x": 1103.5,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 159,
+      "timestamp_s": 5.269498207885305,
+      "position": {
+        "x": 1103.5,
+        "y": 680.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 160,
+      "timestamp_s": 5.302849462365591,
+      "position": {
+        "x": 1104.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 161,
+      "timestamp_s": 5.3362007168458785,
+      "position": {
+        "x": 1104.0,
+        "y": 681.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 162,
+      "timestamp_s": 5.369551971326165,
+      "position": {
+        "x": 1104.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 163,
+      "timestamp_s": 5.402903225806452,
+      "position": {
+        "x": 1105.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 164,
+      "timestamp_s": 5.436254480286738,
+      "position": {
+        "x": 1104.5,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 165,
+      "timestamp_s": 5.4696057347670255,
+      "position": {
+        "x": 1105.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 166,
+      "timestamp_s": 5.502956989247312,
+      "position": {
+        "x": 1105.0,
+        "y": 677.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 167,
+      "timestamp_s": 5.536308243727599,
+      "position": {
+        "x": 1105.0,
+        "y": 678.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 168,
+      "timestamp_s": 5.569659498207885,
+      "position": {
+        "x": 1105.0,
+        "y": 678.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 169,
+      "timestamp_s": 5.6030107526881725,
+      "position": {
+        "x": 1107.0,
+        "y": 678.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 170,
+      "timestamp_s": 5.636362007168459,
+      "position": {
+        "x": 1105.0,
+        "y": 679.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 171,
+      "timestamp_s": 5.669713261648746,
+      "position": {
+        "x": 1105.0,
+        "y": 679.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 172,
+      "timestamp_s": 5.703064516129032,
+      "position": {
+        "x": 1105.0,
+        "y": 679.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 173,
+      "timestamp_s": 5.7364157706093195,
+      "position": {
+        "x": 1105.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 174,
+      "timestamp_s": 5.769767025089606,
+      "position": {
+        "x": 1106.0,
+        "y": 682.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 175,
+      "timestamp_s": 5.803118279569893,
+      "position": {
+        "x": 1106.0,
+        "y": 681.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 176,
+      "timestamp_s": 5.836469534050179,
+      "position": {
+        "x": 1106.0,
+        "y": 681.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 177,
+      "timestamp_s": 5.8698207885304665,
+      "position": {
+        "x": 1106.0,
+        "y": 678.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 178,
+      "timestamp_s": 5.903172043010753,
+      "position": {
+        "x": 1106.0,
+        "y": 678.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 179,
+      "timestamp_s": 5.93652329749104,
+      "position": {
+        "x": 1107.0,
+        "y": 678.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 180,
+      "timestamp_s": 5.969874551971326,
+      "position": {
+        "x": 1107.0,
+        "y": 678.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 181,
+      "timestamp_s": 6.0032258064516135,
+      "position": {
+        "x": 1108.0,
+        "y": 679.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 182,
+      "timestamp_s": 6.0365770609319,
+      "position": {
+        "x": 1108.5,
+        "y": 688.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 183,
+      "timestamp_s": 6.069928315412187,
+      "position": {
+        "x": 1109.0,
+        "y": 688.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 184,
+      "timestamp_s": 6.103279569892473,
+      "position": {
+        "x": 1112.0,
+        "y": 683.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 185,
+      "timestamp_s": 6.1366308243727605,
+      "position": {
+        "x": 1114.0,
+        "y": 680.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 186,
+      "timestamp_s": 6.169982078853047,
+      "position": {
+        "x": 1114.0,
+        "y": 679.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 187,
+      "timestamp_s": 6.203333333333334,
+      "position": {
+        "x": 1118.5,
+        "y": 683.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 188,
+      "timestamp_s": 6.23668458781362,
+      "position": {
+        "x": 1120.5,
+        "y": 686.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 189,
+      "timestamp_s": 6.2700358422939075,
+      "position": {
+        "x": 1124.0,
+        "y": 691.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 190,
+      "timestamp_s": 6.303387096774194,
+      "position": {
+        "x": 1125.0,
+        "y": 693.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 191,
+      "timestamp_s": 6.336738351254481,
+      "position": {
+        "x": 1124.5,
+        "y": 692.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 192,
+      "timestamp_s": 6.370089605734767,
+      "position": {
+        "x": 1134.5,
+        "y": 688.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 193,
+      "timestamp_s": 6.4034408602150545,
+      "position": {
+        "x": 1127.0,
+        "y": 686.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 194,
+      "timestamp_s": 6.436792114695341,
+      "position": {
+        "x": 1120.5,
+        "y": 684.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 195,
+      "timestamp_s": 6.470143369175628,
+      "position": {
+        "x": 1120.0,
+        "y": 683.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 196,
+      "timestamp_s": 6.503494623655914,
+      "position": {
+        "x": 1120.0,
+        "y": 684.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 197,
+      "timestamp_s": 6.536845878136201,
+      "position": {
+        "x": 1130.5,
+        "y": 686.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 198,
+      "timestamp_s": 6.570197132616488,
+      "position": {
+        "x": 1119.5,
+        "y": 686.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 199,
+      "timestamp_s": 6.603548387096774,
+      "position": {
+        "x": 1120.5,
+        "y": 688.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 200,
+      "timestamp_s": 6.636899641577061,
+      "position": {
+        "x": 1126.5,
+        "y": 689.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 201,
+      "timestamp_s": 6.670250896057348,
+      "position": {
+        "x": 1123.0,
+        "y": 689.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 202,
+      "timestamp_s": 6.703602150537635,
+      "position": {
+        "x": 1124.0,
+        "y": 691.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 203,
+      "timestamp_s": 6.736953405017921,
+      "position": {
+        "x": 1124.0,
+        "y": 690.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 204,
+      "timestamp_s": 6.770304659498208,
+      "position": {
+        "x": 1122.0,
+        "y": 688.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 205,
+      "timestamp_s": 6.803655913978495,
+      "position": {
+        "x": 1119.0,
+        "y": 687.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 206,
+      "timestamp_s": 6.837007168458782,
+      "position": {
+        "x": 1115.0,
+        "y": 683.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 207,
+      "timestamp_s": 6.870358422939068,
+      "position": {
+        "x": 1109.5,
+        "y": 675.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 208,
+      "timestamp_s": 6.903709677419355,
+      "position": {
+        "x": 1112.5,
+        "y": 658.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 209,
+      "timestamp_s": 6.937060931899642,
+      "position": {
+        "x": 1098.5,
+        "y": 631.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 210,
+      "timestamp_s": 6.970412186379929,
+      "position": {
+        "x": 1079.0,
+        "y": 597.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 211,
+      "timestamp_s": 7.003763440860215,
+      "position": {
+        "x": 1051.0,
+        "y": 548.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 212,
+      "timestamp_s": 7.037114695340502,
+      "position": {
+        "x": 1012.5,
+        "y": 496.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 213,
+      "timestamp_s": 7.070465949820789,
+      "position": {
+        "x": 973.5,
+        "y": 448.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 214,
+      "timestamp_s": 7.103817204301076,
+      "position": {
+        "x": 940.5,
+        "y": 412.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 215,
+      "timestamp_s": 7.137168458781362,
+      "position": {
+        "x": 909.0,
+        "y": 389.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 216,
+      "timestamp_s": 7.170519713261649,
+      "position": {
+        "x": 883.5,
+        "y": 362.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 217,
+      "timestamp_s": 7.203870967741936,
+      "position": {
+        "x": 861.0,
+        "y": 349.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 218,
+      "timestamp_s": 7.237222222222223,
+      "position": {
+        "x": 843.0,
+        "y": 338.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 219,
+      "timestamp_s": 7.270573476702509,
+      "position": {
+        "x": 828.0,
+        "y": 331.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 220,
+      "timestamp_s": 7.303924731182796,
+      "position": {
+        "x": 816.5,
+        "y": 333.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 221,
+      "timestamp_s": 7.337275985663083,
+      "position": {
+        "x": 811.0,
+        "y": 330.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 222,
+      "timestamp_s": 7.37062724014337,
+      "position": {
+        "x": 808.5,
+        "y": 328.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 223,
+      "timestamp_s": 7.403978494623656,
+      "position": {
+        "x": 808.0,
+        "y": 326.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 224,
+      "timestamp_s": 7.437329749103943,
+      "position": {
+        "x": 809.5,
+        "y": 319.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 225,
+      "timestamp_s": 7.47068100358423,
+      "position": {
+        "x": 813.0,
+        "y": 317.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 226,
+      "timestamp_s": 7.504032258064517,
+      "position": {
+        "x": 814.5,
+        "y": 317.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 227,
+      "timestamp_s": 7.537383512544803,
+      "position": {
+        "x": 812.5,
+        "y": 318.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 228,
+      "timestamp_s": 7.57073476702509,
+      "position": {
+        "x": 827.5,
+        "y": 317.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 229,
+      "timestamp_s": 7.604086021505377,
+      "position": {
+        "x": 825.0,
+        "y": 315.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 230,
+      "timestamp_s": 7.637437275985664,
+      "position": {
+        "x": 825.5,
+        "y": 315.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 231,
+      "timestamp_s": 7.67078853046595,
+      "position": {
+        "x": 826.0,
+        "y": 317.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 232,
+      "timestamp_s": 7.704139784946237,
+      "position": {
+        "x": 827.0,
+        "y": 318.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 233,
+      "timestamp_s": 7.737491039426524,
+      "position": {
+        "x": 829.5,
+        "y": 321.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 234,
+      "timestamp_s": 7.770842293906811,
+      "position": {
+        "x": 830.5,
+        "y": 323.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 235,
+      "timestamp_s": 7.804193548387097,
+      "position": {
+        "x": 810.5,
+        "y": 324.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 236,
+      "timestamp_s": 7.8375448028673835,
+      "position": {
+        "x": 818.0,
+        "y": 312.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 237,
+      "timestamp_s": 7.870896057347671,
+      "position": {
+        "x": 826.0,
+        "y": 334.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 238,
+      "timestamp_s": 7.904247311827957,
+      "position": {
+        "x": 819.0,
+        "y": 333.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 239,
+      "timestamp_s": 7.937598566308244,
+      "position": {
+        "x": 829.0,
+        "y": 359.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 240,
+      "timestamp_s": 7.9709498207885305,
+      "position": {
+        "x": 826.0,
+        "y": 330.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 241,
+      "timestamp_s": 8.004301075268817,
+      "position": {
+        "x": 829.0,
+        "y": 355.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 242,
+      "timestamp_s": 8.037652329749104,
+      "position": {
+        "x": 829.0,
+        "y": 355.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 243,
+      "timestamp_s": 8.071003584229391,
+      "position": {
+        "x": 828.0,
+        "y": 354.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 244,
+      "timestamp_s": 8.104354838709678,
+      "position": {
+        "x": 828.0,
+        "y": 328.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 245,
+      "timestamp_s": 8.137706093189964,
+      "position": {
+        "x": 827.5,
+        "y": 353.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 246,
+      "timestamp_s": 8.171057347670251,
+      "position": {
+        "x": 828.0,
+        "y": 327.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 247,
+      "timestamp_s": 8.204408602150538,
+      "position": {
+        "x": 827.5,
+        "y": 327.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 248,
+      "timestamp_s": 8.237759856630825,
+      "position": {
+        "x": 805.0,
+        "y": 308.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 249,
+      "timestamp_s": 8.27111111111111,
+      "position": {
+        "x": 827.0,
+        "y": 327.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 250,
+      "timestamp_s": 8.304462365591398,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 251,
+      "timestamp_s": 8.337813620071685,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 252,
+      "timestamp_s": 8.371164874551972,
+      "position": {
+        "x": 827.0,
+        "y": 328.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 253,
+      "timestamp_s": 8.404516129032258,
+      "position": {
+        "x": 804.0,
+        "y": 306.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 254,
+      "timestamp_s": 8.437867383512545,
+      "position": {
+        "x": 805.0,
+        "y": 306.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 255,
+      "timestamp_s": 8.471218637992832,
+      "position": {
+        "x": 805.0,
+        "y": 306.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 256,
+      "timestamp_s": 8.50456989247312,
+      "position": {
+        "x": 805.0,
+        "y": 305.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 257,
+      "timestamp_s": 8.537921146953405,
+      "position": {
+        "x": 806.0,
+        "y": 305.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 258,
+      "timestamp_s": 8.571272401433692,
+      "position": {
+        "x": 806.0,
+        "y": 305.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 259,
+      "timestamp_s": 8.60462365591398,
+      "position": {
+        "x": 806.0,
+        "y": 299.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 260,
+      "timestamp_s": 8.637974910394266,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 261,
+      "timestamp_s": 8.671326164874552,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 262,
+      "timestamp_s": 8.704677419354839,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 263,
+      "timestamp_s": 8.738028673835126,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 264,
+      "timestamp_s": 8.771379928315413,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 265,
+      "timestamp_s": 8.804731182795699,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 266,
+      "timestamp_s": 8.838082437275986,
+      "position": {
+        "x": 833.0,
+        "y": 354.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 267,
+      "timestamp_s": 8.871433691756273,
+      "position": {
+        "x": 833.0,
+        "y": 355.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 268,
+      "timestamp_s": 8.90478494623656,
+      "position": {
+        "x": 806.5,
+        "y": 297.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 269,
+      "timestamp_s": 8.938136200716846,
+      "position": {
+        "x": 833.0,
+        "y": 355.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 270,
+      "timestamp_s": 8.971487455197133,
+      "position": {
+        "x": 833.0,
+        "y": 355.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 271,
+      "timestamp_s": 9.00483870967742,
+      "position": {
+        "x": 833.0,
+        "y": 355.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 272,
+      "timestamp_s": 9.038189964157707,
+      "position": {
+        "x": 833.0,
+        "y": 355.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 273,
+      "timestamp_s": 9.071541218637993,
+      "position": {
+        "x": 833.0,
+        "y": 358.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 274,
+      "timestamp_s": 9.10489247311828,
+      "position": {
+        "x": 833.0,
+        "y": 358.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 275,
+      "timestamp_s": 9.138243727598567,
+      "position": {
+        "x": 833.0,
+        "y": 358.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 276,
+      "timestamp_s": 9.171594982078853,
+      "position": {
+        "x": 833.0,
+        "y": 356.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 277,
+      "timestamp_s": 9.20494623655914,
+      "position": {
+        "x": 833.0,
+        "y": 356.0,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 278,
+      "timestamp_s": 9.238297491039427,
+      "position": {
+        "x": 833.0,
+        "y": 356.5,
+        "confidence": 0.8
+      }
+    },
+    {
+      "frame_idx": 279,
+      "timestamp_s": 9.271648745519714,
+      "position": {
+        "x": 832.0,
+        "y": 377.5,
+        "confidence": 0.8
+      }
+    }
+  ]
+}
