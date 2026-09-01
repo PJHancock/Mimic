@@ -22,12 +22,12 @@ class ActionPhase(str, Enum):
 class ObjectTrack:
     """One object observation at a one-based source-video frame.
 
-    table_xy_cm is already image-to-table calibrated: centimeters, top-left
+    table_xy_m is already image-to-table calibrated: meters, top-left
     origin, +X right and +Y down. Pixel coordinates are not accepted here.
     """
 
     frame_idx: int
-    table_xy_cm: Tuple[float, float]
+    table_xy_m: Tuple[float, float]
     center_3d: Optional[Tuple[float, float, float]] = None  # (x, y, z) in world coords
     bbox: Optional[Tuple[float, float, float, float]] = None  # (x, y, w, h)
     confidence: float = 1.0
@@ -112,13 +112,13 @@ class TablePathSample:
     """Detached table-space observation; phase follows the supplied boundaries."""
 
     frame_idx: int
-    table_xy_cm: Tuple[float, float]
+    table_xy_m: Tuple[float, float]
     phase: ActionPhase
     confidence: float
 
     def __post_init__(self):
         object.__setattr__(self, "frame_idx", _source_frame(self.frame_idx))
-        object.__setattr__(self, "table_xy_cm", _finite_xy(self.table_xy_cm))
+        object.__setattr__(self, "table_xy_m", _finite_xy(self.table_xy_m))
         object.__setattr__(self, "phase", ActionPhase(self.phase))
         if (
             isinstance(self.confidence, (bool, np.bool_))
@@ -131,7 +131,7 @@ class TablePathSample:
 
 @dataclass(frozen=True)
 class ExtractedTask:
-    """One complete pick/place in table centimeters; no robot assumptions.
+    """One complete pick/place in table meters; no robot assumptions.
 
     demonstration includes both GRASP and RELEASE onset observations. Samples
     may be irregularly spaced; no missing observations are interpolated.
@@ -187,12 +187,12 @@ class ExtractedTask:
         return "table"
 
     @property
-    def start_xy_cm(self) -> Tuple[float, float]:
-        return self.demonstrated_path[0].table_xy_cm
+    def start_xy_m(self) -> Tuple[float, float]:
+        return self.demonstrated_path[0].table_xy_m
 
     @property
-    def goal_xy_cm(self) -> Tuple[float, float]:
-        return self.demonstrated_path[-1].table_xy_cm
+    def goal_xy_m(self) -> Tuple[float, float]:
+        return self.demonstrated_path[-1].table_xy_m
 
     @property
     def grasp_frame(self) -> int:
@@ -203,14 +203,14 @@ class ExtractedTask:
         return self.phase_boundaries[4].frame_idx
 
     @property
-    def carry_trajectory_xy_cm(self) -> Tuple[Tuple[float, float], ...]:
+    def carry_trajectory_xy_m(self) -> Tuple[Tuple[float, float], ...]:
         """CARRY-only observations; may be empty when tracking is sparse."""
-        return tuple(s.table_xy_cm for s in self.demonstrated_path if s.phase == ActionPhase.CARRY)
+        return tuple(s.table_xy_m for s in self.demonstrated_path if s.phase == ActionPhase.CARRY)
 
     @property
-    def path_xy_cm(self) -> Tuple[Tuple[float, float], ...]:
+    def path_xy_m(self) -> Tuple[Tuple[float, float], ...]:
         """Every retained observation; path selection belongs downstream."""
-        return tuple(s.table_xy_cm for s in self.demonstrated_path)
+        return tuple(s.table_xy_m for s in self.demonstrated_path)
 
 
 @dataclass(frozen=True)
@@ -287,6 +287,7 @@ class RobotCommand:
 class CalibrationData:
     """Camera to table coordinate mapping."""
 
+    homography: np.ndarray  # 3x3 image-pixel to table-meter transform
     camera_matrix: np.ndarray  # 3x3 intrinsic matrix
     table_corners_image: List[Tuple[float, float]]  # 4 corners in image space
     table_corners_world: List[Tuple[float, float]]  # 4 corners in world space

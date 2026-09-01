@@ -12,8 +12,8 @@ from mimic.robot import TaskExtractionError, TaskExtractor, extract_task, extrac
 def test_boundary_positions_and_inclusive_path(extracted_task):
     assert extracted_task.grasp_frame == 3
     assert extracted_task.release_frame == 11
-    assert extracted_task.start_xy_cm == (10, 20)
-    assert extracted_task.goal_xy_cm == (60, 30)
+    assert extracted_task.start_xy_m == (0.10, 0.20)
+    assert extracted_task.goal_xy_m == (0.60, 0.30)
     assert extracted_task.object_id == "object-1"
     assert extracted_task.coordinate_frame == "table"
     assert [s.frame_idx for s in extracted_task.demonstrated_path] == [3, 4, 6, 7, 8, 10, 11]
@@ -31,19 +31,23 @@ def test_phase_intervals_do_not_require_prediction_for_each_track(extracted_task
         ActionPhase.CARRY,
         ActionPhase.RELEASE,
     ]
-    assert extracted_task.carry_trajectory_xy_cm == ((30, 50), (40, 60), (50, 40))
+    assert extracted_task.carry_trajectory_xy_m == (
+        (0.30, 0.50),
+        (0.40, 0.60),
+        (0.50, 0.40),
+    )
     assert all(s.confidence == 0.8 for s in extracted_task.demonstrated_path)
 
 
 def test_extracted_task_exposes_the_complete_path_without_selecting_it(extracted_task):
-    assert extracted_task.path_xy_cm == (
-        (10, 20),
-        (12, 24),
-        (20, 40),
-        (30, 50),
-        (40, 60),
-        (50, 40),
-        (60, 30),
+    assert extracted_task.path_xy_m == (
+        (0.10, 0.20),
+        (0.12, 0.24),
+        (0.20, 0.40),
+        (0.30, 0.50),
+        (0.40, 0.60),
+        (0.50, 0.40),
+        (0.60, 0.30),
     )
     assert not hasattr(extracted_task, "get_path")
     with pytest.raises(FrozenInstanceError):
@@ -116,7 +120,7 @@ def test_unknown_phase_rejected(task_predictions, table_tracks):
     "xy", [(1,), (1, 2, 3), (np.nan, 0), (0, np.inf), ("1", 2), (True, 2), (1j, 2), None]
 )
 def test_invalid_coordinates_rejected(task_predictions, table_tracks, xy):
-    table_tracks[1].table_xy_cm = xy
+    table_tracks[1].table_xy_m = xy
     with pytest.raises(TaskExtractionError, match="Invalid track"):
         extract_task(task_predictions, table_tracks)
 
@@ -149,19 +153,19 @@ def test_zero_confidence_is_retained_without_inventing_a_threshold(task_predicti
 
 def test_sparse_interior_is_preserved_without_interpolation(task_predictions, table_tracks):
     task = extract_task(task_predictions, [t for t in table_tracks if t.frame_idx in (3, 11)])
-    assert task.path_xy_cm == ((10, 20), (60, 30))
-    assert task.carry_trajectory_xy_cm == ()
+    assert task.path_xy_m == ((0.10, 0.20), (0.60, 0.30))
+    assert task.carry_trajectory_xy_m == ()
 
 
 def test_mutating_inputs_cannot_change_task(task_predictions, table_tracks):
-    mutable_xy = np.array([10.0, 20.0])
-    table_tracks[1].table_xy_cm = mutable_xy
+    mutable_xy = np.array([0.10, 0.20])
+    table_tracks[1].table_xy_m = mutable_xy
     task = extract_task(task_predictions, table_tracks)
     mutable_xy[:] = 999
     table_tracks[1].confidence = 0.1
     task_predictions[1].frame_idx = 100
     table_tracks.clear()
-    assert task.start_xy_cm == (10, 20)
+    assert task.start_xy_m == (0.10, 0.20)
     assert task.grasp_frame == 3
     assert task.demonstrated_path[0].confidence == 0.8
 
@@ -217,7 +221,7 @@ def test_multiple_episodes_are_extracted_from_one_timeline(task_predictions, tab
     second_tracks = [
         ObjectTrack(
             track.frame_idx + 14,
-            track.table_xy_cm,
+            track.table_xy_m,
             confidence=track.confidence,
             object_id=track.object_id,
         )

@@ -2,7 +2,7 @@
 """Extract hand and object tracking data from demonstration videos.
 
 Processes videos using calibration data to convert pixel coordinates to table
-coordinates in centimeters. Outputs calibrated tracks and a processed path.
+coordinates in meters. Outputs calibrated tracks and a processed path.
 
 Usage:
     uv run python scripts/extract_tracks.py \\
@@ -18,6 +18,7 @@ from pathlib import Path
 
 import cv2
 
+from mimic.common.constants import TABLE_HEIGHT_M, TABLE_WIDTH_M
 from mimic.common.types import ObjectTrack
 from mimic.tracking import (
     CSRTObjectTracker,
@@ -191,17 +192,17 @@ def extract_tracks_from_video(
     for track in object_tracks:
         mapped_track = ObjectTrack(
             frame_idx=track.frame_idx + 1,
-            table_xy_cm=mapper.pixel_to_table_xy_cm(track.center_2d),
+            table_xy_m=mapper.pixel_to_table_xy_m(track.center_2d),
             bbox=track.bbox,
             confidence=track.confidence,
         )
         mapped_tracks.append(mapped_track)
 
-    trajectory_table_xy_cm = [
-        mapper.pixel_to_table_xy_cm(point) for point in trajectory_pixels
+    trajectory_table_xy_m = [
+        mapper.pixel_to_table_xy_m(point) for point in trajectory_pixels
     ]
 
-    print(f"  Processed trajectory: {len(trajectory_table_xy_cm)} waypoints")
+    print(f"  Processed trajectory: {len(trajectory_table_xy_m)} waypoints")
 
     # Save outputs
     video_stem = video_path.stem
@@ -226,7 +227,7 @@ def extract_tracks_from_video(
     object_tracks_data = [
         {
             "frame_idx": track.frame_idx,
-            "table_xy_cm": track.table_xy_cm,
+            "table_xy_m": track.table_xy_m,
             "bbox": track.bbox,
             "confidence": track.confidence,
         }
@@ -239,11 +240,11 @@ def extract_tracks_from_video(
     trajectory_path = output_dir / f"{video_stem}_trajectory.json"
     trajectory_data = {
         "coordinate_frame": "table",
-        "units": "cm",
-        "waypoints": trajectory_table_xy_cm,
-        "num_waypoints": len(trajectory_table_xy_cm),
-        "start": trajectory_table_xy_cm[0] if trajectory_table_xy_cm else None,
-        "end": trajectory_table_xy_cm[-1] if trajectory_table_xy_cm else None,
+        "units": "m",
+        "waypoints": trajectory_table_xy_m,
+        "num_waypoints": len(trajectory_table_xy_m),
+        "start": trajectory_table_xy_m[0] if trajectory_table_xy_m else None,
+        "end": trajectory_table_xy_m[-1] if trajectory_table_xy_m else None,
     }
     with open(trajectory_path, "w") as f:
         json.dump(trajectory_data, f, indent=2)
@@ -253,7 +254,7 @@ def extract_tracks_from_video(
         "video": str(video_path),
         "hand_tracks": len(hand_tracks),
         "object_tracks": len(object_tracks),
-        "trajectory_waypoints": len(trajectory_table_xy_cm),
+        "trajectory_waypoints": len(trajectory_table_xy_m),
         "outputs": {
             "hand_tracks": str(hand_tracks_path),
             "object_tracks": str(object_tracks_path),
@@ -285,14 +286,14 @@ def main():
     parser.add_argument(
         "--width",
         type=float,
-        default=0.6,
-        help="Table width in meters",
+        default=TABLE_WIDTH_M,
+        help=f"Table width in meters (default: {TABLE_WIDTH_M})",
     )
     parser.add_argument(
         "--height",
         type=float,
-        default=0.4,
-        help="Table height in meters",
+        default=TABLE_HEIGHT_M,
+        help=f"Table height/depth in meters (default: {TABLE_HEIGHT_M})",
     )
 
     args = parser.parse_args()

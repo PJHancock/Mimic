@@ -34,9 +34,9 @@ The extractor does not apply the relationship graph or repair incomplete input.
 finite video time in seconds. Extraction uses frames; it never substitutes frame
 counts for seconds or derives timestamps from a default FPS.
 
-`ObjectTrack.table_xy_cm` contains **already calibrated table coordinates**:
+`ObjectTrack.table_xy_m` contains **already calibrated table coordinates**:
 
-- Units: centimeters.
+- Units: meters.
 - Origin: top-left of the table.
 - Positive X: right.
 - Positive Y: down.
@@ -67,17 +67,17 @@ predictions = [
     ActionPrediction(50, ActionPhase.IDLE, 0.9),
 ]
 tracks = [
-    ObjectTrack(10, table_xy_cm=(10, 20)),
-    ObjectTrack(15, table_xy_cm=(12, 22)),
-    ObjectTrack(25, table_xy_cm=(20, 30)),
-    ObjectTrack(40, table_xy_cm=(30, 20)),
+    ObjectTrack(10, table_xy_m=(0.10, 0.20)),
+    ObjectTrack(15, table_xy_m=(0.12, 0.22)),
+    ObjectTrack(25, table_xy_m=(0.20, 0.30)),
+    ObjectTrack(40, table_xy_m=(0.30, 0.20)),
 ]
 
 task = extract_task(predictions, tracks)
 assert task.grasp_frame == 10
 assert task.release_frame == 40
-assert task.path_xy_cm == (
-    (10.0, 20.0), (12.0, 22.0), (20.0, 30.0), (30.0, 20.0)
+assert task.path_xy_m == (
+    (0.10, 0.20), (0.12, 0.22), (0.20, 0.30), (0.30, 0.20)
 )
 ```
 
@@ -95,20 +95,39 @@ confidence, and phase. Phase intervals are `[onset, next_onset)`; a tracking fra
 between predictions inherits the supplied segment label. This is not a new
 classification or a claim that missing observations were reconstructed.
 
-`carry_trajectory_xy_cm` exposes only CARRY-phase observations, maintaining the
+`carry_trajectory_xy_m` exposes only CARRY-phase observations, maintaining the
 distinction between the canonical CARRY trajectory and the full handled interval.
 Interior tracking gaps remain visible in frame IDs. No gaps are filled; the
 CARRY-only subset can be empty. Downstream path processing must decide whether
 the available geometry is sufficient before generating a safe trajectory.
 
 The legacy `TaskRepresentation` type still describes normalized workspace
-coordinates. Do not put centimeters or target meters into its normalized fields.
+coordinates. Do not put source or target meters into its normalized fields.
 
 ## Required mapping configuration
 
-`configs/retargeting.yaml` is intentionally **not runnable calibration**. All
-deployment placement/orientation values are `null`. Populate it explicitly, or
-provide an equivalent mapping dictionary; otherwise configuration validation fails.
+`configs/retargeting.yaml` defines the default tabletop clone in `mujoco_world`.
+The robot/base origin is the center of the filmed table's left edge. Positive X
+points into the table, positive Y points left from the robot's perspective, and
+positive Z points upward. A deployment with a different scene must override the
+mapping explicitly rather than silently reusing this placement.
+
+The sibling `tabletop_clone` section supplies the measured `0.508 m x 0.762 m`
+footprint to `add_tabletop_clone`. Its minimal `0.01 m` thickness extends below
+the `z=0` top surface and is a simulation default, not a measured property. The
+builder adds no robot geometry; it only creates the bounded table and a named
+base-frame marker at the left-edge center.
+
+For this default `0.762 m` table depth, the configured mapping reduces to:
+
+```text
+x_mujoco = x_table
+y_mujoco = 0.381 - y_table
+```
+
+Thus table `(0, 0.381)` is the robot/base origin, the tabletop occupies
+`x in [0, 0.508]` and `y in [-0.381, 0.381]`, and no Panda workspace dimensions
+participate in the conversion.
 
 Required fields:
 
@@ -120,15 +139,15 @@ Required fields:
 | `table_x_axis_target_xy` | Unit direction of increasing table X in target XY |
 | `table_y_axis_target_xy` | Unit direction of increasing table Y in target XY |
 
-For a column-vector table position `p_cm`, the mapping is:
+For a column-vector table position `p_table_m`, the mapping is:
 
 ```text
 A = [table_x_axis_target_xy  table_y_axis_target_xy]  # axes are columns
-p_target_m = table_origin_target_xy_m + A @ (p_cm / 100)
+p_target_m = table_origin_target_xy_m + A @ p_table_m
 ```
 
-This preserves physical distances: centimeters are converted to meters exactly
-once. The XY axis vectors must be unit length and perpendicular. Numerical axis
+This preserves physical distances without a unit conversion at the task boundary.
+The XY axis vectors must be unit length and perpendicular. Numerical axis
 validation uses an absolute tolerance of `1e-10` with zero relative tolerance;
 this only accommodates floating-point representation, not calibration uncertainty
 or task-success tolerance. Axes are never silently normalized. Reflections in
@@ -143,7 +162,6 @@ booleans are rejected. No mapping values are taken from Panda constants.
 from mimic.config import Config
 from mimic.robot import retarget_task
 
-# Deliberately raises validation errors until the deployment values are supplied.
 mapping = Config("configs/retargeting.yaml").get("retargeting")
 target_task = retarget_task(task, mapping)
 mapped_xy_m = target_task.path_xy_m  # all retained samples, one-for-one
@@ -156,7 +174,7 @@ adapt to its current position, or prove robot reachability.
 
 ## Path processing and downstream integration
 
-`ExtractedTask.path_xy_cm` and `RetargetedTask.path_xy_m` always expose the full
+`ExtractedTask.path_xy_m` and `RetargetedTask.path_xy_m` always expose the full
 retained geometry. Selection and interpolation happen only after retargeting:
 
 ```python

@@ -97,7 +97,7 @@ Configuration is centralized in `src/mimic/config.py`. Experiment parameters go 
 
 The Task Extractor and NumPy-backed Coordinate Retargeter accept already labeled
 predictions and table-space object tracks keyed by shared source-video frame IDs.
-Tracking coordinates are centimeters (top-left origin, +X right, +Y down).
+Tracking coordinates are meters (top-left origin, +X right, +Y down).
 Tasks and retargeting preserve every demonstration sample. The robot-independent
 Path Processor then selects `direct`, `corners_only`, exact `none`, or `cubic`
 geometry. `direct` remains the default. Retargeting requires explicit mapping

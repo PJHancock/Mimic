@@ -93,7 +93,7 @@ class TaskExtractor:
                     if boundary.frame_idx <= track.frame_idx:
                         phase = boundary.phase
                 sample = TablePathSample(
-                    track.frame_idx, track.table_xy_cm, phase, track.confidence
+                    track.frame_idx, track.table_xy_m, phase, track.confidence
                 )
             except (ValueError, TypeError) as exc:
                 raise TaskExtractionError(f"Invalid track: {exc}") from exc

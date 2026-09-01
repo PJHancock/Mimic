@@ -1,4 +1,4 @@
-"""Camera to table to robot workspace coordinate mapping via perspective transform."""
+"""Camera-pixel to physical-table coordinate mapping via perspective transform."""
 
 import json
 from pathlib import Path
@@ -7,12 +7,11 @@ from typing import List, Optional, Tuple
 import cv2
 import numpy as np
 
-from mimic.common.constants import PANDA_WORKSPACE_X_MAX, PANDA_WORKSPACE_X_MIN, PANDA_WORKSPACE_Y_MAX, PANDA_WORKSPACE_Y_MIN
 from mimic.common.types import CalibrationData
 
 
 class CoordinateMapper:
-    """Maps image pixels → table coordinates → normalized robot workspace.
+    """Maps image pixels to metric or normalized physical-table coordinates.
 
     One-time calibration per physical setup.
     """
@@ -58,6 +57,7 @@ class CoordinateMapper:
             camera_matrix = np.eye(3)
 
         calib = CalibrationData(
+            homography=self.homography.copy(),
             camera_matrix=camera_matrix,
             table_corners_image=list(table_corners_image),
             table_corners_world=list(table_corners_world),
@@ -105,21 +105,20 @@ class CoordinateMapper:
         with open(path, "w") as f:
             json.dump(data, f, indent=2)
 
-    def pixel_to_workspace(
+    def pixel_to_normalized_table(
         self, pixel_point: Tuple[float, float]
     ) -> Tuple[float, float]:
-        """Convert pixel coordinates to normalized robot workspace [0,1].
+        """Convert pixel coordinates to normalized physical-table coordinates.
 
         Pipeline:
         1. pixel → table meters (via homography)
         2. table meters → normalized [0,1]
-        3. normalized → robot workspace
 
         Args:
             pixel_point: (x, y) in image pixels.
 
         Returns:
-            (x, y) in normalized robot workspace [0, 1] × [0, 1].
+            (x, y) in clipped normalized table coordinates [0, 1] × [0, 1].
         """
         if not self.is_calibrated:
             raise RuntimeError("Mapper not calibrated. Call calibrate() or load() first.")
@@ -134,45 +133,25 @@ class CoordinateMapper:
 
         return (float(normalized_x), float(normalized_y))
 
-    def pixel_to_table_xy_cm(self, pixel_point: Tuple[float, float]) -> Tuple[float, float]:
-        """Map image pixels to calibrated table centimeters without clipping."""
+    def pixel_to_table_xy_m(self, pixel_point: Tuple[float, float]) -> Tuple[float, float]:
+        """Map image pixels to calibrated table meters without clipping."""
         if not self.is_calibrated:
             raise RuntimeError("Mapper not calibrated. Call calibrate() or load() first.")
         pt_img = np.array(
             [[[float(pixel_point[0]), float(pixel_point[1])]]], dtype=np.float32
         )
         point_m = cv2.perspectiveTransform(pt_img, self.homography)[0][0]
-        return (float(point_m[0] * 100), float(point_m[1] * 100))
+        return (float(point_m[0]), float(point_m[1]))
 
-    def pixels_to_workspace_batch(
+    def pixels_to_normalized_table_batch(
         self, pixel_points: List[Tuple[float, float]]
     ) -> List[Tuple[float, float]]:
-        """Batch convert pixel coordinates to workspace.
+        """Batch convert pixel coordinates to normalized physical-table coordinates.
 
         Args:
             pixel_points: List of (x, y) in image pixels.
 
         Returns:
-            List of (x, y) in normalized workspace.
+            List of (x, y) in normalized table coordinates.
         """
-        return [self.pixel_to_workspace(pt) for pt in pixel_points]
-
-    def workspace_to_panda(
-        self, workspace_point: Tuple[float, float]
-    ) -> Tuple[float, float]:
-        """Convert normalized workspace [0,1] to Panda arm workspace.
-
-        Args:
-            workspace_point: (x, y) in [0, 1] × [0, 1].
-
-        Returns:
-            (x, y) in Panda workspace meters.
-        """
-        x_panda = PANDA_WORKSPACE_X_MIN + workspace_point[0] * (
-            PANDA_WORKSPACE_X_MAX - PANDA_WORKSPACE_X_MIN
-        )
-        y_panda = PANDA_WORKSPACE_Y_MIN + workspace_point[1] * (
-            PANDA_WORKSPACE_Y_MAX - PANDA_WORKSPACE_Y_MIN
-        )
-
-        return (float(x_panda), float(y_panda))
+        return [self.pixel_to_normalized_table(pt) for pt in pixel_points]

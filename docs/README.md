@@ -8,7 +8,7 @@ Comprehensive documentation for the Mimic project.
 - **ARCHITECTURE.md** — System architecture and module interactions
 - **ROBOT_EXECUTION.md** — Modular Mink IK, Panda gripper, simulation setup, and verification limits
 - **ARM_TRACKING_INVESTIGATION.md** — Panda hover-timeout diagnosis, excluded causes, and control/gripper solution options
-- **TASK_EXTRACTION_AND_RETARGETING.md** — Frame-based task extraction, table centimeters, required mapping configuration, and path selection
+- **TASK_EXTRACTION_AND_RETARGETING.md** — Frame-based task extraction, table meters, required mapping configuration, and path selection
 - **SKILL_GRAPH.md** — Versioned composite labels, graph-aware prediction validation, handlers, and saved home presets
 - **API_REFERENCE.md** — API documentation for modules (auto-generated)
 - **SETUP.md** — Installation and environment setup

@@ -1,4 +1,4 @@
-"""Explicit, robot-independent, metric-preserving XY coordinate mapping."""
+"""Explicit, robot-independent, metric-preserving XY frame mapping."""
 
 from typing import Literal, Mapping, Tuple, Union
 
@@ -50,7 +50,7 @@ class MappingConfig(BaseModel):
 
 
 class CoordinateRetargeter:
-    """Map table centimeters to configured target XY meters, preserving source."""
+    """Map table meters to configured target-frame meters, preserving source."""
 
     def __init__(self, mapping_config: Union[MappingConfig, Mapping[str, object]]):
         if mapping_config is None:
@@ -62,14 +62,13 @@ class CoordinateRetargeter:
         if task.coordinate_frame != config.source_frame:
             raise ValueError("Task source frame does not match mapping configuration")
         axes = np.column_stack((config.table_x_axis_target_xy, config.table_y_axis_target_xy))
-        source_cm: np.ndarray = np.asarray(
-            [s.table_xy_cm for s in task.demonstrated_path], dtype=float
+        source_m: np.ndarray = np.asarray(
+            [s.table_xy_m for s in task.demonstrated_path], dtype=float
         )
-        # Row-vector form of p_target = origin_target + axes @ (p_table_cm / 100).
-        # Convert units exactly once, before applying the configured basis.
+        # Row-vector form of p_target = origin_target + axes @ p_table_m.
         with np.errstate(over="raise", invalid="raise"):
             try:
-                target_m = (source_cm / 100.0) @ axes.T + config.table_origin_target_xy_m
+                target_m = source_m @ axes.T + config.table_origin_target_xy_m
             except FloatingPointError as exc:
                 raise ValueError("Mapping produced nonfinite coordinates") from exc
         return RetargetedTask(
