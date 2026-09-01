@@ -224,7 +224,7 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><span>DEMONSTRATION</span><i>→</i><span>SKILL MODEL</span><i>→</i><span>RETARGET</span><i>→</i><span>PANDA</span></div><div className="run-control"><span className="status-dot" /><label htmlFor="run-select">Artifact set</label><select id="run-select" value={runId} onChange={(e) => setRunId(e.target.value)}>{runs.map((run) => <option key={run.id} value={run.id}>{run.name} · {run.success ? 'success' : run.completed ? 'failed' : 'partial'}</option>)}</select></div></header>
+    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><span>DEMONSTRATION</span><i>→</i><span>SKILL MODEL</span><i>→</i><span>RETARGET</span><i>→</i><span>PANDA</span></div></header>
 
     {/* Job Description Section */}
     <div className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
