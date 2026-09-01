@@ -44,7 +44,7 @@ def test_project_default_and_pipeline_yaml_use_cubic():
     )
     assert default_settings == pipeline_settings
     assert default_settings.interpolation == PathInterpolation.CUBIC
-    assert default_settings.corner_max_deviation_m == pytest.approx(0.04)
+    assert default_settings.corner_max_deviation_m == pytest.approx(0.01)
     assert default_settings.output_spacing_m == pytest.approx(0.05)
     assert default_settings.maximum_spline_deviation_m == pytest.approx(0.10)
 

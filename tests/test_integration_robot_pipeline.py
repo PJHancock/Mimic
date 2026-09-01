@@ -363,7 +363,7 @@ def test_committed_panda_pipeline_config_is_complete() -> None:
     waypoints = WaypointConstructionSettings.model_validate(payload["waypoint_construction"])
 
     assert path.interpolation.value == "cubic"
-    assert path.corner_max_deviation_m == pytest.approx(0.04)
+    assert path.corner_max_deviation_m == pytest.approx(0.01)
     assert path.output_spacing_m == pytest.approx(0.05)
     assert path.maximum_spline_deviation_m == pytest.approx(0.10)
     assert waypoints.grasp_z_m == pytest.approx(0.02)
