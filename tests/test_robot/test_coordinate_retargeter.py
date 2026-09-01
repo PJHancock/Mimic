@@ -10,7 +10,7 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from mimic.common.constants import TABLE_HEIGHT_M, TABLE_WIDTH_M
+from mimic.common.constants import ROBOT_TABLE_SETBACK_M, TABLE_HEIGHT_M, TABLE_WIDTH_M
 from mimic.robot import CoordinateRetargeter, MappingConfig, retarget_task
 
 
@@ -92,7 +92,10 @@ def test_deployment_template_maps_left_edge_table_clone():
     assert defaults["tracking"]["table_width_m"] == TABLE_WIDTH_M
     assert defaults["tracking"]["table_height_m"] == TABLE_HEIGHT_M
     assert config.target_frame == "mujoco_world"
-    assert config.table_origin_target_xy_m == (0.0, TABLE_HEIGHT_M / 2)
+    assert config.table_origin_target_xy_m == (
+        ROBOT_TABLE_SETBACK_M,
+        TABLE_HEIGHT_M / 2,
+    )
     assert config.table_x_axis_target_xy == (1.0, 0.0)
     assert config.table_y_axis_target_xy == (0.0, -1.0)
     assert data["tabletop_clone"] == {
@@ -102,6 +105,7 @@ def test_deployment_template_maps_left_edge_table_clone():
         "surface_z_m": 0.0,
         "robot_edge": "left",
         "robot_base_xy_m": [0.0, 0.0],
+        "robot_setback_m": ROBOT_TABLE_SETBACK_M,
     }
 
 
@@ -128,13 +132,13 @@ def test_left_edge_mapping_places_robot_at_origin_and_clones_table(extracted_tas
     np.testing.assert_allclose(
         result.path_xy_m,
         (
-            (0.0, TABLE_HEIGHT_M / 2),
-            (TABLE_WIDTH_M, TABLE_HEIGHT_M / 2),
-            (0.0, -TABLE_HEIGHT_M / 2),
-            (TABLE_WIDTH_M, -TABLE_HEIGHT_M / 2),
-            (0.0, 0.0),
-            (TABLE_WIDTH_M, 0.0),
-            (0.0, 0.0),
+            (ROBOT_TABLE_SETBACK_M, TABLE_HEIGHT_M / 2),
+            (ROBOT_TABLE_SETBACK_M + TABLE_WIDTH_M, TABLE_HEIGHT_M / 2),
+            (ROBOT_TABLE_SETBACK_M, -TABLE_HEIGHT_M / 2),
+            (ROBOT_TABLE_SETBACK_M + TABLE_WIDTH_M, -TABLE_HEIGHT_M / 2),
+            (ROBOT_TABLE_SETBACK_M, 0.0),
+            (ROBOT_TABLE_SETBACK_M + TABLE_WIDTH_M, 0.0),
+            (ROBOT_TABLE_SETBACK_M, 0.0),
         ),
         rtol=0,
         atol=1e-14,
@@ -189,9 +193,7 @@ def test_config_instances_are_revalidated(mapping_config_values):
 
 
 def test_mapping_overflow_rejected(extracted_task, mapping_config_values):
-    samples = tuple(
-        replace(s, table_xy_m=(1e308, 1e308)) for s in extracted_task.demonstrated_path
-    )
+    samples = tuple(replace(s, table_xy_m=(1e308, 1e308)) for s in extracted_task.demonstrated_path)
     task = replace(extracted_task, demonstrated_path=samples)
     mapping_config_values.update(
         table_origin_target_xy_m=[np.finfo(float).max, np.finfo(float).max],

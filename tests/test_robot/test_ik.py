@@ -109,3 +109,33 @@ def test_observation_reflects_post_step_state(small_robot):
     io.advance(0.01)
     observed = io.read()
     assert observed.tool_pose.position[0] == pytest.approx(observed.joint_positions["slide_x"][0])
+
+
+def test_simulated_object_position_is_initialized_only_before_physics(small_robot):
+    _, io, _ = small_robot
+    io.data.qvel[:] = 1
+
+    initialized = io.initialize_object_position((0.2, -0.1, 0.03))
+
+    assert initialized.object_position == pytest.approx((0.2, -0.1, 0.03))
+    object_joint = io.model.joint("object_free").id
+    dof_address = io.model.jnt_dofadr[object_joint]
+    np.testing.assert_array_equal(io.data.qvel[dof_address : dof_address + 6], 0)
+    io.advance(0.01)
+    with pytest.raises(RuntimeError, match="before simulation starts"):
+        io.initialize_object_position((0.3, 0.0, 0.03))
+
+
+def test_support_contact_observer_tracks_only_active_object_support_contact(small_robot):
+    _, io, _ = small_robot
+    observe_support = io.support_contact_observer("support")
+    assert not observe_support()
+
+    object_joint = io.model.joint("object_free").id
+    address = io.model.jnt_qposadr[object_joint]
+    io.data.qpos[address : address + 3] = (0.04, 0.0, 0.0)
+    mujoco.mj_forward(io.model, io.data)
+
+    assert observe_support()
+    with pytest.raises(ValueError, match="Unknown support geometry"):
+        io.support_contact_observer("missing")

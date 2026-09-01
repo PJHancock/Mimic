@@ -40,6 +40,10 @@ def test_mapper_calibrate(mapper):
     assert calib is not None
     assert mapper.homography is not None
     assert mapper.homography.shape == (3, 3)
+    assert mapper.image_width_px == 640
+    assert mapper.image_height_px == 480
+    assert calib.image_width_px == 640
+    assert calib.image_height_px == 480
     np.testing.assert_allclose(calib.homography, mapper.homography)
 
 
@@ -101,6 +105,8 @@ def test_mapper_save_load(mapper):
 
         assert mapper2.is_calibrated
         assert mapper2.homography is not None
+        assert mapper2.image_width_px == 640
+        assert mapper2.image_height_px == 480
 
 
 def test_mapper_batch_conversion(mapper):
@@ -137,6 +143,8 @@ def test_mapper_save_creates_directory(mapper):
         with open(nested_path) as f:
             data = json.load(f)
         assert "homography" in data
+        assert data["image_width_px"] == 640
+        assert data["image_height_px"] == 480
 
 
 def test_mapper_load_invalid_path():

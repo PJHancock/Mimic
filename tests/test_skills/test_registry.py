@@ -28,7 +28,11 @@ def skill_context() -> PickPlaceSkillContext:
         pose(0.2, 0.1),
         (0.2, 0, 0),
     )
-    return PickPlaceSkillContext(waypoints, JointPreset("home", {"j1": 0.1, "j2": -0.2}))
+    return PickPlaceSkillContext(
+        waypoints,
+        JointPreset("home", {"j1": 0.1, "j2": -0.2}),
+        placement_approach_clearance_m=0.015,
+    )
 
 
 def prediction(timestamp_s: float, winner: str) -> SkillPrediction:
@@ -99,6 +103,24 @@ def test_carry_handler_expands_to_lift_and_each_processed_waypoint(
         "FOLLOW_PATH",
         "FOLLOW_PATH",
     ]
+
+
+def test_release_handler_adds_configured_placement_approach(
+    skill_catalog, skill_graph, post_state_settings, skill_context
+) -> None:
+    processor = GraphStatePostProcessor(
+        skill_catalog,
+        skill_graph,
+        post_state_settings,
+        transition_guard=lambda transition: True,
+    )
+    processor.reset("CARRY")
+    registry = build_pick_place_skill_registry(skill_catalog)
+
+    actions = registry.plan(processor.process(prediction(0, "RELEASE")), skill_context)
+
+    assert [action.primitive_id for action in actions] == ["PLACE_APPROACH", "LOWER", "OPEN"]
+    assert actions[0].target.position == pytest.approx((0.2, 0.0, 0.015))
 
 
 def test_registry_rejects_decision_from_an_incompatible_catalog(

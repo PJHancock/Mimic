@@ -99,7 +99,6 @@ def test_duplicate_or_unsorted_frames_rejected(task_predictions, table_tracks, w
         ["HOVER", "GRASP", "CARRY", "RELEASE", "HOVER", "IDLE"],
         ["IDLE", "GRASP", "CARRY", "RELEASE", "HOVER", "IDLE"],
         ["IDLE", "HOVER", "GRASP", "RELEASE", "HOVER", "IDLE"],
-        ["IDLE", "HOVER", "GRASP", "CARRY", "RELEASE", "IDLE"],
         ["IDLE", "HOVER", "GRASP", "HOVER", "CARRY", "RELEASE", "HOVER", "IDLE"],
         ["IDLE", "HOVER", "GRASP", "CARRY", "RELEASE", "HOVER"],
     ],
@@ -114,6 +113,27 @@ def test_unknown_phase_rejected(task_predictions, table_tracks):
     task_predictions[0].phase = "UNKNOWN"
     with pytest.raises(TaskExtractionError, match="Invalid prediction"):
         extract_task(task_predictions, table_tracks)
+
+
+def test_complete_episode_may_end_directly_in_idle(task_predictions, table_tracks):
+    predictions = [
+        prediction
+        for prediction in task_predictions
+        if prediction.phase is not ActionPhase.HOVER or prediction.frame_idx != 14
+    ]
+
+    task = extract_task(predictions, table_tracks)
+
+    assert tuple(boundary.phase for boundary in task.phase_boundaries) == (
+        ActionPhase.IDLE,
+        ActionPhase.HOVER,
+        ActionPhase.GRASP,
+        ActionPhase.CARRY,
+        ActionPhase.RELEASE,
+        ActionPhase.IDLE,
+    )
+    assert task.grasp_frame == 3
+    assert task.release_frame == 11
 
 
 @pytest.mark.parametrize(

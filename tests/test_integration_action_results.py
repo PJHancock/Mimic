@@ -10,8 +10,11 @@ from mimic.common import ActionPhase
 from mimic.integration import (
     SkillSystemDefinition,
     build_action_inference_artifacts,
+    build_demo_task_input,
+    load_demo_task_input,
     load_robot_actions,
     load_skill_system,
+    load_task_actions,
     predictions_from_probabilities,
     write_results,
 )
@@ -66,6 +69,29 @@ def test_complete_scores_are_preserved_before_single_state_export() -> None:
     assert "state_scores" not in robot_payload["frames"][1]
 
 
+def test_offline_export_defers_runtime_guards_and_accepts_direct_terminal_idle() -> None:
+    system = configured_system()
+    winners = ("IDLE", "HOVER", "GRASP", "CARRY", "RELEASE", "IDLE")
+    probabilities = np.array(
+        [
+            [0.8 if label == winner else 0.05 for label in system.catalog.labels]
+            for winner in winners
+        ]
+    )
+    predictions = predictions_from_probabilities(
+        probabilities,
+        np.arange(len(winners), dtype=float) / 10,
+        system.catalog,
+    )
+
+    artifacts = build_action_inference_artifacts(predictions, system, "f" * 64)
+
+    assert tuple(frame.phase.value for frame in artifacts.robot_actions.frames) == winners
+    assert (
+        artifacts.robot_actions.postprocessing.guard_policy == "defer_runtime_guards_to_execution"
+    )
+
+
 def test_robot_loader_returns_one_action_prediction_per_timestep(tmp_path: Path) -> None:
     system = configured_system()
     predictions = predictions_from_probabilities(
@@ -85,6 +111,56 @@ def test_robot_loader_returns_one_action_prediction_per_timestep(tmp_path: Path)
     assert actions[0].frame_idx == 1
     assert actions[0].phase is ActionPhase.IDLE
     assert actions[0].confidence == pytest.approx(0.8)
+
+
+def test_consolidated_task_input_keeps_independent_streams_and_narrow_robot_view() -> None:
+    system = configured_system()
+    predictions = predictions_from_probabilities(
+        np.array(
+            [
+                [0.8, 0.05, 0.05, 0.05, 0.05],
+                [0.05, 0.8, 0.05, 0.05, 0.05],
+            ]
+        ),
+        [0.0, 0.2],
+        system.catalog,
+        frame_indices=[1, 3],
+    )
+    artifacts = build_action_inference_artifacts(predictions, system, "9" * 64)
+    task_input = build_demo_task_input(
+        {
+            "fps": 10.0,
+            "duration": 0.3,
+            "frame_count": 3,
+            "frame_width_px": 640,
+            "frame_height_px": 480,
+            "positions": [
+                {"frame": 0, "time": 0.0, "x": 10.0, "y": 20.0, "confidence": 0.8},
+                {"frame": 1, "time": 0.1, "x": None, "y": None, "confidence": 0.0},
+                {"frame": 2, "time": 0.2, "x": 30.0, "y": 40.0, "confidence": 0.7},
+            ],
+        },
+        artifacts.robot_actions,
+    )
+
+    payload = task_input.model_dump(mode="json")
+    assert payload["schema"] == "mimic.demo_task_input.v1"
+    assert [frame["frame_idx"] for frame in payload["resolved_actions"]] == [1, 3]
+    assert [frame["frame_idx"] for frame in payload["object_tracks"]] == [1, 2, 3]
+    assert payload["object_tracks"][1]["position"] is None
+    assert "state_scores" not in payload["resolved_actions"][0]
+    assert "action_segments" not in payload
+    assert "tracking_summary" not in payload
+
+    loaded = load_demo_task_input(payload)
+    robot_actions = load_task_actions(loaded.model_dump(mode="json"))
+    assert len(robot_actions) == len(loaded.resolved_actions) == 2
+    assert [action.phase for action in robot_actions] == [ActionPhase.IDLE, ActionPhase.HOVER]
+
+
+def test_task_input_loader_rejects_superseded_split_artifacts() -> None:
+    with pytest.raises(ValueError, match="mimic.demo_task_input.v1"):
+        load_demo_task_input({"schema": "mimic.demo_results.v2"})
 
 
 def test_robot_loader_rejects_string_frame_numbers() -> None:
@@ -143,7 +219,7 @@ def test_missing_detection_still_exports_one_state_without_invented_confidence()
     assert fallback.decision_source.value == "no_detection_fallback"
 
 
-def test_committed_null_post_state_settings_fail_closed() -> None:
+def test_committed_post_state_settings_are_ready_for_export() -> None:
     root = Path(__file__).resolve().parents[1]
     system = load_skill_system(root / "configs" / "skills" / "pick_place.yaml")
     prediction = SkillPrediction(
@@ -151,8 +227,8 @@ def test_committed_null_post_state_settings_fail_closed() -> None:
         timestamp_s=0.0,
         state_scores={label: 0.2 for label in system.catalog.labels},
     )
-    with pytest.raises(ValueError, match="Post-state settings are unresolved"):
-        build_action_inference_artifacts((prediction,), system, "d" * 64)
+    artifacts = build_action_inference_artifacts((prediction,), system, "d" * 64)
+    assert artifacts.robot_actions.frames[0].phase is ActionPhase.IDLE
 
 
 def test_probability_columns_must_match_catalog() -> None:

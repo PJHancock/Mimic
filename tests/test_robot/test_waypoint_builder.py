@@ -41,9 +41,11 @@ def test_all_path_modes_feed_the_existing_skill_contract(
     task = retarget_task(extracted_task, mapping_config_values)
     path = process_path(task, path_settings)
     waypoints = build_waypoints(path, _settings())
-    path_skills = [step for step in expand_skills(waypoints) if step.skill == "FOLLOW_PATH"]
+    path_skills = [step for step in expand_skills(waypoints, 0.015) if step.skill == "FOLLOW_PATH"]
     assert len(path_skills) == len(path.xy_m)
     assert tuple(step.pose.position[:2] for step in path_skills) == path.xy_m
+    assert tuple(step.waypoint_index for step in path_skills) == tuple(range(len(path.xy_m)))
+    assert all(step.waypoint_count == len(path.xy_m) for step in path_skills)
     assert all(step.pose.position[2] == 0.2 for step in path_skills)
     assert waypoints.approach.position[:2] == task.start_xy_m
     assert waypoints.lower.position[:2] == task.goal_xy_m

@@ -94,7 +94,23 @@ def executor(io, ik=None):
     )
     return (
         SkillExecutor(
-            controller, ExecutionSettings(2, 0.05, 0.01, 0.1, 0.03, 0.01, 0.01), events.append
+            controller,
+            ExecutionSettings(
+                step_timeout_s=2,
+                minimum_lift_m=0.05,
+                maximum_slip_m=0.01,
+                waypoint_handoff_radius_m=0.03,
+                contact_loss_timeout_s=0.1,
+                settle_time_s=0.03,
+                settled_speed_m_s=0.01,
+                placement_tolerance_m=0.01,
+                placement_approach_clearance_m=0.015,
+                placement_maximum_descent_speed_m_s=0.05,
+                placement_maximum_descent_acceleration_m_s2=0.5,
+                placement_contact_confirmation_s=0.03,
+            ),
+            events.append,
+            support_contact=lambda: io.read().object_position[2] <= task().lower.position[2],
         ),
         events,
     )
@@ -112,6 +128,7 @@ def test_all_phases_have_feedback_gated_subskills():
         "CLOSE",
         "LIFT",
         "FOLLOW_PATH",
+        "PLACE_APPROACH",
         "LOWER",
         "OPEN",
         "RETREAT",
@@ -119,6 +136,128 @@ def test_all_phases_have_feedback_gated_subskills():
     assert {e["phase"] for e in events if e["event"] == "transition"} == {
         p.value for p in ActionPhase if p != ActionPhase.IDLE
     }
+    placement = next(
+        event
+        for event in events
+        if event["event"] == "sample" and event["skill"] == "PLACE_APPROACH"
+    )
+    assert placement["target_pose"]["position"] == pytest.approx((0.2, 0.0, 0.015))
+    assert any(event["event"] == "placement_contact" for event in events)
+    assert any(event["event"] == "placement_supported" for event in events)
+
+
+def test_guarded_lower_caps_continuous_cartesian_reference_speed():
+    runner, events = executor(ScriptedIO())
+
+    result = runner.run(task())
+
+    assert result.success
+    samples = [
+        event for event in events if event["event"] == "sample" and event["skill"] == "LOWER"
+    ]
+    moving = [sample for sample in samples if not sample["support_contact"]]
+    for previous, current in zip(moving, moving[1:]):
+        elapsed = current["state"]["timestamp_s"] - previous["state"]["timestamp_s"]
+        descent = previous["target_pose"]["position"][2] - current["target_pose"]["position"][2]
+        assert descent / elapsed <= 0.05 + 1e-9
+
+
+def test_contact_confirmation_must_fit_within_step_timeout():
+    runner, _ = executor(ScriptedIO())
+    with pytest.raises(ValueError, match="shorter than step timeout"):
+        replace(
+            runner.settings,
+            placement_contact_confirmation_s=runner.settings.step_timeout_s,
+        )
+
+
+def test_guarded_lower_fails_closed_on_measured_descent_overspeed():
+    class OverspeedIO(ScriptedIO):
+        def apply(self, arm_targets, gripper_targets):
+            super().apply(arm_targets, gripper_targets)
+            if self.grasping and 0 < arm_targets["z"] < 0.015:
+                overshot = pose(arm_targets["x"], arm_targets["z"] - 0.002)
+                self.state = replace(
+                    self.state,
+                    tool_pose=overshot,
+                    object_position=overshot.position,
+                )
+
+    runner, _ = executor(OverspeedIO())
+
+    result = runner.run(task())
+
+    assert result.failure == "LOWER: measured descent speed exceeds configured maximum"
+    assert not result.released
+
+
+def test_supported_object_uses_placement_gate_instead_of_airborne_slip_offset():
+    class SupportedIO(ScriptedIO):
+        supported = False
+
+        def apply(self, arm_targets, gripper_targets):
+            super().apply(arm_targets, gripper_targets)
+            if self.supported:
+                self.state = replace(self.state, object_position=task().goal_position)
+
+    io = SupportedIO()
+    runner, _ = executor(io)
+
+    def support_contact():
+        if io.read().tool_pose.position[2] <= 0.01495:
+            io.supported = True
+            io.state = replace(io.state, object_position=task().goal_position)
+        return io.supported
+
+    runner.support_contact = support_contact
+
+    result = runner.run(task())
+
+    assert result.success
+    assert result.released
+
+
+def test_intermediate_path_waypoint_hands_off_before_at_target():
+    waypoints = replace(task(), path=(pose(0.02, 0.1), pose(0.2, 0.1)))
+    runner, events = executor(ScriptedIO())
+
+    result = runner.run(waypoints)
+
+    assert result.success
+    handoffs = [event for event in events if event["event"] == "waypoint_handoff"]
+    assert len(handoffs) == 1
+    assert handoffs[0] == {
+        "event": "waypoint_handoff",
+        "timestamp_s": pytest.approx(handoffs[0]["timestamp_s"]),
+        "phase": "CARRY",
+        "skill": "FOLLOW_PATH",
+        "step": 4,
+        "waypoint_index": 0,
+        "waypoint_count": 2,
+        "distance_m": pytest.approx(0.02),
+        "radius_m": pytest.approx(0.03),
+        "ik_status": "VALID_STEP",
+    }
+
+
+def test_final_path_waypoint_still_requires_measured_arrival():
+    class NeverArriveAtFinalPathIK(ScriptedIK):
+        def solve(self, target, state, dt_s):
+            result = super().solve(target, state, dt_s)
+            if target == pose(0.2, 0.1) and target == state.tool_pose:
+                return replace(result, status=IKStatus.VALID_STEP)
+            return result
+
+    waypoints = replace(task(), path=(pose(0.02, 0.1), pose(0.2, 0.1)))
+    runner, events = executor(ScriptedIO(), NeverArriveAtFinalPathIK())
+
+    result = runner.run(waypoints)
+
+    assert not result.success
+    assert not result.transported
+    assert result.failure == "FOLLOW_PATH: target not achieved before timeout"
+    assert len([event for event in events if event["event"] == "waypoint_handoff"]) == 1
+    assert not any(event["event"] == "transition" and event["skill"] == "LOWER" for event in events)
 
 
 def test_empty_grasp_stops_before_lift_and_does_not_auto_release():
@@ -145,6 +284,26 @@ def test_failed_ik_never_writes_or_steps():
     result = runner.run(task())
     assert "deliberate failure" in result.failure
     assert io.advance_calls == 0 and io.read().gripper.width_m == 0.1
+
+
+def test_executor_initializes_simulated_object_at_grasp_pose():
+    io = ScriptedIO()
+    initialized = []
+
+    def initialize(position):
+        initialized.append(position)
+        io.state = replace(io.state, object_position=position)
+        return io.state
+
+    runner, events = executor(io)
+    runner.initialize_object = initialize
+
+    result = runner.run(task())
+
+    assert result.success
+    assert initialized == [task().grasp.position]
+    event = next(event for event in events if event["event"] == "object_initialized")
+    assert event["position"] == task().grasp.position
 
 
 def test_no_progress_times_out_without_skipping_waypoint():

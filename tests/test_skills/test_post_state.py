@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from mimic.skills.post_state import GraphStatePostProcessor
+from mimic.skills.post_state import GraphStatePostProcessor, PostStateSettings
 from mimic.skills.types import DecisionSource, SkillPrediction
 
 LABELS = ("IDLE", "HOVER", "GRASP", "CARRY", "RELEASE")
@@ -42,15 +42,15 @@ def test_uses_second_choice_when_top_choice_is_illegal(
         SkillPrediction(
             timestamp_s=0.0,
             state_scores={
-                "IDLE": 0.46,
+                "IDLE": 0.03,
                 "HOVER": 0.44,
                 "GRASP": 0.03,
-                "CARRY": 0.03,
+                "CARRY": 0.46,
                 "RELEASE": 0.04,
             },
         )
     )
-    assert decision.top_skill == "IDLE"
+    assert decision.top_skill == "CARRY"
     assert decision.second_skill == "HOVER"
     assert decision.accepted_skill == "HOVER"
     assert decision.selected_rank == 2
@@ -140,5 +140,6 @@ def test_rejects_non_monotonic_time(post_processor: GraphStatePostProcessor) -> 
         post_processor.process(prediction(0.9, IDLE=0.8))
 
 
-def test_committed_template_keeps_model_thresholds_unset(skill_config: dict) -> None:
-    assert all(value is None for value in skill_config["post_state"].values())
+def test_committed_template_has_explicit_validated_thresholds(skill_config: dict) -> None:
+    settings = PostStateSettings.model_validate(skill_config["post_state"])
+    assert settings.minimum_confidence == pytest.approx(0.5)

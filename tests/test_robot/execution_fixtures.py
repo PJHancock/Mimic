@@ -29,7 +29,7 @@ def small_robot(ik_settings):
         <body name="object" pos="0 1 0"><freejoint name="object_free"/>
           <geom type="sphere" size="0.02" mass="0.1"/></body>
         <body name="carriage"><joint name="slide_x" type="slide" axis="1 0 0" range="-1 1"/>
-          <geom type="sphere" size="0.03" mass="1"/>
+          <geom name="support" type="sphere" size="0.03" mass="1"/>
           <body name="tool"><joint name="slide_z" type="slide" axis="0 0 1" range="-1 1"/>
             <geom type="sphere" size="0.02" mass="1"/></body></body>
         <body name="finger" pos="0 -1 0"><joint name="finger" type="slide" range="0 0.1"/>

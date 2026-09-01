@@ -62,6 +62,35 @@ def test_saved_joint_target_uses_same_bounded_position_trajectory(small_robot):
     assert measured["slide_z"][0] == pytest.approx(-0.05, abs=1e-3)
 
 
+def test_cartesian_target_change_preserves_nonzero_reference_motion(small_robot):
+    bindings, io, differential_ik = small_robot
+    solver = RuckigPositionIK(differential_ik, bindings, settings())
+    intermediate = ToolPose((0.1, 0, 0.1), (1, 0, 0, 0))
+    following = ToolPose((0.2, 0, 0.1), (1, 0, 0, 0))
+    commands = [np.zeros(2)]
+
+    for _ in range(1000):
+        result = solver.solve(intermediate, io.read(), 0.01)
+        command = np.array([result.joint_targets[name] for name in bindings.profile.arm_joints])
+        commands.append(command)
+        io.apply(result.joint_targets, {"finger_motor": 0})
+        io.advance(0.01)
+        if np.linalg.norm(np.asarray(io.read().tool_pose.position) - intermediate.position) <= 0.03:
+            break
+
+    assert result.status == IKStatus.VALID_STEP
+    velocity_before_handoff = (commands[-1] - commands[-2]) / 0.01
+    assert velocity_before_handoff[0] > 0
+
+    result = solver.solve(following, io.read(), 0.01)
+    command_after_handoff = np.array(
+        [result.joint_targets[name] for name in bindings.profile.arm_joints]
+    )
+    velocity_after_handoff = (command_after_handoff - commands[-1]) / 0.01
+    assert result.status == IKStatus.VALID_STEP
+    assert velocity_after_handoff[0] > 0
+
+
 def test_saved_joint_target_requires_exact_named_arm_contract(small_robot):
     bindings, io, differential_ik = small_robot
     solver = RuckigPositionIK(differential_ik, bindings, settings())
@@ -106,6 +135,22 @@ def test_fixed_interval_and_sourced_ceiling_are_enforced(small_robot):
     result = solver.solve(state.tool_pose, state, 0.02)
     assert result.status == IKStatus.INVALID_INPUT
     assert "fixed control interval" in result.detail
+
+
+def test_advance_observer_is_optional_and_runs_after_completed_interval(small_robot):
+    _, io, _ = small_robot
+    observations = []
+    io.set_advance_observer(lambda duration_s: observations.append((duration_s, io.data.time)))
+
+    io.advance(0.01)
+
+    assert observations == [(pytest.approx(0.01), pytest.approx(0.01))]
+    io.set_advance_observer(None)
+    io.advance(0.01)
+    assert len(observations) == 1
+
+    with pytest.raises(TypeError, match="callable"):
+        io.set_advance_observer(1)
 
 
 @pytest.mark.parametrize(

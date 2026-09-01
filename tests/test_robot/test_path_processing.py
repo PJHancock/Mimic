@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import yaml
 from pydantic import ValidationError
 
 from mimic.config import Config
@@ -31,14 +32,19 @@ def test_direct_preserves_the_former_endpoint_only_behavior(extracted_task, mapp
     assert result.source_task is task
 
 
-def test_project_default_and_yaml_preserve_direct_behavior():
+def test_project_default_and_pipeline_yaml_use_cubic():
     root = Path(__file__).resolve().parents[2]
     default_settings = PathProcessingSettings.model_validate(Config().get("path_processing"))
-    yaml_settings = PathProcessingSettings.model_validate(
-        Config(str(root / "configs" / "default.yaml")).get("path_processing")
+    pipeline_settings = PathProcessingSettings.model_validate(
+        yaml.safe_load((root / "configs" / "robot_pipeline.yaml").read_text())["robot_pipeline"][
+            "path_processing"
+        ]
     )
-    assert default_settings == yaml_settings
-    assert default_settings.interpolation == PathInterpolation.DIRECT
+    assert default_settings == pipeline_settings
+    assert default_settings.interpolation == PathInterpolation.CUBIC
+    assert default_settings.corner_max_deviation_m == pytest.approx(0.04)
+    assert default_settings.output_spacing_m == pytest.approx(0.05)
+    assert default_settings.maximum_spline_deviation_m == pytest.approx(0.10)
 
 
 def test_none_returns_every_coordinate_exactly_without_deduplication(

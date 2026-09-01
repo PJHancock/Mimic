@@ -41,6 +41,18 @@ def test_graph_exposes_contextual_hover_edges(skill_graph: SkillGraph) -> None:
     assert skill_graph.transition("IDLE", "HOVER").variant == "TO_GRASP"
     assert skill_graph.transition("RELEASE", "HOVER").variant == "TO_HOME"
     assert skill_graph.transition("GRASP", "HOVER").guard == "grasp_empty"
+    assert skill_graph.transition("GRASP", "CARRY").guard_scope == "runtime"
+
+
+def test_idle_is_a_legal_terminal_state_from_every_skill(skill_graph: SkillGraph) -> None:
+    assert all(
+        skill_graph.transition(source, "IDLE") is not None for source in skill_graph.catalog.labels
+    )
+
+
+def test_named_guard_requires_an_explicit_scope() -> None:
+    with pytest.raises(ValueError, match="guard and guard_scope"):
+        SkillTransition(source="GRASP", target="CARRY", guard="grasp_confirmed")
 
 
 def test_graph_requires_self_edge_for_every_skill(skill_catalog: SkillCatalog) -> None:

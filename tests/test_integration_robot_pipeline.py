@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import yaml
 
 from mimic.integration.robot_pipeline import (
     build_robot_pipeline,
@@ -12,6 +13,8 @@ from mimic.integration.robot_pipeline import (
     main,
     waypoint_payload,
 )
+from mimic.integration.task_input import load_demo_task_input
+from mimic.robot import PathProcessingSettings, WaypointConstructionSettings
 
 
 def _actions() -> dict:
@@ -48,17 +51,27 @@ def _actions() -> dict:
     }
 
 
-def _results() -> dict:
+def _task_input() -> dict:
+    actions = _actions()
     return {
-        "schema": "mimic.demo_results.v2",
-        "metadata": {
-            "catalog_fingerprint": "a" * 64,
-            "postprocessing_fingerprint": "c" * 64,
+        "schema": "mimic.demo_task_input.v1",
+        "video": {
+            "created_at": "2026-09-01T00:00:00-06:00",
+            "fps": 10.0,
+            "frame_count": 7,
+            "duration_s": 0.7,
             "tracking_coordinate_frame": "image_pixels",
+            "image_width_px": 1000,
+            "image_height_px": 1000,
         },
-        "per_frame": [
+        "catalog": actions["catalog"],
+        "checkpoint_sha256": actions["checkpoint_sha256"],
+        "postprocessing": actions["postprocessing"],
+        "resolved_actions": actions["frames"],
+        "object_tracks": [
             {
                 "frame_idx": index,
+                "timestamp_s": (index - 1) * 0.1,
                 "position": {"x": x, "y": y, "confidence": 0.8},
             }
             for index, (x, y) in enumerate(
@@ -74,6 +87,8 @@ def _calibration() -> dict:
         "homography": [[0.001, 0, 0], [0, 0.001, 0], [0, 0, 1]],
         "table_width_m": 0.508,
         "table_height_m": 0.762,
+        "image_width_px": 1000,
+        "image_height_px": 1000,
     }
 
 
@@ -113,8 +128,7 @@ def _pipeline_config() -> dict:
 
 def test_saved_pixels_are_calibrated_and_retargeted_into_world_waypoints() -> None:
     artifacts = build_robot_pipeline(
-        actions_source=_actions(),
-        results_source=_results(),
+        task_input_source=load_demo_task_input(_task_input()),
         calibration_source=_calibration(),
         retargeting_source=_retargeting(),
         pipeline_config_source=_pipeline_config(),
@@ -137,17 +151,31 @@ def test_saved_pixels_are_calibrated_and_retargeted_into_world_waypoints() -> No
 
 
 def test_loader_skips_missing_detections_without_fabricating_coordinates() -> None:
-    results = _results()
-    results["per_frame"][0]["position"] = {"x": None, "y": None, "confidence": 0.0}
-    tracks = load_calibrated_object_tracks(results, _calibration())
+    task_input = _task_input()
+    task_input["object_tracks"][0]["position"] = None
+    tracks = load_calibrated_object_tracks(task_input, _calibration())
     assert [track.frame_idx for track in tracks] == [2, 3, 4, 5, 6, 7]
 
 
-def test_loader_prefers_complete_tracker_stream_over_sparse_action_frames() -> None:
-    results = _results()
-    results["per_frame"] = results["per_frame"][::2]
-    results["object_tracks"] = _results()["per_frame"]
-    tracks = load_calibrated_object_tracks(results, _calibration())
+def test_loader_rejects_pixels_outside_calibration_frame() -> None:
+    task_input = _task_input()
+    task_input["object_tracks"][2]["position"]["x"] = 1000
+    with pytest.raises(ValueError, match="outside the declared image frame"):
+        load_calibrated_object_tracks(task_input, _calibration())
+
+
+def test_loader_rejects_calibration_resolution_mismatch() -> None:
+    calibration = _calibration()
+    calibration["image_width_px"] = 1920
+    calibration["image_height_px"] = 1080
+    with pytest.raises(ValueError, match="image dimensions differ"):
+        load_calibrated_object_tracks(_task_input(), calibration)
+
+
+def test_loader_preserves_tracker_stream_independent_of_sparse_action_frames() -> None:
+    task_input = _task_input()
+    task_input["resolved_actions"] = task_input["resolved_actions"][::2]
+    tracks = load_calibrated_object_tracks(task_input, _calibration())
     assert [track.frame_idx for track in tracks] == list(range(1, 8))
 
 
@@ -156,21 +184,19 @@ def test_calibration_must_match_the_tabletop_clone() -> None:
     retargeting["tabletop_clone"]["width_m"] = 1.0
     with pytest.raises(ValueError, match="must match"):
         build_robot_pipeline(
-            actions_source=_actions(),
-            results_source=_results(),
+            task_input_source=_task_input(),
             calibration_source=_calibration(),
             retargeting_source=retargeting,
             pipeline_config_source=_pipeline_config(),
         )
 
 
-def test_pipeline_rejects_action_provenance_mismatch() -> None:
-    results = _results()
-    results["metadata"]["postprocessing_fingerprint"] = "d" * 64
-    with pytest.raises(ValueError, match="post-processing"):
+def test_pipeline_rejects_action_outside_consolidated_catalog() -> None:
+    task_input = _task_input()
+    task_input["resolved_actions"][2]["phase"] = "UNKNOWN"
+    with pytest.raises(ValueError, match="Input should be"):
         build_robot_pipeline(
-            actions_source=_actions(),
-            results_source=results,
+            task_input_source=task_input,
             calibration_source=_calibration(),
             retargeting_source=_retargeting(),
             pipeline_config_source=_pipeline_config(),
@@ -179,24 +205,19 @@ def test_pipeline_rejects_action_provenance_mismatch() -> None:
 
 def test_cli_writes_simulator_contract_without_importing_the_executor(tmp_path: Path) -> None:
     inputs = {
-        "actions.json": _actions(),
-        "results.json": _results(),
+        "task_input.json": _task_input(),
         "calibration.json": _calibration(),
     }
     for name, payload in inputs.items():
         (tmp_path / name).write_text(json.dumps(payload))
-    import yaml
-
     (tmp_path / "retargeting.yaml").write_text(yaml.safe_dump(_retargeting()))
     (tmp_path / "pipeline.yaml").write_text(yaml.safe_dump(_pipeline_config()))
     output = tmp_path / "world_waypoints.json"
 
     result = main(
         (
-            "--actions",
-            str(tmp_path / "actions.json"),
-            "--results",
-            str(tmp_path / "results.json"),
+            "--task-input",
+            str(tmp_path / "task_input.json"),
             "--calibration",
             str(tmp_path / "calibration.json"),
             "--retargeting-config",
@@ -214,8 +235,7 @@ def test_cli_writes_simulator_contract_without_importing_the_executor(tmp_path: 
         json.dumps(
             waypoint_payload(
                 build_robot_pipeline(
-                    actions_source=_actions(),
-                    results_source=_results(),
+                    task_input_source=_task_input(),
                     calibration_source=_calibration(),
                     retargeting_source=_retargeting(),
                     pipeline_config_source=_pipeline_config(),
@@ -232,3 +252,71 @@ def test_cli_writes_simulator_contract_without_importing_the_executor(tmp_path: 
         "retreat",
         "goal_position",
     }
+
+
+def test_committed_panda_pipeline_config_is_complete() -> None:
+    root = Path(__file__).resolve().parents[1]
+    payload = yaml.safe_load((root / "configs" / "robot_pipeline.yaml").read_text())[
+        "robot_pipeline"
+    ]
+    path = PathProcessingSettings.model_validate(payload["path_processing"])
+    waypoints = WaypointConstructionSettings.model_validate(payload["waypoint_construction"])
+
+    assert path.interpolation.value == "cubic"
+    assert path.corner_max_deviation_m == pytest.approx(0.04)
+    assert path.output_spacing_m == pytest.approx(0.05)
+    assert path.maximum_spline_deviation_m == pytest.approx(0.10)
+    assert waypoints.grasp_z_m == pytest.approx(0.02)
+    assert waypoints.transport_z_m == pytest.approx(0.17)
+    assert waypoints.tool_quaternion_wxyz == (0.0, 1.0, 0.0, 0.0)
+
+
+@pytest.mark.parametrize("render_flag", ("--viewer", "--video-out"))
+def test_cli_launches_rendered_simulation_with_mjpython_on_macos(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, render_flag: str
+) -> None:
+    inputs = {
+        "task_input.json": _task_input(),
+        "calibration.json": _calibration(),
+    }
+    for name, payload in inputs.items():
+        (tmp_path / name).write_text(json.dumps(payload))
+    (tmp_path / "retargeting.yaml").write_text(yaml.safe_dump(_retargeting()))
+    (tmp_path / "pipeline.yaml").write_text(yaml.safe_dump(_pipeline_config()))
+    (tmp_path / "robot.yaml").write_text("robot_execution: {}\n")
+    calls = []
+
+    def fake_run(command, *, cwd, check):
+        calls.append((command, cwd, check))
+        return type("Result", (), {"returncode": 0})()
+
+    monkeypatch.setattr("mimic.integration.robot_pipeline.sys.platform", "darwin")
+    monkeypatch.setattr("mimic.integration.robot_pipeline.shutil.which", lambda name: "/mjpython")
+    monkeypatch.setattr("mimic.integration.robot_pipeline.subprocess.run", fake_run)
+
+    result = main(
+        (
+            "--task-input",
+            str(tmp_path / "task_input.json"),
+            "--calibration",
+            str(tmp_path / "calibration.json"),
+            "--retargeting-config",
+            str(tmp_path / "retargeting.yaml"),
+            "--pipeline-config",
+            str(tmp_path / "pipeline.yaml"),
+            "--waypoints",
+            str(tmp_path / "waypoints.json"),
+            "--robot-config",
+            str(tmp_path / "robot.yaml"),
+            "--log",
+            str(tmp_path / "execution.jsonl"),
+            render_flag,
+        )
+    )
+
+    assert result == 0
+    command, cwd, check = calls[0]
+    assert command[0] == "/mjpython"
+    assert command[-1] == render_flag
+    assert cwd == Path(__file__).resolve().parents[1]
+    assert check is False
