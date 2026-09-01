@@ -5,6 +5,11 @@ from .types import *
 
 __all__ = [
     "ActionPhase",
+    "ActionPrediction",
+    "PhaseBoundary",
+    "TablePathSample",
+    "ExtractedTask",
+    "RetargetedTask",
     "ObjectTrack",
     "HandTrack",
     "TaskRepresentation",

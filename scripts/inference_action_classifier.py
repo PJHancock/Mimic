@@ -23,11 +23,12 @@ from pathlib import Path
 import numpy as np
 import json
 
+from mimic.common.types import ActionPhase
 from mimic.vision.action_classifier import ActionClassifier
 
 
 # Action class names (must match training order)
-ACTION_NAMES = ["IDLE", "APPROACH", "GRASP", "MOVE", "RELEASE"]
+ACTION_NAMES = [phase.value for phase in ActionPhase]
 
 
 def run_inference(embeddings_path: str, model_path: str, fps: float = 30.0):
@@ -63,7 +64,11 @@ def run_inference(embeddings_path: str, model_path: str, fps: float = 30.0):
         print(f"ERROR: Model file not found: {model_path}")
         return None
 
-    classifier = ActionClassifier(embedding_dim=1024, num_actions=5, model_type="lstm")
+    classifier = ActionClassifier(
+        embedding_dim=1024,
+        num_actions=len(ACTION_NAMES),
+        model_type="lstm",
+    )
     classifier.load(str(model_path))
     print("   Model loaded successfully")
 

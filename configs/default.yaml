@@ -39,7 +39,6 @@ tracking:
   use_mediapipe: true
   use_opencv_tracker: true
   use_sam2: false  # SAM2 is a stretch goal, not in MVP
-  smooth_trajectories: true
 
   # Red Solo cup color detection (HSV range)
   # Red wraps around hue 0/180, so we use two ranges
@@ -49,10 +48,13 @@ tracking:
   object_color_hsv_upper_wrap: [180, 255, 255]
   min_contour_area: 500  # Minimum pixel area to consider valid cup detection
 
-  # Trajectory processing
-  num_trajectory_waypoints: 30
-  savgol_filter_window: 5  # Window size for Savitzky-Golay smoothing (must be odd)
-  savgol_filter_order: 2   # Polynomial order for smoothing
+
+# Robot-independent path geometry. Direct preserves the former endpoint-only default.
+path_processing:
+  interpolation: direct  # direct | corners_only | none | cubic
+  corner_max_deviation_m: null       # Required by corners_only and cubic
+  output_spacing_m: null              # Required by cubic
+  maximum_spline_deviation_m: null    # Required by cubic
 
 # Robot control
 robot:

@@ -1,5 +1,10 @@
 # V-JEPA 2 → Action Classifier Pipeline
 
+The classifier output order must come from the active versioned
+`SkillCatalog`. The deployment default is `IDLE`, `HOVER`, `GRASP`, `CARRY`,
+`RELEASE`; a different training feature set requires a matching catalog,
+relationship graph, and complete handler registry.
+
 ## Architecture Overview
 
 ```
@@ -44,11 +49,11 @@
     ↓                                  ↓
 ┌─────────────────────┐    ┌──────────────────────┐
 │  Audio Narration    │    │  Action Labels       │
-│  "Approaching..."   │    │  Per frame: [0-3]    │
-│  "Grasping..."      │    │  0=APPROACH          │
-│  "Moving..."        │    │  1=GRASP             │
-│  "Releasing..."     │    │  2=MOVE              │
-│                     │    │  3=RELEASE           │
+│  "Hovering..."      │    │  Per frame: [0-4]    │
+│  "Grasping..."      │    │  0=IDLE              │
+│  "Carrying..."      │    │  1=HOVER             │
+│  "Releasing..."     │    │  2=GRASP             │
+│                     │    │  3=CARRY, 4=RELEASE  │
 └─────────────────────┘    └──────────────────────┘
     │                             │
     └─────────────┬───────────────┘
@@ -69,7 +74,7 @@
         │    Linear(1024 → 256),            │
         │    ReLU(),                         │
         │    Dropout(0.2),                   │
-        │    Linear(256 → 4)                 │
+        │    Linear(256 → 5)                 │
         │  )                                 │
         │                                    │
         │  Loss: CrossEntropyLoss            │
@@ -94,7 +99,7 @@
 │ Output:         │          │ - F1-score       │
 │ [0.95, 0.03,   │          │ - Confusion      │
 │  0.01, 0.01]   │          │   matrix         │
-│ → APPROACH      │          │                  │
+│ → HOVER         │          │                  │
 └──────────────────┘          └──────────────────┘
 ```
 
@@ -231,7 +236,8 @@ embeddings = np.load("data/embeddings/IMG_2006.npy")  # (151, 1024)
 # Create action labels from audio narration
 # (You'll extract/label this from audio)
 action_labels = np.array([
-    0,0,0,1,1,1,2,2,2,2,3,3  # 0=APPROACH, 1=GRASP, 2=MOVE, 3=RELEASE
+    0,0,1,1,1,2,2,3,3,3,4,4
+    # 0=IDLE, 1=HOVER, 2=GRASP, 3=CARRY, 4=RELEASE
     # ... repeat for all 151 frames
 ])
 
@@ -249,20 +255,20 @@ from torch.utils.data import DataLoader, TensorDataset
 class ActionClassifier(nn.Module):
     """Action classification from embeddings."""
     
-    def __init__(self, embedding_dim=1024, num_actions=4):
+    def __init__(self, embedding_dim=1024, num_actions=5):
         super().__init__()
         self.model = nn.Sequential(
             nn.Linear(embedding_dim, 256),     # Compress embeddings
             nn.ReLU(),                          # Non-linearity
             nn.Dropout(0.2),                    # Regularization
-            nn.Linear(256, num_actions)         # 4 action classes
+            nn.Linear(256, num_actions)         # active catalog class count
         )
     
     def forward(self, x):
-        return self.model(x)  # (batch, 4) logits
+        return self.model(x)  # (batch, 5) logits for the default catalog
 
 # Initialize
-model = ActionClassifier(embedding_dim=1024, num_actions=4)
+model = ActionClassifier(embedding_dim=1024, num_actions=5)
 loss_fn = nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 ```
@@ -286,7 +292,7 @@ for emb_file in sorted(Path("data/embeddings").glob("*.npy")):
         metadata = json.load(f)
     
     # Get labels from audio transcription
-    # (Placeholder: you extract "APPROACH", "GRASP", etc. from narration)
+    # (Placeholder: extract active catalog labels from narration)
     labels = extract_labels_from_audio(emb_file.stem)  # Your function
     
     all_embeddings.append(emb)
@@ -364,11 +370,11 @@ embeddings, frame_indices = encoder.extract_video_embeddings("new_demo.mov")
 # Get predictions
 with torch.no_grad():
     embeddings_t = torch.from_numpy(embeddings).float().to(device)
-    logits = model(embeddings_t)  # (num_frames, 4)
-    probs = torch.softmax(logits, dim=1)  # (num_frames, 4)
+    logits = model(embeddings_t)  # (num_frames, 5) for the default catalog
+    probs = torch.softmax(logits, dim=1)  # (num_frames, 5)
     actions = torch.argmax(probs, dim=1)  # (num_frames,)
 
-# actions[i] = 0,1,2,3 for APPROACH, GRASP, MOVE, RELEASE
+# actions[i] follows the active SkillCatalog training_index order
 # probs[i] = confidence for each action
 ```
 
@@ -388,9 +394,10 @@ with torch.no_grad():
 {
   "IMG_2006.MOV": {
     "segments": [
-      {"start": 0.0, "end": 2.5, "action": "APPROACH"},
+      {"start": 0.0, "end": 0.5, "action": "IDLE"},
+      {"start": 0.5, "end": 2.5, "action": "HOVER"},
       {"start": 2.5, "end": 3.5, "action": "GRASP"},
-      {"start": 3.5, "end": 4.8, "action": "MOVE"},
+      {"start": 3.5, "end": 4.8, "action": "CARRY"},
       {"start": 4.8, "end": 5.2, "action": "RELEASE"}
     ]
   }
@@ -405,7 +412,7 @@ import librosa
 y, sr = librosa.load("video.mov")
 
 # Run ASR (e.g., OpenAI Whisper)
-# transcription = "Approaching the cup. Grasping. Moving to target. Releasing."
+# transcription = "Hovering over the cup. Grasping. Carrying. Releasing."
 
 # Parse transcription → frame-level labels
 labels = parse_narration_to_labels(transcription, fps=30, duration=5.2)
@@ -425,7 +432,13 @@ def segment_to_labels(segment, total_frames, fps=30):
     
     start_frame = seconds_to_frames(segment["start"], fps)
     end_frame = seconds_to_frames(segment["end"], fps)
-    action_id = {"APPROACH": 0, "GRASP": 1, "MOVE": 2, "RELEASE": 3}[segment["action"]]
+    action_id = {
+        "IDLE": 0,
+        "HOVER": 1,
+        "GRASP": 2,
+        "CARRY": 3,
+        "RELEASE": 4,
+    }[segment["action"]]
     
     labels[start_frame:end_frame] = action_id
     return labels

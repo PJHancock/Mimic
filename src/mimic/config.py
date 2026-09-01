@@ -31,6 +31,12 @@ class Config:
             "use_mediapipe": True,
             "use_sam2": True,
         },
+        "path_processing": {
+            "interpolation": "direct",
+            "corner_max_deviation_m": None,
+            "output_spacing_m": None,
+            "maximum_spline_deviation_m": None,
+        },
         "robot": {
             "arm_control_hz": 100,
             "gripper_control_hz": 10,

@@ -1,0 +1,31 @@
+# Versioned training/robot skill contract. Post-state thresholds remain unresolved.
+skill_system:
+  catalog:
+    schema_version: 2
+    skills:
+      - {id: IDLE, training_index: 0, handler_id: idle}
+      - {id: HOVER, training_index: 1, handler_id: hover}
+      - {id: GRASP, training_index: 2, handler_id: grasp}
+      - {id: CARRY, training_index: 3, handler_id: carry}
+      - {id: RELEASE, training_index: 4, handler_id: release}
+  graph:
+    start_skill: IDLE
+    transitions:
+      - {source: IDLE, target: IDLE}
+      - {source: IDLE, target: HOVER, variant: TO_GRASP}
+      - {source: HOVER, target: HOVER, variant: CONTINUE}
+      - {source: HOVER, target: GRASP}
+      - {source: HOVER, target: IDLE, guard: home_reached}
+      - {source: GRASP, target: GRASP}
+      - {source: GRASP, target: CARRY, guard: grasp_confirmed}
+      - {source: GRASP, target: HOVER, variant: TO_HOME_ABORT, guard: grasp_empty}
+      - {source: CARRY, target: CARRY}
+      - {source: CARRY, target: RELEASE, guard: transport_complete}
+      - {source: RELEASE, target: RELEASE}
+      - {source: RELEASE, target: HOVER, variant: TO_HOME}
+  post_state:
+    minimum_confidence: null
+    minimum_transition_margin: null
+    maximum_second_choice_gap: null
+    required_consecutive_observations: null
+    missing_detection_timeout_s: null

@@ -13,7 +13,7 @@ Human Video
 │  │ V-JEPA 2     │───→│ Temporal Action  │                 │
 │  │ (frozen)     │    │ Classifier (GRU) │                 │
 │  └──────────────┘    └──────────────────┘                 │
-│                      APPROACH/GRASP/MOVE/RELEASE          │
+│                  IDLE/HOVER/GRASP/CARRY/RELEASE          │
 └─────────────────────────────────────────────────────────────┘
     ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -35,8 +35,8 @@ Human Video
 │                  Robot Pipeline                            │
 │  ┌──────────────┐    ┌──────────────────┐                 │
 │  │ Task Symbol  │───→│ State Machine    │                 │
-│  │ Repr.        │    │ (APPROACH→GRASP→ │                 │
-│  └──────────────┘    │  MOVE→RELEASE)   │                 │
+│  │ Repr.        │    │ (catalog + graph │                 │
+│  └──────────────┘    │  + handlers)     │                 │
 │                      └──────────────────┘                 │
 │                                ↓                           │
 │                      ┌──────────────────┐                 │
@@ -94,6 +94,8 @@ Human Video
 ### `src/mimic/robot/`
 **Robot control logic**
 - `task.py` — Task representation (action sequence + geometry)
+- `path_processing.py` — Explicit direct, corner, exact-sample, or cubic XY processing
+- `waypoint_builder.py` — Add caller-supplied world Z and fixed tool orientation
 - `state_machine.py` — Deterministic state-based behavior
 - `trajectory_gen.py` — Waypoint generation and smoothing
 - `inverse_kinematics.py` — Cartesian to joint-space conversion
