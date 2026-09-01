@@ -98,7 +98,7 @@ const flowboxData: Record<string, FlowboxInfo> = {
   embeddings: { title: '🧠 EMBEDDINGS', technical: 'V-JEPA self-supervised visual feature extraction from frames', skills: ['Representation learning', 'VLA models', 'PyTorch/JAX'] },
   classifier: { title: '⏱️ CLASSIFIER', technical: 'LSTM model predicts manipulation phases from temporal embeddings', skills: ['Imitation learning', 'Policy learning', 'PyTorch'], image: '/loss_curves.png' },
   audio: { title: '🎵 AUDIO INPUT', technical: 'Capture audio events and vocal cues corresponding to actions', skills: ['Sensory data', 'Multimodal learning'] },
-  labels: { title: '📊 LABELS', technical: 'Wav2vec + CTC decoder generates labels from audio automatically', skills: ['Failure analysis', 'Pattern recognition', 'Data debugging'] },
+  labels: { title: '📊 LABELS', technical: 'Wav2vec2 + CTC decoder generates labels from audio automatically', skills: ['Failure analysis', 'Pattern recognition', 'Data debugging'] },
   probs: { title: '📤 PROBABILITIES', technical: 'Output confidence scores for each predicted skill/phase', skills: ['Model evaluation', 'Confidence scoring', 'Technical analysis'] },
   postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'], video: '/sidebyside.webm' },
   taskext: { title: '🎯 TASK EXTRACTION', technical: 'Combine skill graph and object coordinates to extract task primitives', skills: ['Task decomposition', 'Action sequencing', 'Coordinate integration'] },
