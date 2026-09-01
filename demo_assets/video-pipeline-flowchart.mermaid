@@ -1,0 +1,33 @@
+flowchart TD
+    Video[["Video"]]
+
+    Video --> OT["Object Tracking\n(OpenCV)"]
+    Video --> PE["Physical Embeddings\n(V-JEPA 2)"]
+    OT --> OC["Object Coordinates"]
+
+    subgraph ALG["Automatic Label Generation"]
+        direction TB
+        Audio["Audio"] --> W2V["wav2vec"]
+        W2V --> CTC["CTC Decoder"]
+    end
+
+    Video --> Audio
+
+    PE --> TC["Temporal Classifier\n(LSTM)"]
+    CTC --> TC
+    TC --> SP["State Probabilities"]
+
+    OC --> Out(["Final Output"])
+    SP --> Out
+
+    classDef process fill:#0f766e,stroke:#134e4a,stroke-width:2px,color:#fff
+    classDef model fill:#7c3aed,stroke:#4c1d95,stroke-width:2px,color:#fff
+    classDef output fill:#b45309,stroke:#78350f,stroke-width:2px,color:#fff
+    classDef terminal fill:#1f2937,stroke:#111827,stroke-width:2px,color:#fff
+
+    class Video terminal
+    class OT,W2V,CTC process
+    class PE,TC model
+    class Audio process
+    class OC,SP,Out output
+    style ALG fill:#1e1b4b,stroke:#4338ca,stroke-width:2px,color:#fff

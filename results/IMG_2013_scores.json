@@ -1,0 +1,3305 @@
+{
+  "schema": "mimic.skill_scores.v2",
+  "catalog": {
+    "schema_version": 2,
+    "fingerprint": "85407b9fabd71de6404a20183342162ec1363009453cee1f396616c7aa4ef8fa",
+    "labels": [
+      "IDLE",
+      "HOVER",
+      "GRASP",
+      "CARRY",
+      "RELEASE"
+    ]
+  },
+  "checkpoint_sha256": "21b3975ab23eac375a6c29fae4dfc632cd58ac1448846ed735f4d0c5c8cf2f02",
+  "frames": [
+    {
+      "frame_idx": 1,
+      "timestamp_s": 0.0,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.8617992401123047,
+        "HOVER": 8.472544141113758e-05,
+        "GRASP": 0.017527366057038307,
+        "CARRY": 0.002140277298167348,
+        "RELEASE": 0.1184484213590622
+      }
+    },
+    {
+      "frame_idx": 2,
+      "timestamp_s": 0.03335158150851582,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.8528292775154114,
+        "HOVER": 6.746170402038842e-05,
+        "GRASP": 0.06482648104429245,
+        "CARRY": 0.0029297000728547573,
+        "RELEASE": 0.07934704422950745
+      }
+    },
+    {
+      "frame_idx": 3,
+      "timestamp_s": 0.06670316301703164,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.8305168747901917,
+        "HOVER": 6.921389285707846e-05,
+        "GRASP": 0.10067129880189896,
+        "CARRY": 0.003457628423348069,
+        "RELEASE": 0.06528498232364655
+      }
+    },
+    {
+      "frame_idx": 4,
+      "timestamp_s": 0.10005474452554744,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.8074210286140442,
+        "HOVER": 9.415862587047741e-05,
+        "GRASP": 0.1567828208208084,
+        "CARRY": 0.0033039457630366087,
+        "RELEASE": 0.03239802271127701
+      }
+    },
+    {
+      "frame_idx": 5,
+      "timestamp_s": 0.13340632603406327,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.7549342513084412,
+        "HOVER": 0.0001051933504641056,
+        "GRASP": 0.21680569648742676,
+        "CARRY": 0.0035223099403083324,
+        "RELEASE": 0.02463260479271412
+      }
+    },
+    {
+      "frame_idx": 6,
+      "timestamp_s": 0.16675790754257908,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.5513445734977722,
+        "HOVER": 0.00012558820890262723,
+        "GRASP": 0.4371388852596283,
+        "CARRY": 0.0035317023284733295,
+        "RELEASE": 0.007859326899051666
+      }
+    },
+    {
+      "frame_idx": 7,
+      "timestamp_s": 0.20010948905109488,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.4835515320301056,
+        "HOVER": 0.00014161213766783476,
+        "GRASP": 0.5086590647697449,
+        "CARRY": 0.002978290431201458,
+        "RELEASE": 0.00466954754665494
+      }
+    },
+    {
+      "frame_idx": 8,
+      "timestamp_s": 0.2334610705596107,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.4052796959877014,
+        "HOVER": 0.00013577323989011347,
+        "GRASP": 0.5891383290290833,
+        "CARRY": 0.0026677295099943876,
+        "RELEASE": 0.002778506139293313
+      }
+    },
+    {
+      "frame_idx": 9,
+      "timestamp_s": 0.26681265206812654,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.3249070346355438,
+        "HOVER": 9.497324208496138e-05,
+        "GRASP": 0.6702409386634827,
+        "CARRY": 0.002995716640725732,
+        "RELEASE": 0.0017613765085116029
+      }
+    },
+    {
+      "frame_idx": 10,
+      "timestamp_s": 0.30016423357664235,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.3047451972961426,
+        "HOVER": 8.532089850632474e-05,
+        "GRASP": 0.6905031800270081,
+        "CARRY": 0.0031081323977559805,
+        "RELEASE": 0.0015581733314320445
+      }
+    },
+    {
+      "frame_idx": 11,
+      "timestamp_s": 0.33351581508515815,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.24955247342586517,
+        "HOVER": 6.891395605634898e-05,
+        "GRASP": 0.7463722825050354,
+        "CARRY": 0.0030375442001968622,
+        "RELEASE": 0.0009688114514574409
+      }
+    },
+    {
+      "frame_idx": 12,
+      "timestamp_s": 0.36686739659367396,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.18430359661579132,
+        "HOVER": 5.2851144573651254e-05,
+        "GRASP": 0.812215268611908,
+        "CARRY": 0.002959982492029667,
+        "RELEASE": 0.00046830240171402693
+      }
+    },
+    {
+      "frame_idx": 13,
+      "timestamp_s": 0.40021897810218976,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.14426235854625702,
+        "HOVER": 5.3026757086627185e-05,
+        "GRASP": 0.8525229096412659,
+        "CARRY": 0.0028857686556875706,
+        "RELEASE": 0.0002759327762760222
+      }
+    },
+    {
+      "frame_idx": 14,
+      "timestamp_s": 0.4335705596107056,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.11157526075839996,
+        "HOVER": 4.482926306081936e-05,
+        "GRASP": 0.8833196759223938,
+        "CARRY": 0.0048563191667199135,
+        "RELEASE": 0.00020385919196996838
+      }
+    },
+    {
+      "frame_idx": 15,
+      "timestamp_s": 0.4669221411192214,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.1353437453508377,
+        "HOVER": 4.8729663831181824e-05,
+        "GRASP": 0.8565171360969543,
+        "CARRY": 0.008001742884516716,
+        "RELEASE": 8.863746916176751e-05
+      }
+    },
+    {
+      "frame_idx": 16,
+      "timestamp_s": 0.5002737226277372,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.133822962641716,
+        "HOVER": 5.097516987007111e-05,
+        "GRASP": 0.8433490991592407,
+        "CARRY": 0.02275516465306282,
+        "RELEASE": 2.1698917407775298e-05
+      }
+    },
+    {
+      "frame_idx": 17,
+      "timestamp_s": 0.5336253041362531,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.2720923125743866,
+        "HOVER": 0.00011353228910593316,
+        "GRASP": 0.6051742434501648,
+        "CARRY": 0.12260542064905167,
+        "RELEASE": 1.450885429221671e-05
+      }
+    },
+    {
+      "frame_idx": 18,
+      "timestamp_s": 0.5669768856447689,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.5815161466598511,
+        "HOVER": 0.0002040859981207177,
+        "GRASP": 0.3425753116607666,
+        "CARRY": 0.0756874606013298,
+        "RELEASE": 1.69638660736382e-05
+      }
+    },
+    {
+      "frame_idx": 19,
+      "timestamp_s": 0.6003284671532847,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.8148325085639954,
+        "HOVER": 0.00018880038987845182,
+        "GRASP": 0.14795644581317902,
+        "CARRY": 0.03700802102684975,
+        "RELEASE": 1.4211139387043659e-05
+      }
+    },
+    {
+      "frame_idx": 20,
+      "timestamp_s": 0.6336800486618005,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9598637223243713,
+        "HOVER": 0.00017331542039755732,
+        "GRASP": 0.03145847097039223,
+        "CARRY": 0.008494587615132332,
+        "RELEASE": 9.939164556271862e-06
+      }
+    },
+    {
+      "frame_idx": 21,
+      "timestamp_s": 0.6670316301703163,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9826574921607971,
+        "HOVER": 0.0001406562514603138,
+        "GRASP": 0.013255360536277294,
+        "CARRY": 0.003938223700970411,
+        "RELEASE": 8.355805221071932e-06
+      }
+    },
+    {
+      "frame_idx": 22,
+      "timestamp_s": 0.7003832116788321,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9934021830558777,
+        "HOVER": 6.626849790336564e-05,
+        "GRASP": 0.005015043541789055,
+        "CARRY": 0.0015127182705327868,
+        "RELEASE": 3.754591716642608e-06
+      }
+    },
+    {
+      "frame_idx": 23,
+      "timestamp_s": 0.7337347931873479,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.996708869934082,
+        "HOVER": 2.372521339566447e-05,
+        "GRASP": 0.0023688971996307373,
+        "CARRY": 0.0008964358130469918,
+        "RELEASE": 2.0853242403973127e-06
+      }
+    },
+    {
+      "frame_idx": 24,
+      "timestamp_s": 0.7670863746958637,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9980582594871521,
+        "HOVER": 1.4285652468970511e-05,
+        "GRASP": 0.0013082950608804822,
+        "CARRY": 0.000617386307567358,
+        "RELEASE": 1.832575208027265e-06
+      }
+    },
+    {
+      "frame_idx": 25,
+      "timestamp_s": 0.8004379562043795,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9984477758407593,
+        "HOVER": 1.1816981896117795e-05,
+        "GRASP": 0.0010290817590430379,
+        "CARRY": 0.0005096647655591369,
+        "RELEASE": 1.6499810726600117e-06
+      }
+    },
+    {
+      "frame_idx": 26,
+      "timestamp_s": 0.8337895377128953,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9982694387435913,
+        "HOVER": 1.2138663805671968e-05,
+        "GRASP": 0.0011037185322493315,
+        "CARRY": 0.0006126821390353143,
+        "RELEASE": 2.070009031740483e-06
+      }
+    },
+    {
+      "frame_idx": 27,
+      "timestamp_s": 0.8671411192214112,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9978722333908081,
+        "HOVER": 1.3801510249322746e-05,
+        "GRASP": 0.0013428432866930962,
+        "CARRY": 0.0007685603923164308,
+        "RELEASE": 2.5526551326038316e-06
+      }
+    },
+    {
+      "frame_idx": 28,
+      "timestamp_s": 0.900492700729927,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9950464963912964,
+        "HOVER": 1.7071228285203688e-05,
+        "GRASP": 0.0027145962230861187,
+        "CARRY": 0.002214898122474551,
+        "RELEASE": 6.993221632001223e-06
+      }
+    },
+    {
+      "frame_idx": 29,
+      "timestamp_s": 0.9338442822384428,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.7189518809318542,
+        "HOVER": 3.595257658162154e-05,
+        "GRASP": 0.061039235442876816,
+        "CARRY": 0.21938881278038025,
+        "RELEASE": 0.000584208348300308
+      }
+    },
+    {
+      "frame_idx": 30,
+      "timestamp_s": 0.9671958637469587,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.3939729332923889,
+        "HOVER": 3.201769868610427e-05,
+        "GRASP": 0.10309349000453949,
+        "CARRY": 0.5015808343887329,
+        "RELEASE": 0.0013208285672590137
+      }
+    },
+    {
+      "frame_idx": 31,
+      "timestamp_s": 1.0005474452554743,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.508754312992096,
+        "HOVER": 4.2207830119878054e-05,
+        "GRASP": 0.09718242287635803,
+        "CARRY": 0.39290761947631836,
+        "RELEASE": 0.0011133605148643255
+      }
+    },
+    {
+      "frame_idx": 32,
+      "timestamp_s": 1.0338990267639903,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.5816700458526611,
+        "HOVER": 4.835568688577041e-05,
+        "GRASP": 0.09238789230585098,
+        "CARRY": 0.3249802887439728,
+        "RELEASE": 0.0009134052088484168
+      }
+    },
+    {
+      "frame_idx": 33,
+      "timestamp_s": 1.0672506082725062,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.5655068755149841,
+        "HOVER": 5.1592025556601584e-05,
+        "GRASP": 0.09894510358572006,
+        "CARRY": 0.3345891535282135,
+        "RELEASE": 0.000907206442207098
+      }
+    },
+    {
+      "frame_idx": 34,
+      "timestamp_s": 1.1006021897810219,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.5390971899032593,
+        "HOVER": 5.3008818213129416e-05,
+        "GRASP": 0.10530149936676025,
+        "CARRY": 0.35461559891700745,
+        "RELEASE": 0.0009326598374173045
+      }
+    },
+    {
+      "frame_idx": 35,
+      "timestamp_s": 1.1339537712895378,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.48533928394317627,
+        "HOVER": 5.360112481866963e-05,
+        "GRASP": 0.11702955514192581,
+        "CARRY": 0.39659613370895386,
+        "RELEASE": 0.000981370103545487
+      }
+    },
+    {
+      "frame_idx": 36,
+      "timestamp_s": 1.1673053527980535,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.46461376547813416,
+        "HOVER": 5.5371809139614925e-05,
+        "GRASP": 0.1225251778960228,
+        "CARRY": 0.41180187463760376,
+        "RELEASE": 0.0010038140462711453
+      }
+    },
+    {
+      "frame_idx": 37,
+      "timestamp_s": 1.2006569343065694,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.4359281063079834,
+        "HOVER": 5.8508783695288e-05,
+        "GRASP": 0.13082195818424225,
+        "CARRY": 0.43216702342033386,
+        "RELEASE": 0.0010244642617180943
+      }
+    },
+    {
+      "frame_idx": 38,
+      "timestamp_s": 1.234008515815085,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.38884198665618896,
+        "HOVER": 6.366473098751158e-05,
+        "GRASP": 0.14322562515735626,
+        "CARRY": 0.4667964279651642,
+        "RELEASE": 0.0010722789447754622
+      }
+    },
+    {
+      "frame_idx": 39,
+      "timestamp_s": 1.267360097323601,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.350091814994812,
+        "HOVER": 6.800265691708773e-05,
+        "GRASP": 0.154179647564888,
+        "CARRY": 0.4945756793022156,
+        "RELEASE": 0.0010848782258108258
+      }
+    },
+    {
+      "frame_idx": 40,
+      "timestamp_s": 1.3007116788321167,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.30180588364601135,
+        "HOVER": 7.381964678643271e-05,
+        "GRASP": 0.16688111424446106,
+        "CARRY": 0.5301415324211121,
+        "RELEASE": 0.0010976839112117887
+      }
+    },
+    {
+      "frame_idx": 41,
+      "timestamp_s": 1.3340632603406326,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.2736879289150238,
+        "HOVER": 7.777324935887009e-05,
+        "GRASP": 0.17391100525856018,
+        "CARRY": 0.551228940486908,
+        "RELEASE": 0.0010943087982013822
+      }
+    },
+    {
+      "frame_idx": 42,
+      "timestamp_s": 1.3674148418491485,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.21467852592468262,
+        "HOVER": 8.706512016942725e-05,
+        "GRASP": 0.18627551198005676,
+        "CARRY": 0.5977738499641418,
+        "RELEASE": 0.0011849966831505299
+      }
+    },
+    {
+      "frame_idx": 43,
+      "timestamp_s": 1.4007664233576642,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.16747549176216125,
+        "HOVER": 9.679125651018694e-05,
+        "GRASP": 0.19476528465747833,
+        "CARRY": 0.636380136013031,
+        "RELEASE": 0.001282217213883996
+      }
+    },
+    {
+      "frame_idx": 44,
+      "timestamp_s": 1.4341180048661801,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.11248855292797089,
+        "HOVER": 0.00010270028724335134,
+        "GRASP": 0.20008732378482819,
+        "CARRY": 0.6859188675880432,
+        "RELEASE": 0.0014026077697053552
+      }
+    },
+    {
+      "frame_idx": 45,
+      "timestamp_s": 1.4674695863746958,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.06196364387869835,
+        "HOVER": 0.00010618397209327668,
+        "GRASP": 0.19516940414905548,
+        "CARRY": 0.7411069869995117,
+        "RELEASE": 0.0016537924529984593
+      }
+    },
+    {
+      "frame_idx": 46,
+      "timestamp_s": 1.5008211678832117,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04255121946334839,
+        "HOVER": 0.00010803635086631402,
+        "GRASP": 0.19021441042423248,
+        "CARRY": 0.7653754353523254,
+        "RELEASE": 0.0017508717719465494
+      }
+    },
+    {
+      "frame_idx": 47,
+      "timestamp_s": 1.5341727493917274,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.029876483604311943,
+        "HOVER": 0.0001200550323119387,
+        "GRASP": 0.18822908401489258,
+        "CARRY": 0.7797824740409851,
+        "RELEASE": 0.0019918899051845074
+      }
+    },
+    {
+      "frame_idx": 48,
+      "timestamp_s": 1.5675243309002433,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.024403156712651253,
+        "HOVER": 0.0001680742425378412,
+        "GRASP": 0.19963082671165466,
+        "CARRY": 0.7733167409896851,
+        "RELEASE": 0.002481278497725725
+      }
+    },
+    {
+      "frame_idx": 49,
+      "timestamp_s": 1.600875912408759,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01630415767431259,
+        "HOVER": 0.00015091040404513478,
+        "GRASP": 0.18660692870616913,
+        "CARRY": 0.7944332361221313,
+        "RELEASE": 0.0025048134848475456
+      }
+    },
+    {
+      "frame_idx": 50,
+      "timestamp_s": 1.634227493917275,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.012858088128268719,
+        "HOVER": 0.00011857281788252294,
+        "GRASP": 0.1714557707309723,
+        "CARRY": 0.8132380843162537,
+        "RELEASE": 0.0023294927086681128
+      }
+    },
+    {
+      "frame_idx": 51,
+      "timestamp_s": 1.6675790754257906,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.010200943797826767,
+        "HOVER": 0.00012707864516414702,
+        "GRASP": 0.16924521327018738,
+        "CARRY": 0.8177661299705505,
+        "RELEASE": 0.002660582773387432
+      }
+    },
+    {
+      "frame_idx": 52,
+      "timestamp_s": 1.7009306569343066,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.008838492445647717,
+        "HOVER": 0.00013665968435816467,
+        "GRASP": 0.16923336684703827,
+        "CARRY": 0.8188442587852478,
+        "RELEASE": 0.0029472769238054752
+      }
+    },
+    {
+      "frame_idx": 53,
+      "timestamp_s": 1.7342822384428225,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.008607296273112297,
+        "HOVER": 0.0001227803440997377,
+        "GRASP": 0.16572333872318268,
+        "CARRY": 0.8228074908256531,
+        "RELEASE": 0.002739051589742303
+      }
+    },
+    {
+      "frame_idx": 54,
+      "timestamp_s": 1.7676338199513382,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.006776648107916117,
+        "HOVER": 0.00014067893789615482,
+        "GRASP": 0.16715814173221588,
+        "CARRY": 0.8227168917655945,
+        "RELEASE": 0.003207682864740491
+      }
+    },
+    {
+      "frame_idx": 55,
+      "timestamp_s": 1.800985401459854,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.006093711592257023,
+        "HOVER": 0.00014686011127196252,
+        "GRASP": 0.1677873283624649,
+        "CARRY": 0.8226001262664795,
+        "RELEASE": 0.0033719090279191732
+      }
+    },
+    {
+      "frame_idx": 56,
+      "timestamp_s": 1.8343369829683698,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005634021013975143,
+        "HOVER": 0.00017698528245091438,
+        "GRASP": 0.17644979059696198,
+        "CARRY": 0.8138920664787292,
+        "RELEASE": 0.003847150132060051
+      }
+    },
+    {
+      "frame_idx": 57,
+      "timestamp_s": 1.8676885644768857,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005304803140461445,
+        "HOVER": 0.00018701508815865964,
+        "GRASP": 0.1795526146888733,
+        "CARRY": 0.8109149932861328,
+        "RELEASE": 0.00404054531827569
+      }
+    },
+    {
+      "frame_idx": 58,
+      "timestamp_s": 1.9010401459854014,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005490965209901333,
+        "HOVER": 0.00019049465481657535,
+        "GRASP": 0.1820329874753952,
+        "CARRY": 0.8082870244979858,
+        "RELEASE": 0.0039985585026443005
+      }
+    },
+    {
+      "frame_idx": 59,
+      "timestamp_s": 1.9343917274939173,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.00538056343793869,
+        "HOVER": 0.0001944155665114522,
+        "GRASP": 0.18405605852603912,
+        "CARRY": 0.8063494563102722,
+        "RELEASE": 0.004019433166831732
+      }
+    },
+    {
+      "frame_idx": 60,
+      "timestamp_s": 1.967743309002433,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005112524144351482,
+        "HOVER": 0.00019454862922430038,
+        "GRASP": 0.1848277896642685,
+        "CARRY": 0.8058378100395203,
+        "RELEASE": 0.004027350805699825
+      }
+    },
+    {
+      "frame_idx": 61,
+      "timestamp_s": 2.0010948905109487,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005103106610476971,
+        "HOVER": 0.00019039578910451382,
+        "GRASP": 0.18462081253528595,
+        "CARRY": 0.8061450719833374,
+        "RELEASE": 0.0039406344294548035
+      }
+    },
+    {
+      "frame_idx": 62,
+      "timestamp_s": 2.034446472019465,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005444609560072422,
+        "HOVER": 0.0001523169339634478,
+        "GRASP": 0.17566902935504913,
+        "CARRY": 0.8154563903808594,
+        "RELEASE": 0.0032776284497231245
+      }
+    },
+    {
+      "frame_idx": 63,
+      "timestamp_s": 2.0677980535279805,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0058748964220285416,
+        "HOVER": 0.00015039848221931607,
+        "GRASP": 0.1770607829093933,
+        "CARRY": 0.8138320446014404,
+        "RELEASE": 0.0030819163657724857
+      }
+    },
+    {
+      "frame_idx": 64,
+      "timestamp_s": 2.101149635036496,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0061623165383934975,
+        "HOVER": 0.00016421719919890165,
+        "GRASP": 0.1829666793346405,
+        "CARRY": 0.8075838685035706,
+        "RELEASE": 0.003122823778539896
+      }
+    },
+    {
+      "frame_idx": 65,
+      "timestamp_s": 2.1345012165450123,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.006438114680349827,
+        "HOVER": 0.00018953690596390516,
+        "GRASP": 0.19161340594291687,
+        "CARRY": 0.7984693646430969,
+        "RELEASE": 0.0032896536868065596
+      }
+    },
+    {
+      "frame_idx": 66,
+      "timestamp_s": 2.167852798053528,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.007049770560115576,
+        "HOVER": 0.00018773908959701657,
+        "GRASP": 0.19428974390029907,
+        "CARRY": 0.7953780293464661,
+        "RELEASE": 0.0030946850311011076
+      }
+    },
+    {
+      "frame_idx": 67,
+      "timestamp_s": 2.2012043795620437,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005443939007818699,
+        "HOVER": 0.00024063140153884888,
+        "GRASP": 0.20689250528812408,
+        "CARRY": 0.7836536765098572,
+        "RELEASE": 0.003769212868064642
+      }
+    },
+    {
+      "frame_idx": 68,
+      "timestamp_s": 2.2345559610705594,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005683965049684048,
+        "HOVER": 0.0002335248573217541,
+        "GRASP": 0.20590896904468536,
+        "CARRY": 0.7845330834388733,
+        "RELEASE": 0.0036404896527528763
+      }
+    },
+    {
+      "frame_idx": 69,
+      "timestamp_s": 2.2679075425790756,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.00507721584290266,
+        "HOVER": 0.0003392972575966269,
+        "GRASP": 0.23093891143798828,
+        "CARRY": 0.7589907050132751,
+        "RELEASE": 0.004653855226933956
+      }
+    },
+    {
+      "frame_idx": 70,
+      "timestamp_s": 2.3012591240875913,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.005518866702914238,
+        "HOVER": 0.0003077899164054543,
+        "GRASP": 0.22634324431419373,
+        "CARRY": 0.7636367678642273,
+        "RELEASE": 0.004193286411464214
+      }
+    },
+    {
+      "frame_idx": 71,
+      "timestamp_s": 2.334610705596107,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.006629039999097586,
+        "HOVER": 0.0002292774006491527,
+        "GRASP": 0.21034152805805206,
+        "CARRY": 0.779619038105011,
+        "RELEASE": 0.003181097097694874
+      }
+    },
+    {
+      "frame_idx": 72,
+      "timestamp_s": 2.367962287104623,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.007938637398183346,
+        "HOVER": 0.000253094854997471,
+        "GRASP": 0.22056637704372406,
+        "CARRY": 0.7681623697280884,
+        "RELEASE": 0.0030795768834650517
+      }
+    },
+    {
+      "frame_idx": 73,
+      "timestamp_s": 2.401313868613139,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.008433220908045769,
+        "HOVER": 0.0003407462208997458,
+        "GRASP": 0.23929820954799652,
+        "CARRY": 0.7483628392219543,
+        "RELEASE": 0.003564900951460004
+      }
+    },
+    {
+      "frame_idx": 74,
+      "timestamp_s": 2.4346654501216545,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.008041552267968655,
+        "HOVER": 0.0004944497486576438,
+        "GRASP": 0.26875120401382446,
+        "CARRY": 0.7183839678764343,
+        "RELEASE": 0.0043287272565066814
+      }
+    },
+    {
+      "frame_idx": 75,
+      "timestamp_s": 2.46801703163017,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.008299198932945728,
+        "HOVER": 0.0005793904419988394,
+        "GRASP": 0.2837408781051636,
+        "CARRY": 0.7028261423110962,
+        "RELEASE": 0.004554476123303175
+      }
+    },
+    {
+      "frame_idx": 76,
+      "timestamp_s": 2.5013686131386863,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.008386246860027313,
+        "HOVER": 0.0008959950064308941,
+        "GRASP": 0.3220195174217224,
+        "CARRY": 0.6630266308784485,
+        "RELEASE": 0.005671588703989983
+      }
+    },
+    {
+      "frame_idx": 77,
+      "timestamp_s": 2.534720194647202,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.009025453589856625,
+        "HOVER": 0.0011976446257904172,
+        "GRASP": 0.3529326915740967,
+        "CARRY": 0.6307116150856018,
+        "RELEASE": 0.006132630631327629
+      }
+    },
+    {
+      "frame_idx": 78,
+      "timestamp_s": 2.5680717761557177,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.009009212255477905,
+        "HOVER": 0.0015710508450865746,
+        "GRASP": 0.38349205255508423,
+        "CARRY": 0.5991833209991455,
+        "RELEASE": 0.0067443326115608215
+      }
+    },
+    {
+      "frame_idx": 79,
+      "timestamp_s": 2.6014233576642334,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.009169479832053185,
+        "HOVER": 0.0015311948955059052,
+        "GRASP": 0.38556715846061707,
+        "CARRY": 0.5973971486091614,
+        "RELEASE": 0.006335034500807524
+      }
+    },
+    {
+      "frame_idx": 80,
+      "timestamp_s": 2.6347749391727495,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.011094896122813225,
+        "HOVER": 0.0010617788648232818,
+        "GRASP": 0.3538508415222168,
+        "CARRY": 0.6291300058364868,
+        "RELEASE": 0.004862501751631498
+      }
+    },
+    {
+      "frame_idx": 81,
+      "timestamp_s": 2.668126520681265,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.013239733874797821,
+        "HOVER": 0.0008636497077532113,
+        "GRASP": 0.33686012029647827,
+        "CARRY": 0.6449632048606873,
+        "RELEASE": 0.004073317628353834
+      }
+    },
+    {
+      "frame_idx": 82,
+      "timestamp_s": 2.701478102189781,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01724403351545334,
+        "HOVER": 0.0008791913278400898,
+        "GRASP": 0.33982476592063904,
+        "CARRY": 0.6382859945297241,
+        "RELEASE": 0.0037659681402146816
+      }
+    },
+    {
+      "frame_idx": 83,
+      "timestamp_s": 2.734829683698297,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01547956932336092,
+        "HOVER": 0.0015549552626907825,
+        "GRASP": 0.39258328080177307,
+        "CARRY": 0.5852788686752319,
+        "RELEASE": 0.005103235132992268
+      }
+    },
+    {
+      "frame_idx": 84,
+      "timestamp_s": 2.7681812652068127,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01743696630001068,
+        "HOVER": 0.0013411807594820857,
+        "GRASP": 0.38111376762390137,
+        "CARRY": 0.595695972442627,
+        "RELEASE": 0.004412087146192789
+      }
+    },
+    {
+      "frame_idx": 85,
+      "timestamp_s": 2.8015328467153284,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.018186811357736588,
+        "HOVER": 0.00235793087631464,
+        "GRASP": 0.4369581639766693,
+        "CARRY": 0.5368983149528503,
+        "RELEASE": 0.005598798394203186
+      }
+    },
+    {
+      "frame_idx": 86,
+      "timestamp_s": 2.834884428223844,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01807488687336445,
+        "HOVER": 0.001506189932115376,
+        "GRASP": 0.3980250954627991,
+        "CARRY": 0.5780618190765381,
+        "RELEASE": 0.004332055803388357
+      }
+    },
+    {
+      "frame_idx": 87,
+      "timestamp_s": 2.8682360097323603,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.019124656915664673,
+        "HOVER": 0.0017353130970150232,
+        "GRASP": 0.4101721942424774,
+        "CARRY": 0.5643384456634521,
+        "RELEASE": 0.004629326984286308
+      }
+    },
+    {
+      "frame_idx": 88,
+      "timestamp_s": 2.901587591240876,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01954726129770279,
+        "HOVER": 0.0016275168163701892,
+        "GRASP": 0.40435412526130676,
+        "CARRY": 0.5700308084487915,
+        "RELEASE": 0.0044401767663657665
+      }
+    },
+    {
+      "frame_idx": 89,
+      "timestamp_s": 2.9349391727493916,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.02310837060213089,
+        "HOVER": 0.001350863603875041,
+        "GRASP": 0.38622188568115234,
+        "CARRY": 0.5854265689849854,
+        "RELEASE": 0.0038922519888728857
+      }
+    },
+    {
+      "frame_idx": 90,
+      "timestamp_s": 2.9682907542579073,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01711859181523323,
+        "HOVER": 0.0037334240041673183,
+        "GRASP": 0.4870229661464691,
+        "CARRY": 0.4852765202522278,
+        "RELEASE": 0.006848469842225313
+      }
+    },
+    {
+      "frame_idx": 91,
+      "timestamp_s": 3.0016423357664235,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.016938477754592896,
+        "HOVER": 0.0024817714001983404,
+        "GRASP": 0.4480936527252197,
+        "CARRY": 0.5269119143486023,
+        "RELEASE": 0.0055741555988788605
+      }
+    },
+    {
+      "frame_idx": 92,
+      "timestamp_s": 3.034993917274939,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.016139548271894455,
+        "HOVER": 0.0030849683098495007,
+        "GRASP": 0.4683411121368408,
+        "CARRY": 0.5060643553733826,
+        "RELEASE": 0.006370045244693756
+      }
+    },
+    {
+      "frame_idx": 93,
+      "timestamp_s": 3.068345498783455,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.015246014110744,
+        "HOVER": 0.003520416561514139,
+        "GRASP": 0.4833044409751892,
+        "CARRY": 0.49117138981819153,
+        "RELEASE": 0.006757700815796852
+      }
+    },
+    {
+      "frame_idx": 94,
+      "timestamp_s": 3.101697080291971,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.014626440592110157,
+        "HOVER": 0.004017477855086327,
+        "GRASP": 0.49677979946136475,
+        "CARRY": 0.4772522449493408,
+        "RELEASE": 0.007323973812162876
+      }
+    },
+    {
+      "frame_idx": 95,
+      "timestamp_s": 3.1350486618004867,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01491442508995533,
+        "HOVER": 0.004102152306586504,
+        "GRASP": 0.5018219947814941,
+        "CARRY": 0.4720521569252014,
+        "RELEASE": 0.00710923271253705
+      }
+    },
+    {
+      "frame_idx": 96,
+      "timestamp_s": 3.1684002433090024,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.015683220699429512,
+        "HOVER": 0.003083624178543687,
+        "GRASP": 0.4755435883998871,
+        "CARRY": 0.499753475189209,
+        "RELEASE": 0.005936034955084324
+      }
+    },
+    {
+      "frame_idx": 97,
+      "timestamp_s": 3.201751824817518,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.022622935473918915,
+        "HOVER": 0.0009573390707373619,
+        "GRASP": 0.37031620740890503,
+        "CARRY": 0.6032227873802185,
+        "RELEASE": 0.0028806854970753193
+      }
+    },
+    {
+      "frame_idx": 98,
+      "timestamp_s": 3.235103406326034,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.028617950156331062,
+        "HOVER": 0.0006550367106683552,
+        "GRASP": 0.3484481871128082,
+        "CARRY": 0.62010657787323,
+        "RELEASE": 0.002172323176637292
+      }
+    },
+    {
+      "frame_idx": 99,
+      "timestamp_s": 3.26845498783455,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.031868938356637955,
+        "HOVER": 0.0006841323338449001,
+        "GRASP": 0.3523416221141815,
+        "CARRY": 0.6129369139671326,
+        "RELEASE": 0.0021683629602193832
+      }
+    },
+    {
+      "frame_idx": 100,
+      "timestamp_s": 3.3018065693430656,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0315883569419384,
+        "HOVER": 0.0005904862191528082,
+        "GRASP": 0.3399064838886261,
+        "CARRY": 0.6258516907691956,
+        "RELEASE": 0.002063001273199916
+      }
+    },
+    {
+      "frame_idx": 101,
+      "timestamp_s": 3.3351581508515813,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.033301811665296555,
+        "HOVER": 0.0004821451148018241,
+        "GRASP": 0.32565930485725403,
+        "CARRY": 0.638702929019928,
+        "RELEASE": 0.0018538391450420022
+      }
+    },
+    {
+      "frame_idx": 102,
+      "timestamp_s": 3.3685097323600974,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.036911915987730026,
+        "HOVER": 0.00037565105594694614,
+        "GRASP": 0.31006795167922974,
+        "CARRY": 0.651046633720398,
+        "RELEASE": 0.0015979059971868992
+      }
+    },
+    {
+      "frame_idx": 103,
+      "timestamp_s": 3.401861313868613,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03882119432091713,
+        "HOVER": 0.0004446583043318242,
+        "GRASP": 0.319994181394577,
+        "CARRY": 0.6389937400817871,
+        "RELEASE": 0.0017462910618633032
+      }
+    },
+    {
+      "frame_idx": 104,
+      "timestamp_s": 3.435212895377129,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03952830284833908,
+        "HOVER": 0.0004898084443993866,
+        "GRASP": 0.3265838325023651,
+        "CARRY": 0.6315829157829285,
+        "RELEASE": 0.001815096940845251
+      }
+    },
+    {
+      "frame_idx": 105,
+      "timestamp_s": 3.468564476885645,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04103134945034981,
+        "HOVER": 0.0005089101614430547,
+        "GRASP": 0.329637348651886,
+        "CARRY": 0.6269925236701965,
+        "RELEASE": 0.0018298537470400333
+      }
+    },
+    {
+      "frame_idx": 106,
+      "timestamp_s": 3.5019160583941606,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03779926151037216,
+        "HOVER": 0.0006413139635697007,
+        "GRASP": 0.34137651324272156,
+        "CARRY": 0.6180365681648254,
+        "RELEASE": 0.0021462938748300076
+      }
+    },
+    {
+      "frame_idx": 107,
+      "timestamp_s": 3.5352676399026763,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.037899527698755264,
+        "HOVER": 0.0007776714628562331,
+        "GRASP": 0.35300320386886597,
+        "CARRY": 0.605919599533081,
+        "RELEASE": 0.002399998717010021
+      }
+    },
+    {
+      "frame_idx": 108,
+      "timestamp_s": 3.568619221411192,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03806980699300766,
+        "HOVER": 0.0009620770579203963,
+        "GRASP": 0.36529746651649475,
+        "CARRY": 0.5929152965545654,
+        "RELEASE": 0.0027553695254027843
+      }
+    },
+    {
+      "frame_idx": 109,
+      "timestamp_s": 3.601970802919708,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.043264441192150116,
+        "HOVER": 0.0008596389670856297,
+        "GRASP": 0.35949811339378357,
+        "CARRY": 0.5938986539840698,
+        "RELEASE": 0.002479163696989417
+      }
+    },
+    {
+      "frame_idx": 110,
+      "timestamp_s": 3.635322384428224,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.07643736153841019,
+        "HOVER": 0.0003715652856044471,
+        "GRASP": 0.3119000792503357,
+        "CARRY": 0.6098338961601257,
+        "RELEASE": 0.0014570466009899974
+      }
+    },
+    {
+      "frame_idx": 111,
+      "timestamp_s": 3.6686739659367396,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.1725708395242691,
+        "HOVER": 0.0002684555365704,
+        "GRASP": 0.28089824318885803,
+        "CARRY": 0.5450945496559143,
+        "RELEASE": 0.001167880604043603
+      }
+    },
+    {
+      "frame_idx": 112,
+      "timestamp_s": 3.7020255474452557,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.3085676431655884,
+        "HOVER": 0.00025438988814130425,
+        "GRASP": 0.2453647255897522,
+        "CARRY": 0.44479185342788696,
+        "RELEASE": 0.0010213609784841537
+      }
+    },
+    {
+      "frame_idx": 113,
+      "timestamp_s": 3.7353771289537714,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.3547843396663666,
+        "HOVER": 0.00031871063401922584,
+        "GRASP": 0.24118375778198242,
+        "CARRY": 0.40263259410858154,
+        "RELEASE": 0.001080552232451737
+      }
+    },
+    {
+      "frame_idx": 114,
+      "timestamp_s": 3.768728710462287,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.3356897532939911,
+        "HOVER": 0.0002897755184676498,
+        "GRASP": 0.24026046693325043,
+        "CARRY": 0.42267170548439026,
+        "RELEASE": 0.0010882335482165217
+      }
+    },
+    {
+      "frame_idx": 115,
+      "timestamp_s": 3.8020802919708028,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.31141430139541626,
+        "HOVER": 0.00029437808552756906,
+        "GRASP": 0.24448616802692413,
+        "CARRY": 0.44263726472854614,
+        "RELEASE": 0.001167873153463006
+      }
+    },
+    {
+      "frame_idx": 116,
+      "timestamp_s": 3.835431873479319,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.26500850915908813,
+        "HOVER": 0.0002892203629016876,
+        "GRASP": 0.2507760226726532,
+        "CARRY": 0.4826303720474243,
+        "RELEASE": 0.0012958446750417352
+      }
+    },
+    {
+      "frame_idx": 117,
+      "timestamp_s": 3.8687834549878346,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.23538467288017273,
+        "HOVER": 0.00025623265537433326,
+        "GRASP": 0.24846132099628448,
+        "CARRY": 0.5145795345306396,
+        "RELEASE": 0.0013182861730456352
+      }
+    },
+    {
+      "frame_idx": 118,
+      "timestamp_s": 3.9021350364963503,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.19987726211547852,
+        "HOVER": 0.0002019232779275626,
+        "GRASP": 0.23794665932655334,
+        "CARRY": 0.5606207847595215,
+        "RELEASE": 0.0013533791061490774
+      }
+    },
+    {
+      "frame_idx": 119,
+      "timestamp_s": 3.935486618004866,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.20484620332717896,
+        "HOVER": 0.00017898423539008945,
+        "GRASP": 0.2278285175561905,
+        "CARRY": 0.5657954216003418,
+        "RELEASE": 0.0013508668635040522
+      }
+    },
+    {
+      "frame_idx": 120,
+      "timestamp_s": 3.968838199513382,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.16768001019954681,
+        "HOVER": 0.00018368990276940167,
+        "GRASP": 0.2303764969110489,
+        "CARRY": 0.6002464294433594,
+        "RELEASE": 0.0015134436544030905
+      }
+    },
+    {
+      "frame_idx": 121,
+      "timestamp_s": 4.002189781021897,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.14486895501613617,
+        "HOVER": 0.00016893456631805748,
+        "GRASP": 0.22284652292728424,
+        "CARRY": 0.6304923295974731,
+        "RELEASE": 0.0016232464695349336
+      }
+    },
+    {
+      "frame_idx": 122,
+      "timestamp_s": 4.035541362530414,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.1682545393705368,
+        "HOVER": 0.00012356399383861572,
+        "GRASP": 0.20832157135009766,
+        "CARRY": 0.6218666434288025,
+        "RELEASE": 0.001433671684935689
+      }
+    },
+    {
+      "frame_idx": 123,
+      "timestamp_s": 4.06889294403893,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.1679605096578598,
+        "HOVER": 0.00010689526243368164,
+        "GRASP": 0.20155534148216248,
+        "CARRY": 0.6289451122283936,
+        "RELEASE": 0.001432147459127009
+      }
+    },
+    {
+      "frame_idx": 124,
+      "timestamp_s": 4.102244525547445,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.15843462944030762,
+        "HOVER": 0.0001004654259304516,
+        "GRASP": 0.19800594449043274,
+        "CARRY": 0.6419880390167236,
+        "RELEASE": 0.0014709195820614696
+      }
+    },
+    {
+      "frame_idx": 125,
+      "timestamp_s": 4.135596107055961,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.15681342780590057,
+        "HOVER": 9.144358045887202e-05,
+        "GRASP": 0.19339850544929504,
+        "CARRY": 0.6482139229774475,
+        "RELEASE": 0.0014826467959210277
+      }
+    },
+    {
+      "frame_idx": 126,
+      "timestamp_s": 4.168947688564477,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.14576898515224457,
+        "HOVER": 8.22768488433212e-05,
+        "GRASP": 0.1883600950241089,
+        "CARRY": 0.664291501045227,
+        "RELEASE": 0.0014971009222790599
+      }
+    },
+    {
+      "frame_idx": 127,
+      "timestamp_s": 4.202299270072992,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.13346126675605774,
+        "HOVER": 7.665602606721222e-05,
+        "GRASP": 0.18408769369125366,
+        "CARRY": 0.6808462142944336,
+        "RELEASE": 0.0015282179228961468
+      }
+    },
+    {
+      "frame_idx": 128,
+      "timestamp_s": 4.235650851581508,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.11551818996667862,
+        "HOVER": 7.19007512088865e-05,
+        "GRASP": 0.17877307534217834,
+        "CARRY": 0.7040430903434753,
+        "RELEASE": 0.0015937166754156351
+      }
+    },
+    {
+      "frame_idx": 129,
+      "timestamp_s": 4.269002433090025,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.1072770431637764,
+        "HOVER": 7.408717647194862e-05,
+        "GRASP": 0.1768781542778015,
+        "CARRY": 0.7140533924102783,
+        "RELEASE": 0.001717320759780705
+      }
+    },
+    {
+      "frame_idx": 130,
+      "timestamp_s": 4.30235401459854,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.1076500192284584,
+        "HOVER": 6.823962030466646e-05,
+        "GRASP": 0.17360378801822662,
+        "CARRY": 0.7169924378395081,
+        "RELEASE": 0.0016855373978614807
+      }
+    },
+    {
+      "frame_idx": 131,
+      "timestamp_s": 4.335705596107056,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.1065983772277832,
+        "HOVER": 6.94415284669958e-05,
+        "GRASP": 0.17308293282985687,
+        "CARRY": 0.7185132503509521,
+        "RELEASE": 0.0017359273042529821
+      }
+    },
+    {
+      "frame_idx": 132,
+      "timestamp_s": 4.369057177615572,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0969485193490982,
+        "HOVER": 7.735448889434338e-05,
+        "GRASP": 0.17377547919750214,
+        "CARRY": 0.7272890210151672,
+        "RELEASE": 0.0019096949836239219
+      }
+    },
+    {
+      "frame_idx": 133,
+      "timestamp_s": 4.4024087591240875,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.09258527308702469,
+        "HOVER": 7.364110206253827e-05,
+        "GRASP": 0.1706610471010208,
+        "CARRY": 0.7347485423088074,
+        "RELEASE": 0.0019314237870275974
+      }
+    },
+    {
+      "frame_idx": 134,
+      "timestamp_s": 4.435760340632603,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.09580297023057938,
+        "HOVER": 7.047583494568244e-05,
+        "GRASP": 0.16932697594165802,
+        "CARRY": 0.7329027056694031,
+        "RELEASE": 0.001896886620670557
+      }
+    },
+    {
+      "frame_idx": 135,
+      "timestamp_s": 4.469111922141119,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.08689682185649872,
+        "HOVER": 7.141702371882275e-05,
+        "GRASP": 0.1676211804151535,
+        "CARRY": 0.7434415817260742,
+        "RELEASE": 0.001968955621123314
+      }
+    },
+    {
+      "frame_idx": 136,
+      "timestamp_s": 4.502463503649635,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.07692399621009827,
+        "HOVER": 7.975014887051657e-05,
+        "GRASP": 0.16805611550807953,
+        "CARRY": 0.7527686357498169,
+        "RELEASE": 0.0021714537870138884
+      }
+    },
+    {
+      "frame_idx": 137,
+      "timestamp_s": 4.535815085158151,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.061728280037641525,
+        "HOVER": 7.861889025662094e-05,
+        "GRASP": 0.16423338651657104,
+        "CARRY": 0.7717198133468628,
+        "RELEASE": 0.0022398531436920166
+      }
+    },
+    {
+      "frame_idx": 138,
+      "timestamp_s": 4.569166666666667,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.049656886607408524,
+        "HOVER": 8.237822476075962e-05,
+        "GRASP": 0.16149917244911194,
+        "CARRY": 0.7863540053367615,
+        "RELEASE": 0.0024075652472674847
+      }
+    },
+    {
+      "frame_idx": 139,
+      "timestamp_s": 4.6025182481751825,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05358721688389778,
+        "HOVER": 6.179328920552507e-05,
+        "GRASP": 0.15307089686393738,
+        "CARRY": 0.7910987138748169,
+        "RELEASE": 0.0021814412903040648
+      }
+    },
+    {
+      "frame_idx": 140,
+      "timestamp_s": 4.635869829683698,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.06257934868335724,
+        "HOVER": 6.182188371894881e-05,
+        "GRASP": 0.15394549071788788,
+        "CARRY": 0.7811665534973145,
+        "RELEASE": 0.0022467158269137144
+      }
+    },
+    {
+      "frame_idx": 141,
+      "timestamp_s": 4.669221411192214,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.07676169276237488,
+        "HOVER": 5.473218334373087e-05,
+        "GRASP": 0.15301953256130219,
+        "CARRY": 0.7680374383926392,
+        "RELEASE": 0.002126522595062852
+      }
+    },
+    {
+      "frame_idx": 142,
+      "timestamp_s": 4.70257299270073,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.07640436291694641,
+        "HOVER": 5.704640716430731e-05,
+        "GRASP": 0.15404728055000305,
+        "CARRY": 0.7673264741897583,
+        "RELEASE": 0.0021648008842021227
+      }
+    },
+    {
+      "frame_idx": 143,
+      "timestamp_s": 4.735924574209246,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.07706232368946075,
+        "HOVER": 5.977078035357408e-05,
+        "GRASP": 0.1556568145751953,
+        "CARRY": 0.7650277614593506,
+        "RELEASE": 0.002193362219259143
+      }
+    },
+    {
+      "frame_idx": 144,
+      "timestamp_s": 4.769276155717762,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.07703571766614914,
+        "HOVER": 5.528199108084664e-05,
+        "GRASP": 0.15411485731601715,
+        "CARRY": 0.7667171359062195,
+        "RELEASE": 0.0020770039409399033
+      }
+    },
+    {
+      "frame_idx": 145,
+      "timestamp_s": 4.802627737226278,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.07273105531930923,
+        "HOVER": 5.181008600629866e-05,
+        "GRASP": 0.1525212675333023,
+        "CARRY": 0.772732675075531,
+        "RELEASE": 0.0019632885232567787
+      }
+    },
+    {
+      "frame_idx": 146,
+      "timestamp_s": 4.835979318734793,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.06574149429798126,
+        "HOVER": 5.4022111726226285e-05,
+        "GRASP": 0.15217702090740204,
+        "CARRY": 0.7800163626670837,
+        "RELEASE": 0.002011034404858947
+      }
+    },
+    {
+      "frame_idx": 147,
+      "timestamp_s": 4.869330900243309,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.059081628918647766,
+        "HOVER": 4.777508365805261e-05,
+        "GRASP": 0.14722834527492523,
+        "CARRY": 0.7917132377624512,
+        "RELEASE": 0.0019290476338937879
+      }
+    },
+    {
+      "frame_idx": 148,
+      "timestamp_s": 4.902682481751825,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.06095537915825844,
+        "HOVER": 4.250141137163155e-05,
+        "GRASP": 0.14503316581249237,
+        "CARRY": 0.7921635508537292,
+        "RELEASE": 0.0018054721876978874
+      }
+    },
+    {
+      "frame_idx": 149,
+      "timestamp_s": 4.93603406326034,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.06554367393255234,
+        "HOVER": 4.189968603895977e-05,
+        "GRASP": 0.1458718329668045,
+        "CARRY": 0.7867701649665833,
+        "RELEASE": 0.0017723528435453773
+      }
+    },
+    {
+      "frame_idx": 150,
+      "timestamp_s": 4.969385644768856,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.062283530831336975,
+        "HOVER": 4.3513118725968525e-05,
+        "GRASP": 0.14595218002796173,
+        "CARRY": 0.7899101376533508,
+        "RELEASE": 0.0018106525531038642
+      }
+    },
+    {
+      "frame_idx": 151,
+      "timestamp_s": 5.002737226277373,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05804815888404846,
+        "HOVER": 4.414045542944223e-05,
+        "GRASP": 0.14539870619773865,
+        "CARRY": 0.7946912050247192,
+        "RELEASE": 0.001817774260416627
+      }
+    },
+    {
+      "frame_idx": 152,
+      "timestamp_s": 5.036088807785888,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05445454642176628,
+        "HOVER": 4.3707219447242096e-05,
+        "GRASP": 0.14417217671871185,
+        "CARRY": 0.7995110750198364,
+        "RELEASE": 0.0018184182699769735
+      }
+    },
+    {
+      "frame_idx": 153,
+      "timestamp_s": 5.069440389294404,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.051682692021131516,
+        "HOVER": 4.149581945966929e-05,
+        "GRASP": 0.14198578894138336,
+        "CARRY": 0.8045042753219604,
+        "RELEASE": 0.001785758533515036
+      }
+    },
+    {
+      "frame_idx": 154,
+      "timestamp_s": 5.10279197080292,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05295160785317421,
+        "HOVER": 3.767923772102222e-05,
+        "GRASP": 0.14005134999752045,
+        "CARRY": 0.8052647709846497,
+        "RELEASE": 0.0016945789102464914
+      }
+    },
+    {
+      "frame_idx": 155,
+      "timestamp_s": 5.136143552311435,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05118520185351372,
+        "HOVER": 3.729582385858521e-05,
+        "GRASP": 0.13917206227779388,
+        "CARRY": 0.8079127073287964,
+        "RELEASE": 0.0016926664393395185
+      }
+    },
+    {
+      "frame_idx": 156,
+      "timestamp_s": 5.169495133819951,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.051808398216962814,
+        "HOVER": 3.63853141607251e-05,
+        "GRASP": 0.13881784677505493,
+        "CARRY": 0.8076717257499695,
+        "RELEASE": 0.001665615476667881
+      }
+    },
+    {
+      "frame_idx": 157,
+      "timestamp_s": 5.202846715328467,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05193379521369934,
+        "HOVER": 3.767200178117491e-05,
+        "GRASP": 0.1394939422607422,
+        "CARRY": 0.8068333864212036,
+        "RELEASE": 0.001701129600405693
+      }
+    },
+    {
+      "frame_idx": 158,
+      "timestamp_s": 5.236198296836983,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.049265410751104355,
+        "HOVER": 3.6785371776204556e-05,
+        "GRASP": 0.13820956647396088,
+        "CARRY": 0.8108097910881042,
+        "RELEASE": 0.0016784442123025656
+      }
+    },
+    {
+      "frame_idx": 159,
+      "timestamp_s": 5.269549878345499,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04813138395547867,
+        "HOVER": 3.6148350773146376e-05,
+        "GRASP": 0.13731412589550018,
+        "CARRY": 0.8128440380096436,
+        "RELEASE": 0.0016743696760386229
+      }
+    },
+    {
+      "frame_idx": 160,
+      "timestamp_s": 5.302901459854015,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.048860467970371246,
+        "HOVER": 3.559075412340462e-05,
+        "GRASP": 0.13700807094573975,
+        "CARRY": 0.8124290108680725,
+        "RELEASE": 0.001666960190050304
+      }
+    },
+    {
+      "frame_idx": 161,
+      "timestamp_s": 5.33625304136253,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05039823800325394,
+        "HOVER": 3.74769042537082e-05,
+        "GRASP": 0.13858073949813843,
+        "CARRY": 0.8092727661132812,
+        "RELEASE": 0.0017108554020524025
+      }
+    },
+    {
+      "frame_idx": 162,
+      "timestamp_s": 5.369604622871046,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04758904129266739,
+        "HOVER": 3.9212434785440564e-05,
+        "GRASP": 0.13872918486595154,
+        "CARRY": 0.8118740320205688,
+        "RELEASE": 0.0017685862258076668
+      }
+    },
+    {
+      "frame_idx": 163,
+      "timestamp_s": 5.402956204379562,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0466282032430172,
+        "HOVER": 4.324505425756797e-05,
+        "GRASP": 0.1407168209552765,
+        "CARRY": 0.8107366561889648,
+        "RELEASE": 0.0018750843591988087
+      }
+    },
+    {
+      "frame_idx": 164,
+      "timestamp_s": 5.4363077858880775,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.047796830534935,
+        "HOVER": 4.314425677875988e-05,
+        "GRASP": 0.14089523255825043,
+        "CARRY": 0.8093817234039307,
+        "RELEASE": 0.0018830428598448634
+      }
+    },
+    {
+      "frame_idx": 165,
+      "timestamp_s": 5.469659367396594,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.047835107892751694,
+        "HOVER": 4.158325828029774e-05,
+        "GRASP": 0.13984368741512299,
+        "CARRY": 0.810417652130127,
+        "RELEASE": 0.0018620158080011606
+      }
+    },
+    {
+      "frame_idx": 166,
+      "timestamp_s": 5.50301094890511,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04970433935523033,
+        "HOVER": 4.045817331643775e-05,
+        "GRASP": 0.13979780673980713,
+        "CARRY": 0.8086301684379578,
+        "RELEASE": 0.0018272025045007467
+      }
+    },
+    {
+      "frame_idx": 167,
+      "timestamp_s": 5.5363625304136255,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.051117923110723495,
+        "HOVER": 3.777191886911169e-05,
+        "GRASP": 0.13869893550872803,
+        "CARRY": 0.8083910942077637,
+        "RELEASE": 0.0017542907735332847
+      }
+    },
+    {
+      "frame_idx": 168,
+      "timestamp_s": 5.569714111922141,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05533919855952263,
+        "HOVER": 3.5916473279939964e-05,
+        "GRASP": 0.13893771171569824,
+        "CARRY": 0.8040019869804382,
+        "RELEASE": 0.0016851131804287434
+      }
+    },
+    {
+      "frame_idx": 169,
+      "timestamp_s": 5.603065693430657,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05392126739025116,
+        "HOVER": 3.624206146923825e-05,
+        "GRASP": 0.13881272077560425,
+        "CARRY": 0.8055474758148193,
+        "RELEASE": 0.0016823228215798736
+      }
+    },
+    {
+      "frame_idx": 170,
+      "timestamp_s": 5.6364172749391726,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.051824964582920074,
+        "HOVER": 3.772502168430947e-05,
+        "GRASP": 0.13885799050331116,
+        "CARRY": 0.8075491189956665,
+        "RELEASE": 0.0017302125925198197
+      }
+    },
+    {
+      "frame_idx": 171,
+      "timestamp_s": 5.669768856447688,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04867643490433693,
+        "HOVER": 3.616304093156941e-05,
+        "GRASP": 0.1366194635629654,
+        "CARRY": 0.8129603862762451,
+        "RELEASE": 0.0017076194053515792
+      }
+    },
+    {
+      "frame_idx": 172,
+      "timestamp_s": 5.703120437956204,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04327824339270592,
+        "HOVER": 3.6886169255012646e-05,
+        "GRASP": 0.13537545502185822,
+        "CARRY": 0.8195660710334778,
+        "RELEASE": 0.0017432768363505602
+      }
+    },
+    {
+      "frame_idx": 173,
+      "timestamp_s": 5.7364720194647205,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0390343964099884,
+        "HOVER": 3.823831502813846e-05,
+        "GRASP": 0.1341102570295334,
+        "CARRY": 0.8249825835227966,
+        "RELEASE": 0.0018344513373449445
+      }
+    },
+    {
+      "frame_idx": 174,
+      "timestamp_s": 5.769823600973236,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04071340709924698,
+        "HOVER": 3.783903594012372e-05,
+        "GRASP": 0.13448122143745422,
+        "CARRY": 0.8229507207870483,
+        "RELEASE": 0.0018168332753702998
+      }
+    },
+    {
+      "frame_idx": 175,
+      "timestamp_s": 5.803175182481752,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04048094153404236,
+        "HOVER": 3.7147859984543175e-05,
+        "GRASP": 0.13377122581005096,
+        "CARRY": 0.8238996863365173,
+        "RELEASE": 0.0018110345117747784
+      }
+    },
+    {
+      "frame_idx": 176,
+      "timestamp_s": 5.836526763990268,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.036353662610054016,
+        "HOVER": 3.757015656447038e-05,
+        "GRASP": 0.13222350180149078,
+        "CARRY": 0.8295249938964844,
+        "RELEASE": 0.0018602870404720306
+      }
+    },
+    {
+      "frame_idx": 177,
+      "timestamp_s": 5.869878345498783,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03661513701081276,
+        "HOVER": 3.7793997762491927e-05,
+        "GRASP": 0.13207866251468658,
+        "CARRY": 0.8293682932853699,
+        "RELEASE": 0.0019001670880243182
+      }
+    },
+    {
+      "frame_idx": 178,
+      "timestamp_s": 5.903229927007299,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04084833711385727,
+        "HOVER": 3.444863250479102e-05,
+        "GRASP": 0.1311972439289093,
+        "CARRY": 0.8261008262634277,
+        "RELEASE": 0.001819111523218453
+      }
+    },
+    {
+      "frame_idx": 179,
+      "timestamp_s": 5.936581508515815,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04543399065732956,
+        "HOVER": 3.3585507480893284e-05,
+        "GRASP": 0.13181385397911072,
+        "CARRY": 0.8209189772605896,
+        "RELEASE": 0.001799661898985505
+      }
+    },
+    {
+      "frame_idx": 180,
+      "timestamp_s": 5.969933090024331,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.046242378652095795,
+        "HOVER": 3.402908623684198e-05,
+        "GRASP": 0.13241124153137207,
+        "CARRY": 0.8195073008537292,
+        "RELEASE": 0.0018051119986921549
+      }
+    },
+    {
+      "frame_idx": 181,
+      "timestamp_s": 6.003284671532847,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.046908680349588394,
+        "HOVER": 3.274858681834303e-05,
+        "GRASP": 0.13185977935791016,
+        "CARRY": 0.819434642791748,
+        "RELEASE": 0.0017641402082517743
+      }
+    },
+    {
+      "frame_idx": 182,
+      "timestamp_s": 6.036636253041363,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04783488065004349,
+        "HOVER": 3.1867068173596635e-05,
+        "GRASP": 0.13163405656814575,
+        "CARRY": 0.8187682032585144,
+        "RELEASE": 0.0017309971153736115
+      }
+    },
+    {
+      "frame_idx": 183,
+      "timestamp_s": 6.069987834549878,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04517737776041031,
+        "HOVER": 3.1862415198702365e-05,
+        "GRASP": 0.1306818723678589,
+        "CARRY": 0.8223686218261719,
+        "RELEASE": 0.0017403002129867673
+      }
+    },
+    {
+      "frame_idx": 184,
+      "timestamp_s": 6.103339416058394,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04573442041873932,
+        "HOVER": 3.0875493393978104e-05,
+        "GRASP": 0.12997329235076904,
+        "CARRY": 0.8225350975990295,
+        "RELEASE": 0.0017262626206502318
+      }
+    },
+    {
+      "frame_idx": 185,
+      "timestamp_s": 6.13669099756691,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04840562492609024,
+        "HOVER": 3.1448791560251266e-05,
+        "GRASP": 0.13115407526493073,
+        "CARRY": 0.8186679482460022,
+        "RELEASE": 0.0017408974235877395
+      }
+    },
+    {
+      "frame_idx": 186,
+      "timestamp_s": 6.170042579075425,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04667244851589203,
+        "HOVER": 3.12243246298749e-05,
+        "GRASP": 0.1304953396320343,
+        "CARRY": 0.8210682272911072,
+        "RELEASE": 0.0017327775713056326
+      }
+    },
+    {
+      "frame_idx": 187,
+      "timestamp_s": 6.203394160583942,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.046114642173051834,
+        "HOVER": 3.110566103714518e-05,
+        "GRASP": 0.1302790641784668,
+        "CARRY": 0.8218480348587036,
+        "RELEASE": 0.0017272124532610178
+      }
+    },
+    {
+      "frame_idx": 188,
+      "timestamp_s": 6.236745742092458,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04504288360476494,
+        "HOVER": 3.0921899451641366e-05,
+        "GRASP": 0.12977533042430878,
+        "CARRY": 0.8234250545501709,
+        "RELEASE": 0.0017258338630199432
+      }
+    },
+    {
+      "frame_idx": 189,
+      "timestamp_s": 6.270097323600973,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04635092243552208,
+        "HOVER": 3.124624345218763e-05,
+        "GRASP": 0.1304285079240799,
+        "CARRY": 0.8214557766914368,
+        "RELEASE": 0.001733587123453617
+      }
+    },
+    {
+      "frame_idx": 190,
+      "timestamp_s": 6.303448905109489,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.044764865189790726,
+        "HOVER": 3.14661992888432e-05,
+        "GRASP": 0.1300991177558899,
+        "CARRY": 0.8233628869056702,
+        "RELEASE": 0.001741641666740179
+      }
+    },
+    {
+      "frame_idx": 191,
+      "timestamp_s": 6.336800486618005,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04395570605993271,
+        "HOVER": 3.134904909529723e-05,
+        "GRASP": 0.12963959574699402,
+        "CARRY": 0.8246216177940369,
+        "RELEASE": 0.0017517008818686008
+      }
+    },
+    {
+      "frame_idx": 192,
+      "timestamp_s": 6.3701520681265205,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0457250140607357,
+        "HOVER": 2.9804223231622018e-05,
+        "GRASP": 0.12928029894828796,
+        "CARRY": 0.8232665061950684,
+        "RELEASE": 0.0016983288805931807
+      }
+    },
+    {
+      "frame_idx": 193,
+      "timestamp_s": 6.403503649635036,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04670058563351631,
+        "HOVER": 2.8694696084130555e-05,
+        "GRASP": 0.12892939150333405,
+        "CARRY": 0.822685182094574,
+        "RELEASE": 0.0016560939839109778
+      }
+    },
+    {
+      "frame_idx": 194,
+      "timestamp_s": 6.436855231143553,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04962174966931343,
+        "HOVER": 2.8139682399341837e-05,
+        "GRASP": 0.12954643368721008,
+        "CARRY": 0.8191783428192139,
+        "RELEASE": 0.0016253858339041471
+      }
+    },
+    {
+      "frame_idx": 195,
+      "timestamp_s": 6.470206812652068,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05045279860496521,
+        "HOVER": 2.862682958948426e-05,
+        "GRASP": 0.1301882416009903,
+        "CARRY": 0.8176971673965454,
+        "RELEASE": 0.0016331165097653866
+      }
+    },
+    {
+      "frame_idx": 196,
+      "timestamp_s": 6.503558394160584,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.047808680683374405,
+        "HOVER": 2.835853047145065e-05,
+        "GRASP": 0.1290237158536911,
+        "CARRY": 0.8215022087097168,
+        "RELEASE": 0.001637016423046589
+      }
+    },
+    {
+      "frame_idx": 197,
+      "timestamp_s": 6.5369099756691,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04828137159347534,
+        "HOVER": 2.970586865558289e-05,
+        "GRASP": 0.13002605736255646,
+        "CARRY": 0.8199809789657593,
+        "RELEASE": 0.001681902795098722
+      }
+    },
+    {
+      "frame_idx": 198,
+      "timestamp_s": 6.5702615571776155,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04650946334004402,
+        "HOVER": 2.941517232102342e-05,
+        "GRASP": 0.12936975061893463,
+        "CARRY": 0.8224270343780518,
+        "RELEASE": 0.0016642650589346886
+      }
+    },
+    {
+      "frame_idx": 199,
+      "timestamp_s": 6.603613138686131,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04474502056837082,
+        "HOVER": 2.8502920031314716e-05,
+        "GRASP": 0.1280362755060196,
+        "CARRY": 0.8255479335784912,
+        "RELEASE": 0.0016422074986621737
+      }
+    },
+    {
+      "frame_idx": 200,
+      "timestamp_s": 6.636964720194647,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.043760985136032104,
+        "HOVER": 2.6581095880828798e-05,
+        "GRASP": 0.12621596455574036,
+        "CARRY": 0.8284153938293457,
+        "RELEASE": 0.0015810583718121052
+      }
+    },
+    {
+      "frame_idx": 201,
+      "timestamp_s": 6.670316301703163,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04265275597572327,
+        "HOVER": 2.6621919460012577e-05,
+        "GRASP": 0.1256781965494156,
+        "CARRY": 0.8300509452819824,
+        "RELEASE": 0.0015914930263534188
+      }
+    },
+    {
+      "frame_idx": 202,
+      "timestamp_s": 6.703667883211679,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04150468111038208,
+        "HOVER": 2.6668496502679773e-05,
+        "GRASP": 0.12511402368545532,
+        "CARRY": 0.8317514061927795,
+        "RELEASE": 0.001603257143869996
+      }
+    },
+    {
+      "frame_idx": 203,
+      "timestamp_s": 6.737019464720195,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03944743797183037,
+        "HOVER": 2.596330887172371e-05,
+        "GRASP": 0.12347500771284103,
+        "CARRY": 0.8354470133781433,
+        "RELEASE": 0.0016045905649662018
+      }
+    },
+    {
+      "frame_idx": 204,
+      "timestamp_s": 6.7703710462287106,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.041148968040943146,
+        "HOVER": 2.5946332243620418e-05,
+        "GRASP": 0.12385890632867813,
+        "CARRY": 0.8333495259284973,
+        "RELEASE": 0.0016166474670171738
+      }
+    },
+    {
+      "frame_idx": 205,
+      "timestamp_s": 6.803722627737226,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04260271415114403,
+        "HOVER": 2.761872747214511e-05,
+        "GRASP": 0.12532132863998413,
+        "CARRY": 0.8303571939468384,
+        "RELEASE": 0.0016911376733332872
+      }
+    },
+    {
+      "frame_idx": 206,
+      "timestamp_s": 6.837074209245742,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04155721142888069,
+        "HOVER": 2.852825855370611e-05,
+        "GRASP": 0.12532402575016022,
+        "CARRY": 0.831342875957489,
+        "RELEASE": 0.0017473744228482246
+      }
+    },
+    {
+      "frame_idx": 207,
+      "timestamp_s": 6.870425790754258,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.045504894107580185,
+        "HOVER": 2.865977876354009e-05,
+        "GRASP": 0.12672671675682068,
+        "CARRY": 0.82598876953125,
+        "RELEASE": 0.0017509651370346546
+      }
+    },
+    {
+      "frame_idx": 208,
+      "timestamp_s": 6.903777372262773,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04726855084300041,
+        "HOVER": 2.9863045710953884e-05,
+        "GRASP": 0.1280921995639801,
+        "CARRY": 0.8228170871734619,
+        "RELEASE": 0.001792315160855651
+      }
+    },
+    {
+      "frame_idx": 209,
+      "timestamp_s": 6.93712895377129,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04788743704557419,
+        "HOVER": 2.9809591069351882e-05,
+        "GRASP": 0.12830370664596558,
+        "CARRY": 0.8219915628433228,
+        "RELEASE": 0.0017875311896204948
+      }
+    },
+    {
+      "frame_idx": 210,
+      "timestamp_s": 6.970480535279806,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.049746375530958176,
+        "HOVER": 2.932926145149395e-05,
+        "GRASP": 0.12842220067977905,
+        "CARRY": 0.8200265765190125,
+        "RELEASE": 0.0017755359876900911
+      }
+    },
+    {
+      "frame_idx": 211,
+      "timestamp_s": 7.003832116788321,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.051931872963905334,
+        "HOVER": 2.9831035135430284e-05,
+        "GRASP": 0.12955014407634735,
+        "CARRY": 0.816713273525238,
+        "RELEASE": 0.0017749149119481444
+      }
+    },
+    {
+      "frame_idx": 212,
+      "timestamp_s": 7.037183698296837,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.05059271305799484,
+        "HOVER": 3.015496076841373e-05,
+        "GRASP": 0.1294621229171753,
+        "CARRY": 0.8181318640708923,
+        "RELEASE": 0.0017831458244472742
+      }
+    },
+    {
+      "frame_idx": 213,
+      "timestamp_s": 7.070535279805353,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.049967359751462936,
+        "HOVER": 2.8933714929735288e-05,
+        "GRASP": 0.12859517335891724,
+        "CARRY": 0.8196772336959839,
+        "RELEASE": 0.0017312869895249605
+      }
+    },
+    {
+      "frame_idx": 214,
+      "timestamp_s": 7.103886861313868,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04614381119608879,
+        "HOVER": 2.897036392823793e-05,
+        "GRASP": 0.12740856409072876,
+        "CARRY": 0.8246784806251526,
+        "RELEASE": 0.0017401218647137284
+      }
+    },
+    {
+      "frame_idx": 215,
+      "timestamp_s": 7.137238442822384,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.0439913347363472,
+        "HOVER": 2.794103966152761e-05,
+        "GRASP": 0.1259908229112625,
+        "CARRY": 0.8282803297042847,
+        "RELEASE": 0.0017095684306696057
+      }
+    },
+    {
+      "frame_idx": 216,
+      "timestamp_s": 7.170590024330901,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04298458993434906,
+        "HOVER": 2.7380241590435617e-05,
+        "GRASP": 0.12513615190982819,
+        "CARRY": 0.8301499485969543,
+        "RELEASE": 0.0017019369406625628
+      }
+    },
+    {
+      "frame_idx": 217,
+      "timestamp_s": 7.203941605839416,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04432179778814316,
+        "HOVER": 2.8219004889251664e-05,
+        "GRASP": 0.1263357698917389,
+        "CARRY": 0.8275918364524841,
+        "RELEASE": 0.0017223532777279615
+      }
+    },
+    {
+      "frame_idx": 218,
+      "timestamp_s": 7.237293187347932,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04426116123795509,
+        "HOVER": 2.7396683435654268e-05,
+        "GRASP": 0.1258924901485443,
+        "CARRY": 0.828133225440979,
+        "RELEASE": 0.001685664989054203
+      }
+    },
+    {
+      "frame_idx": 219,
+      "timestamp_s": 7.270644768856448,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04228804633021355,
+        "HOVER": 2.720405609579757e-05,
+        "GRASP": 0.12501509487628937,
+        "CARRY": 0.8309783935546875,
+        "RELEASE": 0.0016912290593609214
+      }
+    },
+    {
+      "frame_idx": 220,
+      "timestamp_s": 7.303996350364963,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.042562637478113174,
+        "HOVER": 2.7067477276432328e-05,
+        "GRASP": 0.12492157518863678,
+        "CARRY": 0.8307892680168152,
+        "RELEASE": 0.0016994444886222482
+      }
+    },
+    {
+      "frame_idx": 221,
+      "timestamp_s": 7.337347931873479,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04651975259184837,
+        "HOVER": 2.735038651735522e-05,
+        "GRASP": 0.12653201818466187,
+        "CARRY": 0.8252197504043579,
+        "RELEASE": 0.0017011240124702454
+      }
+    },
+    {
+      "frame_idx": 222,
+      "timestamp_s": 7.370699513381995,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.049462296068668365,
+        "HOVER": 2.8239141101948917e-05,
+        "GRASP": 0.12840883433818817,
+        "CARRY": 0.8203945159912109,
+        "RELEASE": 0.0017060625832527876
+      }
+    },
+    {
+      "frame_idx": 223,
+      "timestamp_s": 7.404051094890511,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04543682560324669,
+        "HOVER": 2.8177340936963446e-05,
+        "GRASP": 0.1272905319929123,
+        "CARRY": 0.8255397081375122,
+        "RELEASE": 0.0017047269502654672
+      }
+    },
+    {
+      "frame_idx": 224,
+      "timestamp_s": 7.437402676399027,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.047350961714982986,
+        "HOVER": 2.7062607841799036e-05,
+        "GRASP": 0.1271412968635559,
+        "CARRY": 0.8238158822059631,
+        "RELEASE": 0.0016647949814796448
+      }
+    },
+    {
+      "frame_idx": 225,
+      "timestamp_s": 7.470754257907543,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04981730133295059,
+        "HOVER": 2.6605013772496022e-05,
+        "GRASP": 0.12785813212394714,
+        "CARRY": 0.8206723928451538,
+        "RELEASE": 0.001625526463612914
+      }
+    },
+    {
+      "frame_idx": 226,
+      "timestamp_s": 7.5041058394160585,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04887052997946739,
+        "HOVER": 2.650760143296793e-05,
+        "GRASP": 0.12777580320835114,
+        "CARRY": 0.8217191696166992,
+        "RELEASE": 0.0016079151537269354
+      }
+    },
+    {
+      "frame_idx": 227,
+      "timestamp_s": 7.537457420924574,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04907333850860596,
+        "HOVER": 2.6550520487944596e-05,
+        "GRASP": 0.12820543348789215,
+        "CARRY": 0.8211092948913574,
+        "RELEASE": 0.0015853730728849769
+      }
+    },
+    {
+      "frame_idx": 228,
+      "timestamp_s": 7.57080900243309,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.045085467398166656,
+        "HOVER": 2.643723928485997e-05,
+        "GRASP": 0.12695801258087158,
+        "CARRY": 0.826350212097168,
+        "RELEASE": 0.0015799832763150334
+      }
+    },
+    {
+      "frame_idx": 229,
+      "timestamp_s": 7.6041605839416055,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04259801656007767,
+        "HOVER": 2.6849107598536648e-05,
+        "GRASP": 0.1263429820537567,
+        "CARRY": 0.8294301629066467,
+        "RELEASE": 0.0016019183676689863
+      }
+    },
+    {
+      "frame_idx": 230,
+      "timestamp_s": 7.637512165450121,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.044144000858068466,
+        "HOVER": 2.6672323656384833e-05,
+        "GRASP": 0.12695613503456116,
+        "CARRY": 0.8272956013679504,
+        "RELEASE": 0.001577630522660911
+      }
+    },
+    {
+      "frame_idx": 231,
+      "timestamp_s": 7.670863746958638,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04250742495059967,
+        "HOVER": 2.7670048439176753e-05,
+        "GRASP": 0.12717726826667786,
+        "CARRY": 0.8286821246147156,
+        "RELEASE": 0.001605552970431745
+      }
+    },
+    {
+      "frame_idx": 232,
+      "timestamp_s": 7.7042153284671535,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.04176774621009827,
+        "HOVER": 2.8066819140804e-05,
+        "GRASP": 0.12729743123054504,
+        "CARRY": 0.8292973637580872,
+        "RELEASE": 0.0016093550948426127
+      }
+    },
+    {
+      "frame_idx": 233,
+      "timestamp_s": 7.737566909975669,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03899644687771797,
+        "HOVER": 3.073208426940255e-05,
+        "GRASP": 0.12860926985740662,
+        "CARRY": 0.8306848406791687,
+        "RELEASE": 0.0016787063796073198
+      }
+    },
+    {
+      "frame_idx": 234,
+      "timestamp_s": 7.770918491484185,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.034817058593034744,
+        "HOVER": 3.055772322113626e-05,
+        "GRASP": 0.12715865671634674,
+        "CARRY": 0.8363189697265625,
+        "RELEASE": 0.0016746744513511658
+      }
+    },
+    {
+      "frame_idx": 235,
+      "timestamp_s": 7.804270072992701,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03454424813389778,
+        "HOVER": 2.8381573429214768e-05,
+        "GRASP": 0.12562577426433563,
+        "CARRY": 0.8382017016410828,
+        "RELEASE": 0.0015998792368918657
+      }
+    },
+    {
+      "frame_idx": 236,
+      "timestamp_s": 7.837621654501216,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03329789638519287,
+        "HOVER": 2.5986530090449378e-05,
+        "GRASP": 0.1232963353395462,
+        "CARRY": 0.8418561220169067,
+        "RELEASE": 0.0015236405888572335
+      }
+    },
+    {
+      "frame_idx": 237,
+      "timestamp_s": 7.870973236009732,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.034625135362148285,
+        "HOVER": 2.6251904273522086e-05,
+        "GRASP": 0.12399399280548096,
+        "CARRY": 0.8398255705833435,
+        "RELEASE": 0.0015291048912331462
+      }
+    },
+    {
+      "frame_idx": 238,
+      "timestamp_s": 7.904324817518249,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03545312210917473,
+        "HOVER": 2.6553088900982402e-05,
+        "GRASP": 0.12454061210155487,
+        "CARRY": 0.8384456038475037,
+        "RELEASE": 0.0015341026009991765
+      }
+    },
+    {
+      "frame_idx": 239,
+      "timestamp_s": 7.937676399026764,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03652644157409668,
+        "HOVER": 2.712432797125075e-05,
+        "GRASP": 0.12555503845214844,
+        "CARRY": 0.8363571763038635,
+        "RELEASE": 0.0015342582482844591
+      }
+    },
+    {
+      "frame_idx": 240,
+      "timestamp_s": 7.97102798053528,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.03275879845023155,
+        "HOVER": 2.864858106477186e-05,
+        "GRASP": 0.1254568099975586,
+        "CARRY": 0.8401790261268616,
+        "RELEASE": 0.0015766506548970938
+      }
+    },
+    {
+      "frame_idx": 241,
+      "timestamp_s": 8.004379562043795,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.034432604908943176,
+        "HOVER": 2.7770282031269744e-05,
+        "GRASP": 0.1255752295255661,
+        "CARRY": 0.838431715965271,
+        "RELEASE": 0.0015327362343668938
+      }
+    },
+    {
+      "frame_idx": 242,
+      "timestamp_s": 8.037731143552312,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.02993626892566681,
+        "HOVER": 2.6879326469497755e-05,
+        "GRASP": 0.12310964614152908,
+        "CARRY": 0.8454227447509766,
+        "RELEASE": 0.0015044980682432652
+      }
+    },
+    {
+      "frame_idx": 243,
+      "timestamp_s": 8.071082725060828,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.027940552681684494,
+        "HOVER": 2.55412651313236e-05,
+        "GRASP": 0.12105269730091095,
+        "CARRY": 0.8495159149169922,
+        "RELEASE": 0.0014652750687673688
+      }
+    },
+    {
+      "frame_idx": 244,
+      "timestamp_s": 8.104434306569344,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.024304909631609917,
+        "HOVER": 2.427539584459737e-05,
+        "GRASP": 0.1177830621600151,
+        "CARRY": 0.8564406037330627,
+        "RELEASE": 0.0014470750465989113
+      }
+    },
+    {
+      "frame_idx": 245,
+      "timestamp_s": 8.13778588807786,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.019931817427277565,
+        "HOVER": 2.4345477868337184e-05,
+        "GRASP": 0.11404873430728912,
+        "CARRY": 0.864481508731842,
+        "RELEASE": 0.001513583236373961
+      }
+    },
+    {
+      "frame_idx": 246,
+      "timestamp_s": 8.171137469586375,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.020847512409090996,
+        "HOVER": 2.6794043151312508e-05,
+        "GRASP": 0.11371185630559921,
+        "CARRY": 0.8637099266052246,
+        "RELEASE": 0.0017039073863998055
+      }
+    },
+    {
+      "frame_idx": 247,
+      "timestamp_s": 8.20448905109489,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.01885458268225193,
+        "HOVER": 2.9813594665029086e-05,
+        "GRASP": 0.10940685868263245,
+        "CARRY": 0.8696627020835876,
+        "RELEASE": 0.002046039793640375
+      }
+    },
+    {
+      "frame_idx": 248,
+      "timestamp_s": 8.237840632603406,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.026479704305529594,
+        "HOVER": 3.172689685015939e-05,
+        "GRASP": 0.10627269744873047,
+        "CARRY": 0.8646007180213928,
+        "RELEASE": 0.0026150818448513746
+      }
+    },
+    {
+      "frame_idx": 249,
+      "timestamp_s": 8.271192214111922,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.06924642622470856,
+        "HOVER": 4.567353971651755e-05,
+        "GRASP": 0.08797979354858398,
+        "CARRY": 0.8367636203765869,
+        "RELEASE": 0.005964518990367651
+      }
+    },
+    {
+      "frame_idx": 250,
+      "timestamp_s": 8.304543795620438,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.23087865114212036,
+        "HOVER": 6.009141361573711e-05,
+        "GRASP": 0.05041414499282837,
+        "CARRY": 0.7028743028640747,
+        "RELEASE": 0.0157728623598814
+      }
+    },
+    {
+      "frame_idx": 251,
+      "timestamp_s": 8.337895377128953,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.4294619858264923,
+        "HOVER": 6.641981599386781e-05,
+        "GRASP": 0.03323351591825485,
+        "CARRY": 0.5142305493354797,
+        "RELEASE": 0.023007525131106377
+      }
+    },
+    {
+      "frame_idx": 252,
+      "timestamp_s": 8.37124695863747,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.6696507930755615,
+        "HOVER": 7.456222374457866e-05,
+        "GRASP": 0.017635617405176163,
+        "CARRY": 0.28442272543907166,
+        "RELEASE": 0.028216300532221794
+      }
+    },
+    {
+      "frame_idx": 253,
+      "timestamp_s": 8.404598540145985,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.7827854156494141,
+        "HOVER": 6.417895929189399e-05,
+        "GRASP": 0.011726628988981247,
+        "CARRY": 0.18121838569641113,
+        "RELEASE": 0.02420533075928688
+      }
+    },
+    {
+      "frame_idx": 254,
+      "timestamp_s": 8.4379501216545,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.8872045874595642,
+        "HOVER": 4.726426050183363e-05,
+        "GRASP": 0.005786003544926643,
+        "CARRY": 0.08862489461898804,
+        "RELEASE": 0.018337342888116837
+      }
+    },
+    {
+      "frame_idx": 255,
+      "timestamp_s": 8.471301703163016,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9542629718780518,
+        "HOVER": 3.54249968950171e-05,
+        "GRASP": 0.002018205588683486,
+        "CARRY": 0.030607858672738075,
+        "RELEASE": 0.013075602240860462
+      }
+    },
+    {
+      "frame_idx": 256,
+      "timestamp_s": 8.504653284671534,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9842259287834167,
+        "HOVER": 1.5207679098239169e-05,
+        "GRASP": 0.0007356927380897105,
+        "CARRY": 0.010295307263731956,
+        "RELEASE": 0.0047278921119868755
+      }
+    },
+    {
+      "frame_idx": 257,
+      "timestamp_s": 8.53800486618005,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9943575263023376,
+        "HOVER": 8.054429599724244e-06,
+        "GRASP": 0.000283961184322834,
+        "CARRY": 0.003449514973908663,
+        "RELEASE": 0.001900886301882565
+      }
+    },
+    {
+      "frame_idx": 258,
+      "timestamp_s": 8.571356447688565,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9978971481323242,
+        "HOVER": 3.036978569070925e-06,
+        "GRASP": 8.665176574140787e-05,
+        "CARRY": 0.0011593324597924948,
+        "RELEASE": 0.0008538563852198422
+      }
+    },
+    {
+      "frame_idx": 259,
+      "timestamp_s": 8.60470802919708,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9982298016548157,
+        "HOVER": 5.139416430210986e-07,
+        "GRASP": 1.1663004443107639e-05,
+        "CARRY": 0.0005552629590965807,
+        "RELEASE": 0.00120284385047853
+      }
+    },
+    {
+      "frame_idx": 260,
+      "timestamp_s": 8.638059610705596,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9993201494216919,
+        "HOVER": 1.2319193842813547e-07,
+        "GRASP": 2.5750578060979024e-06,
+        "CARRY": 0.00016162243264261633,
+        "RELEASE": 0.0005154830869287252
+      }
+    },
+    {
+      "frame_idx": 261,
+      "timestamp_s": 8.671411192214112,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9998527765274048,
+        "HOVER": 3.029252226838253e-08,
+        "GRASP": 4.1322780930386216e-07,
+        "CARRY": 2.4927066988311708e-05,
+        "RELEASE": 0.00012197129399282858
+      }
+    },
+    {
+      "frame_idx": 262,
+      "timestamp_s": 8.704762773722628,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999529123306274,
+        "HOVER": 8.931126949107693e-09,
+        "GRASP": 1.0778077808026865e-07,
+        "CARRY": 6.71615407554782e-06,
+        "RELEASE": 4.031822027172893e-05
+      }
+    },
+    {
+      "frame_idx": 263,
+      "timestamp_s": 8.738114355231144,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999723434448242,
+        "HOVER": 4.792358065941471e-09,
+        "GRASP": 5.5415135591374565e-08,
+        "CARRY": 3.464977453404572e-06,
+        "RELEASE": 2.4215580197051167e-05
+      }
+    },
+    {
+      "frame_idx": 264,
+      "timestamp_s": 8.77146593673966,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999791383743286,
+        "HOVER": 3.3099689655813336e-09,
+        "GRASP": 3.8783117162211056e-08,
+        "CARRY": 2.4213240976678208e-06,
+        "RELEASE": 1.8432034266879782e-05
+      }
+    },
+    {
+      "frame_idx": 265,
+      "timestamp_s": 8.804817518248175,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999793767929077,
+        "HOVER": 3.085425248627871e-09,
+        "GRASP": 3.8747931085936216e-08,
+        "CARRY": 2.426419314360828e-06,
+        "RELEASE": 1.8285007172380574e-05
+      }
+    },
+    {
+      "frame_idx": 266,
+      "timestamp_s": 8.83816909975669,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999793767929077,
+        "HOVER": 2.9959033032156412e-09,
+        "GRASP": 3.9185543698749825e-08,
+        "CARRY": 2.4636522084620083e-06,
+        "RELEASE": 1.8149667084799148e-05
+      }
+    },
+    {
+      "frame_idx": 267,
+      "timestamp_s": 8.871520681265206,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999814033508301,
+        "HOVER": 2.7044935180242646e-09,
+        "GRASP": 3.5850135304826836e-08,
+        "CARRY": 2.2583178633794887e-06,
+        "RELEASE": 1.6362837413907982e-05
+      }
+    },
+    {
+      "frame_idx": 268,
+      "timestamp_s": 8.904872262773722,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999815225601196,
+        "HOVER": 2.6135176245389857e-09,
+        "GRASP": 3.5549515331467774e-08,
+        "CARRY": 2.254520268252236e-06,
+        "RELEASE": 1.615371002117172e-05
+      }
+    },
+    {
+      "frame_idx": 269,
+      "timestamp_s": 8.938223844282238,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999821186065674,
+        "HOVER": 2.49757881043422e-09,
+        "GRASP": 3.47530644262406e-08,
+        "CARRY": 2.2107549284555716e-06,
+        "RELEASE": 1.5610934497090057e-05
+      }
+    },
+    {
+      "frame_idx": 270,
+      "timestamp_s": 8.971575425790753,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999819993972778,
+        "HOVER": 2.4863138214925584e-09,
+        "GRASP": 3.462061215486756e-08,
+        "CARRY": 2.2088854620960774e-06,
+        "RELEASE": 1.5704872566857375e-05
+      }
+    },
+    {
+      "frame_idx": 271,
+      "timestamp_s": 9.00492700729927,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999809265136719,
+        "HOVER": 2.5681137216793104e-09,
+        "GRASP": 3.612619536852435e-08,
+        "CARRY": 2.3266507014341187e-06,
+        "RELEASE": 1.6729647541069426e-05
+      }
+    },
+    {
+      "frame_idx": 272,
+      "timestamp_s": 9.038278588807787,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999803304672241,
+        "HOVER": 2.657944309092386e-09,
+        "GRASP": 3.499445710986038e-08,
+        "CARRY": 2.2671479200653266e-06,
+        "RELEASE": 1.740879815770313e-05
+      }
+    },
+    {
+      "frame_idx": 273,
+      "timestamp_s": 9.071630170316302,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999725818634033,
+        "HOVER": 3.2352771572874417e-09,
+        "GRASP": 4.0760383512861154e-08,
+        "CARRY": 2.7800545012723887e-06,
+        "RELEASE": 2.466730438754894e-05
+      }
+    },
+    {
+      "frame_idx": 274,
+      "timestamp_s": 9.104981751824818,
+      "detection_valid": true,
+      "state_scores": {
+        "IDLE": 0.9999068975448608,
+        "HOVER": 5.011799419918361e-09,
+        "GRASP": 8.622501468380506e-08,
+        "CARRY": 7.221855867101112e-06,
+        "RELEASE": 8.574347157264128e-05
+      }
+    }
+  ]
+}

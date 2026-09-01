@@ -1,7 +1,7 @@
 {
   "schema": "mimic.demo_task_input.v1",
   "video": {
-    "created_at": "2026-09-01T09:40:29.576941-06:00",
+    "created_at": "2026-09-01T09:37:28.218445-06:00",
     "fps": 29.98387963460505,
     "frame_count": 279,
     "duration_s": 9.305,
