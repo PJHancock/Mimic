@@ -1,7 +1,4 @@
-"""Action classifier: Maps embeddings to action labels.
-
-Trains a simple MLP on V-JEPA embeddings + audio-labeled actions.
-"""
+"""Temporal manipulation-phase classifier over cached frame features."""
 
 import logging
 from typing import TYPE_CHECKING, Optional, Tuple

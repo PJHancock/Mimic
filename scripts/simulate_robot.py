@@ -33,7 +33,12 @@ def _parser() -> argparse.ArgumentParser:
         required=True,
         help="JSON of processed world tool poses and object goal; not raw tracking",
     )
-    parser.add_argument("--log", type=Path, required=True, help="New JSONL diagnostics file")
+    parser.add_argument(
+        "--log",
+        type=Path,
+        required=True,
+        help="JSONL diagnostics file; replaces existing contents",
+    )
     parser.add_argument(
         "--viewer",
         action="store_true",
@@ -215,7 +220,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         parser.error(str(exc))
     task = read_waypoints(json.loads(args.waypoints.read_text()))
     args.log.parent.mkdir(parents=True, exist_ok=True)
-    with args.log.open("x") as stream:
+    with args.log.open("w") as stream:
 
         def record(event):
             stream.write(json.dumps(event, allow_nan=False) + "\n")

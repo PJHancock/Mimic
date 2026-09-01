@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Train temporal action classifier using embeddings + audio labels.
+"""Train a temporal action classifier using frame features and audio labels.
 
-Combines V-JEPA embeddings with frame-level action labels to train an LSTM
+Combines cached features with frame-level action labels to train an LSTM
 classifier that predicts action sequences. Labels are extracted from audio narration.
 
 Usage:

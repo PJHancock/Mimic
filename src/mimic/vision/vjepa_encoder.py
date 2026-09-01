@@ -1,7 +1,7 @@
-"""V-JEPA 2 video feature encoder for action classification.
+"""Frame-feature encoder abstraction for action classification.
 
-Provides pretrained video embeddings for downstream action prediction.
-Handles model loading, frame preprocessing, and batch embedding extraction.
+The current integrated backend is framewise ResNet50. The optional V-JEPA 2
+path is incomplete and is not evidence of loaded pretrained V-JEPA weights.
 """
 
 from typing import List, Optional, Tuple
@@ -17,11 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class VJepaEncoder:
-    """Wrapper for V-JEPA 2 video encoder.
-
-    Loads pretrained V-JEPA 2 model and extracts frame embeddings.
-    Can use actual V-JEPA 2 or fallback to alternative video encoders.
-    """
+    """Select a configured feature backend and extract fixed-size frame vectors."""
 
     def __init__(
         self,

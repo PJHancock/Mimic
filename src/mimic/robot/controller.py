@@ -55,13 +55,24 @@ class RobotController:
             reset_ik()
         self.gripper.reset()
 
-    def prepare(self, target: ToolPose, action: GripperAction) -> ControlSample:
+    def prepare(
+        self,
+        target: ToolPose,
+        action: GripperAction,
+        *,
+        stop_on_measured_arrival: bool = False,
+    ) -> ControlSample:
         """Observe/compute only. The executor can reject this sample before actuating."""
         if self._failed:
             raise ExecutionFailure("Controller is stopped after failure; explicit reset required")
         self._pending = None
         state = self.io.read()
-        result = self.ik.solve(target, state, self.dt_s)
+        stopping_solve = getattr(self.ik, "solve_stopping_at_measured_arrival", None)
+        result = (
+            stopping_solve(target, state, self.dt_s)
+            if stop_on_measured_arrival and stopping_solve is not None
+            else self.ik.solve(target, state, self.dt_s)
+        )
         if not result.valid:
             self._failed = True
             raise ExecutionFailure(f"IK {result.status.value}: {result.detail}")

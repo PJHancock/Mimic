@@ -167,6 +167,7 @@ class SkillExecutor:
         grasped = transported = released = False
         grasp_offset = None
         contact_lost_at = None
+        release_hold_pose = None
         failure = None
         self.record(
             {
@@ -210,7 +211,11 @@ class SkillExecutor:
                     }
                 )
                 while True:
-                    target_pose = step.pose
+                    target_pose = (
+                        release_hold_pose
+                        if step.skill == "OPEN" and release_hold_pose is not None
+                        else step.pose
+                    )
                     support_observed = False
                     measured_descent_speed_m_s = 0.0
                     if step.skill == "LOWER":
@@ -287,7 +292,14 @@ class SkillExecutor:
                                     guarded_reference_z,
                                 ),
                             )
-                    sample = self.controller.prepare(target_pose, step.gripper_action)
+                    sample = self.controller.prepare(
+                        target_pose,
+                        step.gripper_action,
+                        # These stationary manipulation poses must not inherit
+                        # residual reference motion after measured arrival. LOWER
+                        # is deliberately excluded because its guarded target moves.
+                        stop_on_measured_arrival=step.skill == "DESCEND",
+                    )
                     state, grip = sample.state, sample.gripper
                     self.record(
                         {
@@ -438,6 +450,16 @@ class SkillExecutor:
                                 raise ExecutionFailure(
                                     "LOWER: supported object outside placement tolerance"
                                 )
+                            # Release at the final measured supported pose, not the
+                            # pre-contact lower target. Re-solving that exact pose
+                            # stops and re-anchors the persistent Ruckig reference
+                            # before OPEN begins without advancing physics.
+                            release_hold_pose = state.tool_pose
+                            self.controller.prepare(
+                                release_hold_pose,
+                                GripperAction.HOLD,
+                                stop_on_measured_arrival=True,
+                            )
                             complete = True
                             self.record(
                                 {

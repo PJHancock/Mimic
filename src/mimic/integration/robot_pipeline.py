@@ -285,7 +285,11 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--waypoints", type=Path, required=True, help="New world-waypoint JSON")
     parser.add_argument("--overwrite", action="store_true", help="Replace --waypoints if it exists")
     parser.add_argument("--robot-config", type=Path, help="Also run this robot simulation config")
-    parser.add_argument("--log", type=Path, help="New simulator JSONL log; requires --robot-config")
+    parser.add_argument(
+        "--log",
+        type=Path,
+        help="Simulator JSONL log, replacing existing contents; requires --robot-config",
+    )
     parser.add_argument(
         "--viewer",
         action="store_true",

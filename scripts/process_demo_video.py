@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""End-to-end demo video processing: tracks + embeddings + actions + robot simulation.
+"""End-to-end demo video processing: tracks + features + actions + robot simulation.
 
 Processes a new demo video through the complete pipeline:
   1. Extract object position tracks (from tracking module)
-  2. Extract V-JEPA embeddings from frames
+  2. Extract frame features
   3. Predict action sequences from embeddings
   4. Build one consolidated task input with independent action/tracker streams
   5. Generate robot waypoints from predictions
@@ -156,12 +156,12 @@ def extract_tracks(video_path: str, device: str = "cpu"):
 
 
 def extract_embeddings(video_path: str, device: str = "cpu"):
-    """Extract V-JEPA embeddings from video.
+    """Extract frame features from video.
 
     Returns:
         (embeddings array, fps, frame_count)
     """
-    print("\n2. Extracting V-JEPA embeddings...")
+    print("\n2. Extracting frame features...")
 
     encoder = VJepaEncoder(device=device, model_name="timesformer")
 

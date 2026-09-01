@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and explore V-JEPA embeddings for action classification.
+"""Validate and explore cached frame features for action classification.
 
 Demonstrates:
 - Loading saved embeddings

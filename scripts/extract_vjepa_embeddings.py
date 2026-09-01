@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Extract V-JEPA 2 embeddings from demonstration videos.
+"""Extract cached frame features from demonstration videos.
 
 Processes videos using ResNet50 feature encoder to generate 1024-dimensional
 embeddings for each frame. Embeddings are ready for downstream action classifier.
@@ -141,7 +141,7 @@ def save_embeddings(
 def main():
     """Main extraction pipeline."""
     parser = argparse.ArgumentParser(
-        description="Extract V-JEPA embeddings from demonstration videos"
+        description="Extract frame features from demonstration videos"
     )
     parser.add_argument(
         "--video-dir",
@@ -191,7 +191,7 @@ def main():
     videos.sort()
 
     print("\n" + "=" * 60)
-    print("V-JEPA EMBEDDING EXTRACTION")
+    print("FRAME FEATURE EXTRACTION")
     print("=" * 60)
     print(f"\nDevice: {args.device}")
     print(f"Model: {args.model}")

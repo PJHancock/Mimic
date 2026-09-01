@@ -136,6 +136,25 @@ class RuckigPositionIK:
         }
         return replace(state, joint_positions=joints)
 
+    def _stop_at_measured(self, target: ToolPose, measured_q: np.ndarray) -> None:
+        """Stop a Cartesian reference once measured pose has reached its target.
+
+        A planned joint endpoint can carry the nonlinear Cartesian path beyond a
+        pose that the measured robot has already reached. Re-anchor all persistent
+        Ruckig state at that measured configuration so the next skill starts from
+        rest instead of inheriting the remainder of the old trajectory.
+        """
+        stopped = measured_q.tolist()
+        zeros = [0.0] * len(stopped)
+        self._input.current_position = stopped
+        self._input.current_velocity = zeros
+        self._input.current_acceleration = zeros
+        self._input.target_position = stopped
+        self._input.target_velocity = zeros
+        self._input.target_acceleration = zeros
+        self._target = target
+        self._trajectory_finished = True
+
     def _plan(self, target: ToolPose, state: RobotState, measured_q: np.ndarray, dt_s: float):
         q = measured_q.copy()
         last = None
@@ -166,6 +185,32 @@ class RuckigPositionIK:
         )
 
     def solve(self, target: ToolPose, state: RobotState, dt_s: float) -> IKResult:
+        return self._solve_cartesian(
+            target,
+            state,
+            dt_s,
+            stop_on_measured_arrival=False,
+        )
+
+    def solve_stopping_at_measured_arrival(
+        self, target: ToolPose, state: RobotState, dt_s: float
+    ) -> IKResult:
+        """Solve a manipulation-boundary target and stop on measured arrival."""
+        return self._solve_cartesian(
+            target,
+            state,
+            dt_s,
+            stop_on_measured_arrival=True,
+        )
+
+    def _solve_cartesian(
+        self,
+        target: ToolPose,
+        state: RobotState,
+        dt_s: float,
+        *,
+        stop_on_measured_arrival: bool,
+    ) -> IKResult:
         started = perf_counter()
         measured = self.solver.solve(target, state, dt_s)
         if not measured.valid:
@@ -189,10 +234,16 @@ class RuckigPositionIK:
                 started,
                 "Position reference exceeds the configured tracking-error bound",
             )
-        if measured.status == IKStatus.AT_TARGET and self._trajectory_finished:
+        if measured.status == IKStatus.AT_TARGET and (
+            self._trajectory_finished or stop_on_measured_arrival
+        ):
+            command = reference
+            if stop_on_measured_arrival:
+                self._stop_at_measured(target, measured_q)
+                command = measured_q
             return replace(
                 measured,
-                joint_targets=dict(zip(self.bindings.profile.arm_joints, map(float, reference))),
+                joint_targets=dict(zip(self.bindings.profile.arm_joints, map(float, command))),
                 solve_time_s=perf_counter() - started,
             )
 
