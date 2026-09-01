@@ -10,10 +10,11 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
+from mimic.common.constants import TABLE_HEIGHT_M, TABLE_WIDTH_M
 from mimic.robot import CoordinateRetargeter, MappingConfig, retarget_task
 
 
-def test_known_origin_rotation_and_centimeter_conversion(extracted_task, mapping_config_values):
+def test_known_origin_rotation_in_meters(extracted_task, mapping_config_values):
     result = retarget_task(extracted_task, mapping_config_values)
     assert result.target_frame == "synthetic_world"
     assert result.source_task is extracted_task
@@ -46,18 +47,18 @@ def test_configured_arbitrary_rotation_round_trip(extracted_task, mapping_config
     result = CoordinateRetargeter(config).retarget(extracted_task)
     axes = np.column_stack((config.table_x_axis_target_xy, config.table_y_axis_target_xy))
     recovered = (np.asarray(result.path_xy_m) - config.table_origin_target_xy_m) @ axes
-    np.testing.assert_allclose(recovered * 100, extracted_task.path_xy_cm, rtol=0, atol=1e-12)
+    np.testing.assert_allclose(recovered, extracted_task.path_xy_m, rtol=0, atol=1e-12)
 
 
 def test_mapping_keeps_path_frames_phases_and_source_unchanged(
     extracted_task, mapping_config_values
 ):
-    original = extracted_task.path_xy_cm
+    original = extracted_task.path_xy_m
     result = retarget_task(extracted_task, mapping_config_values)
     full = result.path_xy_m
     for _ in range(3):
         assert result.path_xy_m == full
-        assert extracted_task.path_xy_cm == original
+        assert extracted_task.path_xy_m == original
     assert result.source_task.phase_boundaries == extracted_task.phase_boundaries
 
 
@@ -83,11 +84,61 @@ def test_no_default_mapping(values):
         CoordinateRetargeter(values)
 
 
-def test_deployment_template_is_intentionally_unconfigured():
+def test_deployment_template_maps_left_edge_table_clone():
     root = Path(__file__).resolve().parents[2]
     data = yaml.safe_load((root / "configs" / "retargeting.yaml").read_text())
-    with pytest.raises(ValidationError):
-        CoordinateRetargeter(data["retargeting"])
+    defaults = yaml.safe_load((root / "configs" / "default.yaml").read_text())
+    config = CoordinateRetargeter(data["retargeting"]).mapping_config
+    assert defaults["tracking"]["table_width_m"] == TABLE_WIDTH_M
+    assert defaults["tracking"]["table_height_m"] == TABLE_HEIGHT_M
+    assert config.target_frame == "mujoco_world"
+    assert config.table_origin_target_xy_m == (0.0, TABLE_HEIGHT_M / 2)
+    assert config.table_x_axis_target_xy == (1.0, 0.0)
+    assert config.table_y_axis_target_xy == (0.0, -1.0)
+    assert data["tabletop_clone"] == {
+        "width_m": TABLE_WIDTH_M,
+        "depth_m": TABLE_HEIGHT_M,
+        "thickness_m": 0.01,
+        "surface_z_m": 0.0,
+        "robot_edge": "left",
+        "robot_base_xy_m": [0.0, 0.0],
+    }
+
+
+def test_left_edge_mapping_places_robot_at_origin_and_clones_table(extracted_task):
+    root = Path(__file__).resolve().parents[2]
+    data = yaml.safe_load((root / "configs" / "retargeting.yaml").read_text())
+    table_points = (
+        (0.0, 0.0),
+        (TABLE_WIDTH_M, 0.0),
+        (0.0, TABLE_HEIGHT_M),
+        (TABLE_WIDTH_M, TABLE_HEIGHT_M),
+        (0.0, TABLE_HEIGHT_M / 2),
+        (TABLE_WIDTH_M, TABLE_HEIGHT_M / 2),
+        (0.0, TABLE_HEIGHT_M / 2),
+    )
+    samples = tuple(
+        replace(sample, table_xy_m=point)
+        for sample, point in zip(extracted_task.demonstrated_path, table_points)
+    )
+    task = replace(extracted_task, demonstrated_path=samples)
+
+    result = retarget_task(task, data["retargeting"])
+
+    np.testing.assert_allclose(
+        result.path_xy_m,
+        (
+            (0.0, TABLE_HEIGHT_M / 2),
+            (TABLE_WIDTH_M, TABLE_HEIGHT_M / 2),
+            (0.0, -TABLE_HEIGHT_M / 2),
+            (TABLE_WIDTH_M, -TABLE_HEIGHT_M / 2),
+            (0.0, 0.0),
+            (TABLE_WIDTH_M, 0.0),
+            (0.0, 0.0),
+        ),
+        rtol=0,
+        atol=1e-14,
+    )
 
 
 @pytest.mark.parametrize(
@@ -139,7 +190,7 @@ def test_config_instances_are_revalidated(mapping_config_values):
 
 def test_mapping_overflow_rejected(extracted_task, mapping_config_values):
     samples = tuple(
-        replace(s, table_xy_cm=(1e308, 1e308)) for s in extracted_task.demonstrated_path
+        replace(s, table_xy_m=(1e308, 1e308)) for s in extracted_task.demonstrated_path
     )
     task = replace(extracted_task, demonstrated_path=samples)
     mapping_config_values.update(

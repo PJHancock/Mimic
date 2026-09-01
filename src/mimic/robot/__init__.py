@@ -22,6 +22,8 @@ _EXPORT_MODULES = {
     "WaypointConstructionSettings": "waypoint_builder",
     "WaypointBuilder": "waypoint_builder",
     "build_waypoints": "waypoint_builder",
+    "TabletopCloneSettings": "tabletop_scene",
+    "add_tabletop_clone": "tabletop_scene",
     "command_target": "commands",
     "CartesianMotion": "action_primitives",
     "JointPresetMotion": "action_primitives",

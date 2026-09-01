@@ -7,8 +7,6 @@ to compute a perspective transformation. Saves calibration for later use.
 Usage:
     uv run python scripts/calibrate_camera.py \\
         --image data/raw/calibration_frame.png \\
-        --width 0.6 \\
-        --height 0.4 \\
         --output data/annotations/calibration.json
 """
 
@@ -19,6 +17,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
+from mimic.common.constants import TABLE_HEIGHT_M, TABLE_WIDTH_M
 from mimic.tracking import CoordinateMapper
 
 
@@ -147,14 +146,14 @@ def main():
     parser.add_argument(
         "--width",
         type=float,
-        required=True,
-        help="Table width in meters (e.g., 0.6)",
+        default=TABLE_WIDTH_M,
+        help=f"Table width in meters (default: {TABLE_WIDTH_M})",
     )
     parser.add_argument(
         "--height",
         type=float,
-        required=True,
-        help="Table height/depth in meters (e.g., 0.4)",
+        default=TABLE_HEIGHT_M,
+        help=f"Table height/depth in meters (default: {TABLE_HEIGHT_M})",
     )
     parser.add_argument(
         "--output",
@@ -218,7 +217,7 @@ def main():
     # Test: map corners back to verify
     print("\nVerification (mapping image corners back to world):")
     for i, corner_img in enumerate(ui.corners_image):
-        corner_world = mapper.pixel_to_workspace(corner_img)
+        corner_world = mapper.pixel_to_table_xy_m(corner_img)
         expected_world = table_corners_world[i]
         error = np.sqrt((corner_world[0] - expected_world[0]) ** 2 +
                        (corner_world[1] - expected_world[1]) ** 2)

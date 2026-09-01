@@ -64,7 +64,7 @@ def track_demonstration(
 
     Returns:
         ``object_tracks`` use one-based source frames and calibrated table
-        centimeters. ``trajectory`` contains processed table-centimeter points.
+        meters. ``trajectory`` contains processed table-meter points.
     """
     import cv2
 
@@ -90,7 +90,7 @@ def track_demonstration(
         table_height_m=calibration.table_corners_world[2][1]
         - calibration.table_corners_world[0][1],
     )
-    coordinate_mapper.homography = calibration.camera_matrix  # This should be the homography
+    coordinate_mapper.homography = calibration.homography.copy()
     coordinate_mapper.is_calibrated = True
 
     # Open video
@@ -143,11 +143,11 @@ def track_demonstration(
     # Map coordinates and process trajectory
     object_tracks_mapped = []
     for track in object_tracks_raw:
-        table_xy_cm = coordinate_mapper.pixel_to_table_xy_cm(track.center_2d)
+        table_xy_m = coordinate_mapper.pixel_to_table_xy_m(track.center_2d)
 
         mapped_track = ObjectTrack(
             frame_idx=track.frame_idx + 1,
-            table_xy_cm=table_xy_cm,
+            table_xy_m=table_xy_m,
             bbox=track.bbox,
             confidence=track.confidence,
         )
@@ -158,9 +158,9 @@ def track_demonstration(
         object_tracks_raw, num_trajectory_waypoints
     )
 
-    trajectory_table_xy_cm = [
-        coordinate_mapper.pixel_to_table_xy_cm(point)
+    trajectory_table_xy_m = [
+        coordinate_mapper.pixel_to_table_xy_m(point)
         for point in trajectory_processed
     ]
 
-    return hand_tracks, object_tracks_mapped, trajectory_table_xy_cm
+    return hand_tracks, object_tracks_mapped, trajectory_table_xy_m

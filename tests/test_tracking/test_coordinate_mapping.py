@@ -22,6 +22,7 @@ def test_mapper_init(mapper):
     assert mapper.table_width_m == 0.6
     assert mapper.table_height_m == 0.4
     assert not mapper.is_calibrated
+    assert not hasattr(mapper, "workspace_to_panda")
 
 
 def test_mapper_calibrate(mapper):
@@ -39,10 +40,11 @@ def test_mapper_calibrate(mapper):
     assert calib is not None
     assert mapper.homography is not None
     assert mapper.homography.shape == (3, 3)
+    np.testing.assert_allclose(calib.homography, mapper.homography)
 
 
-def test_mapper_pixel_to_workspace(mapper):
-    """Test pixel to normalized workspace conversion."""
+def test_mapper_pixel_to_normalized_table(mapper):
+    """Test pixel to normalized physical-table conversion."""
     # Set up simple identity homography
     corners_img = [(0, 0), (640, 0), (0, 480), (640, 480)]
     corners_world = [(0, 0), (0.6, 0), (0, 0.4), (0.6, 0.4)]
@@ -51,30 +53,30 @@ def test_mapper_pixel_to_workspace(mapper):
     mapper.calibrate(frame, corners_img, corners_world)
 
     # Test: pixel (0, 0) should map to normalized (0, 0)
-    norm_coord = mapper.pixel_to_workspace((0, 0))
+    norm_coord = mapper.pixel_to_normalized_table((0, 0))
     assert isinstance(norm_coord, tuple)
     assert len(norm_coord) == 2
     assert 0 <= norm_coord[0] <= 1
     assert 0 <= norm_coord[1] <= 1
 
 
-def test_mapper_pixel_to_table_centimeters_without_clipping(mapper):
+def test_mapper_pixel_to_table_meters_without_clipping(mapper):
     """Calibrated robot inputs retain table units and out-of-bounds evidence."""
     corners_img = [(0, 0), (640, 0), (0, 480), (640, 480)]
     corners_world = [(0, 0), (0.6, 0), (0, 0.4), (0.6, 0.4)]
     frame = np.zeros((480, 640, 3), dtype=np.uint8)
     mapper.calibrate(frame, corners_img, corners_world)
 
-    assert mapper.pixel_to_table_xy_cm((320, 240)) == pytest.approx((30.0, 20.0))
-    outside = mapper.pixel_to_table_xy_cm((800, 600))
-    assert outside[0] > 60.0
-    assert outside[1] > 40.0
+    assert mapper.pixel_to_table_xy_m((320, 240)) == pytest.approx((0.3, 0.2))
+    outside = mapper.pixel_to_table_xy_m((800, 600))
+    assert outside[0] > 0.6
+    assert outside[1] > 0.4
 
 
 def test_mapper_not_calibrated_error(mapper):
     """Test that error is raised if mapping without calibration."""
     with pytest.raises(RuntimeError):
-        mapper.pixel_to_workspace((100, 100))
+        mapper.pixel_to_normalized_table((100, 100))
 
 
 def test_mapper_save_load(mapper):
@@ -101,34 +103,8 @@ def test_mapper_save_load(mapper):
         assert mapper2.homography is not None
 
 
-def test_mapper_workspace_to_panda(mapper):
-    """Test conversion from normalized workspace to Panda coordinates."""
-    # Calibrate first
-    corners_img = [(0, 0), (640, 0), (0, 480), (640, 480)]
-    corners_world = [(0, 0), (0.6, 0), (0, 0.4), (0.6, 0.4)]
-    frame = np.zeros((480, 640, 3), dtype=np.uint8)
-    mapper.calibrate(frame, corners_img, corners_world)
-
-    # Test workspace to Panda conversion
-    panda_coord = mapper.workspace_to_panda((0.5, 0.5))
-
-    assert isinstance(panda_coord, tuple)
-    assert len(panda_coord) == 2
-    # Should be within Panda workspace bounds
-    from mimic.common.constants import (
-        PANDA_WORKSPACE_X_MAX,
-        PANDA_WORKSPACE_X_MIN,
-        PANDA_WORKSPACE_Y_MAX,
-        PANDA_WORKSPACE_Y_MIN,
-    )
-
-    x, y = panda_coord
-    assert PANDA_WORKSPACE_X_MIN <= x <= PANDA_WORKSPACE_X_MAX
-    assert PANDA_WORKSPACE_Y_MIN <= y <= PANDA_WORKSPACE_Y_MAX
-
-
 def test_mapper_batch_conversion(mapper):
-    """Test batch pixel to workspace conversion."""
+    """Test batch pixel to normalized-table conversion."""
     corners_img = [(0, 0), (640, 0), (0, 480), (640, 480)]
     corners_world = [(0, 0), (0.6, 0), (0, 0.4), (0.6, 0.4)]
     frame = np.zeros((480, 640, 3), dtype=np.uint8)
@@ -136,7 +112,7 @@ def test_mapper_batch_conversion(mapper):
 
     # Batch conversion
     pixels = [(0, 0), (320, 240), (640, 480)]
-    workspace_coords = mapper.pixels_to_workspace_batch(pixels)
+    workspace_coords = mapper.pixels_to_normalized_table_batch(pixels)
 
     assert len(workspace_coords) == len(pixels)
     for coord in workspace_coords:
@@ -178,8 +154,8 @@ def test_mapper_normalization_bounds(mapper):
     mapper.calibrate(frame, corners_img, corners_world)
 
     # Test points outside bounds
-    coord_oob_neg = mapper.pixel_to_workspace((-100, -100))
-    coord_oob_pos = mapper.pixel_to_workspace((1000, 1000))
+    coord_oob_neg = mapper.pixel_to_normalized_table((-100, -100))
+    coord_oob_pos = mapper.pixel_to_normalized_table((1000, 1000))
 
     # All should be clipped to [0, 1]
     for coord in [coord_oob_neg, coord_oob_pos]:
