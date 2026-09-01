@@ -1,17 +1,28 @@
 {
   "embeddings_dir": "data/embeddings/",
   "labels_dir": "data/labels/",
-  "num_videos": 14,
-  "num_train_videos": 11,
-  "num_val_videos": 3,
-  "num_train_frames": 3849,
-  "num_val_frames": 1367,
+  "num_videos": 43,
+  "num_train_videos": 34,
+  "num_val_videos": 9,
+  "num_train_frames": 10690,
+  "num_val_frames": 2686,
   "epochs": 1000,
   "batch_size": 2,
   "learning_rate": 0.001,
   "train_split": 0.8,
-  "best_val_accuracy": 0.6470588235294118,
-  "best_epoch": 548,
+  "best_val_accuracy": 0.8142315543890347,
+  "best_epoch": 80,
   "model_path": "models/action_classifier_lstm.pt",
-  "device": "cuda"
+  "device": "cuda",
+  "catalog": {
+    "schema_version": 2,
+    "fingerprint": "85407b9fabd71de6404a20183342162ec1363009453cee1f396616c7aa4ef8fa",
+    "labels": [
+      "IDLE",
+      "HOVER",
+      "GRASP",
+      "CARRY",
+      "RELEASE"
+    ]
+  }
 }

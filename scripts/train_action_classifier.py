@@ -409,7 +409,7 @@ def main():
                 f"  Epoch {epoch+1:3d}/{args.epochs} | "
                 f"Train loss: {train_loss:.4f} | "
                 f"Val acc: {val_acc:.3f} | "
-                f"Val loss: {val_loss:.4f}"
+                f"Val loss: {val_loss:.4f}", flush=True
             )
 
     print(f"\n  Best validation accuracy: {best_val_acc:.3f} (epoch {best_epoch})")
