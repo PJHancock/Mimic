@@ -89,23 +89,23 @@ function Trajectory({ detail }: { detail: Detail }) {
   </div>
 }
 
-type FlowboxInfo = { title: string; technical: string; desc: string; skills: string[]; image?: string; video?: string }
+type FlowboxInfo = { title: string; technical: string; desc?: string; skills: string[]; image?: string; video?: string }
 
 const flowboxData: Record<string, FlowboxInfo> = {
-  video: { title: '📹 VIDEO INPUT', technical: 'Raw video frames from human demonstrations', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['RGB-D data', 'Dataset inspection', 'Sensory inputs'], video: '/input-demo.webm' },
-  tracking: { title: '👁️ OBJECT TRACKING', technical: 'OpenCV HSV color detection to track red solo cup position', desc: '"Familiarity with ROS, ROS2, robot logs, RGB-D data, point clouds, or robot kinematics."', skills: ['Computer vision', 'Object detection', 'RGB-D data'] },
-  coords: { title: '📍 COORDINATES', technical: 'Extract and normalize 2D/3D object position for retargeting', desc: '"Build data pipelines, training scripts, evaluation metrics, and experiment reports."', skills: ['Position estimation', 'Data validation', 'Metric design'] },
-  embeddings: { title: '🧠 EMBEDDINGS', technical: 'V-JEPA self-supervised visual feature extraction from frames', desc: '"Design, implement, and deliver approaches that bridge exploration and production readiness with imitation learning, diffusion policy, VLA models, or representation learning."', skills: ['Representation learning', 'VLA models', 'PyTorch/JAX'] },
-  classifier: { title: '⏱️ CLASSIFIER', technical: 'LSTM model predicts manipulation phases from temporal embeddings', desc: '"Develop and evaluate robot learning models for a range of manipulation-related tasks." Strong hands-on experience with PyTorch, JAX, or similar ML frameworks.', skills: ['Imitation learning', 'Policy learning', 'PyTorch'], image: '/loss_curves.png' },
-  audio: { title: '🎵 AUDIO INPUT', technical: 'Capture audio events and vocal cues corresponding to actions', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['Sensory data', 'Multimodal learning'] },
-  labels: { title: '📊 LABELS', technical: 'Wav2vec + CTC decoder generates labels from audio automatically', desc: '"Analyze successful and failed robot trials to identify learnable patterns and production-relevant failure modes."', skills: ['Failure analysis', 'Pattern recognition', 'Data debugging'] },
-  probs: { title: '📤 PROBABILITIES', technical: 'Output confidence scores for each predicted skill/phase', desc: '"Present clear technical findings, including what worked, what failed, and what should be tested next."', skills: ['Model evaluation', 'Confidence scoring', 'Technical analysis'] },
-  postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', desc: 'Filter predictions and generate skill sequence graph from state probabilities. Smooth temporal sequences and extract transition patterns for task planning.', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'], video: '/sidebyside.webm' },
-  taskext: { title: '🎯 TASK EXTRACTION', technical: 'Combine skill graph and object coordinates to extract task primitives', desc: 'Extract task-level actions from skill predictions and object coordinates. Decompose complex manipulation tasks into executable skill sequences.', skills: ['Task decomposition', 'Action sequencing', 'Coordinate integration'] },
-  pathproc: { title: '🛤️ PATH PROCESSING', technical: 'Convert task sequences and coordinates into robot waypoint trajectories', desc: 'Convert skill sequences to robot waypoints and trajectories', skills: ['Trajectory planning', 'Path optimization', 'Collision avoidance'] },
-  skillexp: { title: '⚙️ SKILL EXPANDER', technical: 'Expand abstract skills into parametrized motion primitives and sub-skills', desc: 'Expand abstract skills into detailed motion primitives', skills: ['Motion planning', 'Skill libraries', 'Parameter tuning'] },
-  ikctrl: { title: '🔧 IK / MOTOR CTRL', technical: 'Solve inverse kinematics and convert to joint angles and motor commands', desc: 'Solve inverse kinematics and generate motor commands', skills: ['Inverse kinematics', 'Joint control', 'Motor control'] },
-  mujoco: { title: '🤖 MUJOCO SIM', technical: 'Execute trajectories and verify manipulation success in physics simulation', desc: 'Execute trajectories in MuJoCo physics simulator', skills: ['Physics simulation', 'Dynamics modeling', 'Real-time control'] },
+  video: { title: '📹 VIDEO INPUT', technical: 'Raw video frames from human demonstrations', skills: ['RGB-D data', 'Dataset inspection', 'Sensory inputs'], video: '/input-demo.webm' },
+  tracking: { title: '👁️ OBJECT TRACKING', technical: 'OpenCV HSV color detection to track red solo cup position', skills: ['Computer vision', 'Object detection', 'RGB-D data'] },
+  coords: { title: '📍 COORDINATES', technical: 'Extract and normalize 2D/3D object position for retargeting', skills: ['Position estimation', 'Data validation', 'Metric design'] },
+  embeddings: { title: '🧠 EMBEDDINGS', technical: 'V-JEPA self-supervised visual feature extraction from frames', skills: ['Representation learning', 'VLA models', 'PyTorch/JAX'] },
+  classifier: { title: '⏱️ CLASSIFIER', technical: 'LSTM model predicts manipulation phases from temporal embeddings', skills: ['Imitation learning', 'Policy learning', 'PyTorch'], image: '/loss_curves.png' },
+  audio: { title: '🎵 AUDIO INPUT', technical: 'Capture audio events and vocal cues corresponding to actions', skills: ['Sensory data', 'Multimodal learning'] },
+  labels: { title: '📊 LABELS', technical: 'Wav2vec + CTC decoder generates labels from audio automatically', skills: ['Failure analysis', 'Pattern recognition', 'Data debugging'] },
+  probs: { title: '📤 PROBABILITIES', technical: 'Output confidence scores for each predicted skill/phase', skills: ['Model evaluation', 'Confidence scoring', 'Technical analysis'] },
+  postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'], video: '/sidebyside.webm' },
+  taskext: { title: '🎯 TASK EXTRACTION', technical: 'Combine skill graph and object coordinates to extract task primitives', skills: ['Task decomposition', 'Action sequencing', 'Coordinate integration'] },
+  pathproc: { title: '🛤️ PATH PROCESSING', technical: 'Convert task sequences and coordinates into robot waypoint trajectories', skills: ['Trajectory planning', 'Path optimization', 'Collision avoidance'] },
+  skillexp: { title: '⚙️ SKILL EXPANDER', technical: 'Expand abstract skills into parametrized motion primitives and sub-skills', skills: ['Motion planning', 'Skill libraries', 'Parameter tuning'] },
+  ikctrl: { title: '🔧 IK / MOTOR CTRL', technical: 'Solve inverse kinematics and convert to joint angles and motor commands', skills: ['Inverse kinematics', 'Joint control', 'Motor control'] },
+  mujoco: { title: '🤖 MUJOCO SIM', technical: 'Execute trajectories and verify manipulation success in physics simulation', skills: ['Physics simulation', 'Dynamics modeling', 'Real-time control'] },
 }
 
 function FlowboxModal({ info, onClose }: { info: FlowboxInfo | null; onClose: () => void }) {
@@ -118,7 +118,6 @@ function FlowboxModal({ info, onClose }: { info: FlowboxInfo | null; onClose: ()
         </div>
         <div className="panel-content">
           <div className="flowbox-modal-technical">{info.technical}</div>
-          <div className="flowbox-modal-desc">{info.desc}</div>
           {info.video && <video src={info.video} controls style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px', backgroundColor: '#000' }} />}
           {info.image && <img src={info.image} alt={info.title} style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px' }} />}
           <div className="flowbox-modal-skills">
@@ -236,35 +235,13 @@ export default function App() {
           <strong>What We Built:</strong> We created MIMIC, a system that learns robot manipulation skills from human demonstrations. The project implements visual imitation learning from video input, uses computer vision to understand human actions, trains a temporal classifier to recognize individual manipulation subskills, and chains these predicted skills together to execute new robot tasks. The interactive dashboard visualizes the complete pipeline from raw video through computer vision, temporal modeling, and robot control execution.
           <br /><br />
           <strong>Why We Built This:</strong> This project was created for a hackathon where we selected the Anyware Robotics Robot Learning Intern position and built a working demonstration system around the key skills in the job description. It showcases practical robotics engineering across multiple domains: imitation learning, computer vision, temporal classification, and robot control—demonstrating the integration needed to solve real-world manipulation problems.
-          <br /><br />
-          <strong>About Anyware Robotics:</strong> Anyware Robotics builds general-purpose mobile manipulator robots for industrial applications, deployed in real warehouse and logistics environments supporting truck unloading, mobile palletizing, and machine tending.
-          <br /><br />
-          <strong>The Role:</strong> Work on applied manipulation learning using real robot data collected from production and in-house operations. Take a scoped robot learning problem from data understanding to model training, evaluation, and technical recommendation. Example directions include vision-language-action models, imitation learning, diffusion policies, action prediction, failure-mode analysis, or policy evaluation using multimodal robot data.
-          <br /><br />
-          <strong>What You'll Do:</strong>
-          <ul>
-            <li>Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes</li>
-            <li>Develop and evaluate robot learning models for manipulation-related tasks</li>
-            <li>Design and deliver approaches with imitation learning, diffusion policy, VLA models, or representation learning</li>
-            <li>Build data pipelines, training scripts, evaluation metrics, and experiment reports</li>
-            <li>Analyze successful and failed robot trials to identify learnable patterns and production-relevant failure modes</li>
-            <li>Collaborate with planning, perception, and controls engineers</li>
-          </ul>
-          <strong>Required Skills:</strong>
-          <ul style={{marginTop: '8px', marginBottom: '8px'}}>
-            <li>MS/PhD in robotics or machine learning</li>
-            <li>Experience with imitation learning, diffusion policies, or visuomotor policy learning</li>
-            <li>Strong Python + PyTorch/JAX programming skills</li>
-            <li>Data debugging and failure analysis</li>
-            <li>Familiarity with ROS, RGB-D data, point clouds, or robot kinematics</li>
-          </ul>
         </div>
       </div>
 
       {/* Interactive Flowchart */}
       <div className="flowchart-section">
         <div className="flowchart-title">TECHNOLOGY PIPELINE</div>
-        <div className="flowchart-subtitle">Click any box to learn about related job skills</div>
+        <div className="flowchart-subtitle">Click any box to learn more about that stage</div>
 
         <svg viewBox="0 0 1000 1300" style={{ width: '100%', maxWidth: '1000px', margin: '40px auto', display: 'block' }}>
           <defs>
