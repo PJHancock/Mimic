@@ -6,7 +6,7 @@
 robot_pipeline:
   path_processing:
     interpolation: cubic
-    corner_max_deviation_m: .04
+    corner_max_deviation_m: .01
     output_spacing_m: .05
     maximum_spline_deviation_m: .10
   waypoint_construction:
