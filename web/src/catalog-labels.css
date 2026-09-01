@@ -9,12 +9,30 @@
 .raw-video-panel .video-stage,
 .sim-video-panel .video-stage {
   height: 410px;
+  display: flex;
+  flex-direction: column;
+}
+
+.raw-video-panel video,
+.sim-video-panel video,
+.raw-video-panel .empty-video,
+.sim-video-panel .empty-video {
+  flex: 1;
+  min-height: 0;
+  height: auto;
 }
 
 .raw-video-panel video,
 .sim-video-panel video {
   background: #050607;
   object-fit: contain;
+}
+
+.video-overlay {
+  position: relative;
+  inset: auto;
+  flex-shrink: 0;
+  background: #050607;
 }
 
 .sync-strip {
@@ -162,7 +180,7 @@
 
 .process-body {
   display: grid;
-  grid-template-columns: minmax(520px, 0.9fr) minmax(420px, 1.1fr);
+  grid-template-columns: min-content minmax(0, 1fr);
   gap: 18px;
   align-items: end;
   padding: 10px 12px 11px;
@@ -173,6 +191,11 @@
   grid-template-columns: minmax(180px, 1.1fr) minmax(190px, 1fr) 145px 150px;
   gap: 8px;
   align-items: end;
+  min-width: min-content;
+}
+
+.process-monitor {
+  min-width: 0;
 }
 
 .process-controls label > span {
@@ -346,6 +369,7 @@
 @media (max-width: 700px) {
   .process-controls {
     grid-template-columns: 1fr;
+    min-width: 0;
   }
 
   .process-body {
