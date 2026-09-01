@@ -1,7 +1,7 @@
 {
   "schema": "mimic.demo_results.v2",
   "metadata": {
-    "created": "2026-08-31T21:00:30.385722",
+    "created": "2026-08-31T21:18:44.264615",
     "fps": 29.978586723768736,
     "total_frames": 140,
     "duration": 4.636642857142857,
@@ -19,7 +19,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 8.216146852646489e-06,
+      "action_confidence": 8.228465048887301e-06,
       "decision_source": "model"
     },
     {
@@ -31,7 +31,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 7.566161457361886e-07,
+      "action_confidence": 7.564970587736752e-07,
       "decision_source": "model"
     },
     {
@@ -43,7 +43,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 7.222324143185688e-07,
+      "action_confidence": 7.218249606921745e-07,
       "decision_source": "model"
     },
     {
@@ -55,7 +55,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.870626988420554e-06,
+      "action_confidence": 1.8688224372453988e-06,
       "decision_source": "model"
     },
     {
@@ -67,7 +67,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 2.2600838747166563e-06,
+      "action_confidence": 2.257585038023535e-06,
       "decision_source": "model"
     },
     {
@@ -79,7 +79,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 2.3493739718105644e-06,
+      "action_confidence": 2.3455056634702487e-06,
       "decision_source": "model"
     },
     {
@@ -91,7 +91,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 2.189599399571307e-06,
+      "action_confidence": 2.183368678743136e-06,
       "decision_source": "model"
     },
     {
@@ -103,7 +103,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.8954317511088448e-06,
+      "action_confidence": 1.8873876115321764e-06,
       "decision_source": "model"
     },
     {
@@ -115,7 +115,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.875529960670974e-06,
+      "action_confidence": 1.8665099332793034e-06,
       "decision_source": "model"
     },
     {
@@ -127,7 +127,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.996247192437295e-06,
+      "action_confidence": 1.98914995053201e-06,
       "decision_source": "model"
     },
     {
@@ -139,7 +139,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.8940897916763788e-06,
+      "action_confidence": 1.8930360283775371e-06,
       "decision_source": "model"
     },
     {
@@ -151,7 +151,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.6848597397256526e-06,
+      "action_confidence": 1.6861325775607838e-06,
       "decision_source": "model"
     },
     {
@@ -163,7 +163,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.7288469962295494e-06,
+      "action_confidence": 1.7319066500931513e-06,
       "decision_source": "model"
     },
     {
@@ -175,7 +175,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 3.751370741156279e-06,
+      "action_confidence": 3.793589257838903e-06,
       "decision_source": "model"
     },
     {
@@ -187,7 +187,7 @@
         "confidence": 0.8
       },
       "action": "IDLE",
-      "action_confidence": 1.20500353659736e-05,
+      "action_confidence": 1.202369367092615e-05,
       "decision_source": "model"
     },
     {
@@ -199,7 +199,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.9947838187217712,
+      "action_confidence": 0.9948417544364929,
       "decision_source": "model"
     },
     {
@@ -271,7 +271,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.9999998807907104,
+      "action_confidence": 1.0,
       "decision_source": "model"
     },
     {
@@ -283,7 +283,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.999906063079834,
+      "action_confidence": 0.9999216794967651,
       "decision_source": "model"
     },
     {
@@ -295,7 +295,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.8648785352706909,
+      "action_confidence": 0.8761715292930603,
       "decision_source": "model"
     },
     {
@@ -307,7 +307,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.7081295847892761,
+      "action_confidence": 0.7277346253395081,
       "decision_source": "model"
     },
     {
@@ -319,7 +319,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.9634589552879333,
+      "action_confidence": 0.9646565318107605,
       "decision_source": "model"
     },
     {
@@ -331,7 +331,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.9996849298477173,
+      "action_confidence": 0.9996970891952515,
       "decision_source": "model"
     },
     {
@@ -511,7 +511,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.9999947547912598,
+      "action_confidence": 0.9999905824661255,
       "decision_source": "model"
     },
     {
@@ -523,7 +523,7 @@
         "confidence": 0.8
       },
       "action": "HOVER",
-      "action_confidence": 0.9959918856620789,
+      "action_confidence": 0.9911013841629028,
       "decision_source": "model"
     },
     {
@@ -535,7 +535,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.8783397078514099,
+      "action_confidence": 0.9528407454490662,
       "decision_source": "model"
     },
     {
@@ -547,7 +547,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.9999488592147827,
+      "action_confidence": 0.999984860420227,
       "decision_source": "model"
     },
     {
@@ -751,7 +751,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.9999998807907104,
+      "action_confidence": 0.999998927116394,
       "decision_source": "model"
     },
     {
@@ -763,7 +763,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.9925286769866943,
+      "action_confidence": 0.9349371790885925,
       "decision_source": "model"
     },
     {
@@ -775,7 +775,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.356341689825058,
+      "action_confidence": 0.2239840179681778,
       "decision_source": "model"
     },
     {
@@ -787,7 +787,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.09136158227920532,
+      "action_confidence": 0.04015127569437027,
       "decision_source": "model"
     },
     {
@@ -799,7 +799,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.004280939698219299,
+      "action_confidence": 0.0015093273250386119,
       "decision_source": "model"
     },
     {
@@ -811,7 +811,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.186059282394126e-05,
+      "action_confidence": 7.329112122533843e-06,
       "decision_source": "model"
     },
     {
@@ -823,7 +823,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 5.923445911548697e-08,
+      "action_confidence": 1.888040124242707e-08,
       "decision_source": "model"
     },
     {
@@ -835,7 +835,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 5.680329123736172e-11,
+      "action_confidence": 2.585741516736295e-11,
       "decision_source": "model"
     },
     {
@@ -847,7 +847,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.8400762729134882e-15,
+      "action_confidence": 1.4566686056563484e-15,
       "decision_source": "model"
     },
     {
@@ -859,7 +859,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.767691771802184e-21,
+      "action_confidence": 9.498130666156942e-22,
       "decision_source": "model"
     },
     {
@@ -871,7 +871,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 6.213614282659489e-25,
+      "action_confidence": 8.894715471455592e-26,
       "decision_source": "model"
     },
     {
@@ -883,7 +883,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 6.159776467215539e-27,
+      "action_confidence": 1.4271018591357949e-27,
       "decision_source": "model"
     },
     {
@@ -895,7 +895,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 8.428731290288657e-28,
+      "action_confidence": 2.1162756193221026e-28,
       "decision_source": "model"
     },
     {
@@ -907,7 +907,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.511931685600968e-28,
+      "action_confidence": 6.456590462445173e-29,
       "decision_source": "model"
     },
     {
@@ -919,7 +919,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 8.802720403951923e-29,
+      "action_confidence": 2.3744498385593035e-29,
       "decision_source": "model"
     },
     {
@@ -931,7 +931,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.591989346553441e-29,
+      "action_confidence": 1.052113260053765e-29,
       "decision_source": "model"
     },
     {
@@ -943,7 +943,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.1779369748306442e-29,
+      "action_confidence": 9.505921512387836e-30,
       "decision_source": "model"
     },
     {
@@ -955,7 +955,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.240995538670682e-29,
+      "action_confidence": 2.4729203796666693e-29,
       "decision_source": "model"
     },
     {
@@ -967,7 +967,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.8788969295859767e-28,
+      "action_confidence": 3.0556664867726916e-28,
       "decision_source": "model"
     },
     {
@@ -979,7 +979,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.812906800091273e-27,
+      "action_confidence": 7.992870425307488e-27,
       "decision_source": "model"
     },
     {
@@ -991,7 +991,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 5.741745792326028e-25,
+      "action_confidence": 1.1986653694057569e-24,
       "decision_source": "model"
     },
     {
@@ -1003,7 +1003,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.6674501314632272e-22,
+      "action_confidence": 8.555935522017884e-23,
       "decision_source": "model"
     },
     {
@@ -1015,7 +1015,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.1340747172297878e-21,
+      "action_confidence": 3.2738376325880444e-22,
       "decision_source": "model"
     },
     {
@@ -1027,7 +1027,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.3122111404138376e-21,
+      "action_confidence": 1.592349740249071e-21,
       "decision_source": "model"
     },
     {
@@ -1039,7 +1039,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 6.190205710143799e-21,
+      "action_confidence": 2.588467048735066e-21,
       "decision_source": "model"
     },
     {
@@ -1051,7 +1051,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.6784472722469747e-20,
+      "action_confidence": 1.460336965143793e-20,
       "decision_source": "model"
     },
     {
@@ -1063,7 +1063,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.46730780530568e-19,
+      "action_confidence": 8.031930210238434e-20,
       "decision_source": "model"
     },
     {
@@ -1075,7 +1075,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.3728976154459789e-18,
+      "action_confidence": 4.85289908182304e-19,
       "decision_source": "model"
     },
     {
@@ -1087,7 +1087,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.7929492820960025e-18,
+      "action_confidence": 4.6397776513599775e-18,
       "decision_source": "model"
     },
     {
@@ -1099,7 +1099,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.7144820355153895e-17,
+      "action_confidence": 7.534846168562857e-16,
       "decision_source": "model"
     },
     {
@@ -1111,7 +1111,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.6164242075853113e-16,
+      "action_confidence": 2.2524798866385698e-13,
       "decision_source": "model"
     },
     {
@@ -1123,7 +1123,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.721127866902028e-15,
+      "action_confidence": 4.797732523764697e-12,
       "decision_source": "model"
     },
     {
@@ -1135,7 +1135,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.163913258307725e-13,
+      "action_confidence": 1.4428630512597351e-10,
       "decision_source": "model"
     },
     {
@@ -1147,7 +1147,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 6.181243451114371e-12,
+      "action_confidence": 1.7339643054725684e-09,
       "decision_source": "model"
     },
     {
@@ -1159,7 +1159,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.001492540095519e-11,
+      "action_confidence": 5.303472327966574e-09,
       "decision_source": "model"
     },
     {
@@ -1171,7 +1171,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.0472122608250487e-10,
+      "action_confidence": 5.991336138322367e-07,
       "decision_source": "model"
     },
     {
@@ -1183,7 +1183,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 7.81480906653087e-08,
+      "action_confidence": 7.055012247292325e-05,
       "decision_source": "model"
     },
     {
@@ -1195,7 +1195,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 7.3840747063513845e-06,
+      "action_confidence": 1.885249548649881e-05,
       "decision_source": "model"
     },
     {
@@ -1207,7 +1207,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.9114384233253077e-05,
+      "action_confidence": 1.7970985481952084e-06,
       "decision_source": "model"
     },
     {
@@ -1219,7 +1219,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.4605164324166253e-05,
+      "action_confidence": 1.6475543418437155e-07,
       "decision_source": "model"
     },
     {
@@ -1231,7 +1231,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 8.685236139172048e-07,
+      "action_confidence": 2.0986933080280323e-08,
       "decision_source": "model"
     },
     {
@@ -1243,7 +1243,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.881506648260256e-07,
+      "action_confidence": 1.0699179320283747e-08,
       "decision_source": "model"
     },
     {
@@ -1255,7 +1255,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 6.534816776593289e-08,
+      "action_confidence": 9.400776157519886e-09,
       "decision_source": "model"
     },
     {
@@ -1267,7 +1267,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.685944705011934e-08,
+      "action_confidence": 1.0870886413272274e-08,
       "decision_source": "model"
     },
     {
@@ -1279,7 +1279,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.635763334841613e-08,
+      "action_confidence": 1.0171262943003967e-08,
       "decision_source": "model"
     },
     {
@@ -1291,7 +1291,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.666679842557642e-08,
+      "action_confidence": 1.5617331428074976e-08,
       "decision_source": "model"
     },
     {
@@ -1303,7 +1303,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 5.25989847233177e-08,
+      "action_confidence": 2.0537907374773567e-08,
       "decision_source": "model"
     },
     {
@@ -1315,7 +1315,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 9.567222569728528e-09,
+      "action_confidence": 4.762309657735386e-09,
       "decision_source": "model"
     },
     {
@@ -1327,7 +1327,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.4354332167343387e-09,
+      "action_confidence": 7.263635248833111e-10,
       "decision_source": "model"
     },
     {
@@ -1339,7 +1339,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.746629395617873e-10,
+      "action_confidence": 8.892267477911275e-11,
       "decision_source": "model"
     },
     {
@@ -1351,7 +1351,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 8.823158315074409e-10,
+      "action_confidence": 7.332962015382805e-11,
       "decision_source": "model"
     },
     {
@@ -1363,7 +1363,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.328236734064134e-14,
+      "action_confidence": 3.140145088398327e-11,
       "decision_source": "model"
     },
     {
@@ -1375,7 +1375,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.2673316389377742e-11,
+      "action_confidence": 1.2861136634845227e-11,
       "decision_source": "model"
     },
     {
@@ -1387,7 +1387,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.2118142872784574e-09,
+      "action_confidence": 1.3387172446976958e-11,
       "decision_source": "model"
     },
     {
@@ -1399,7 +1399,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.0426734465294203e-09,
+      "action_confidence": 3.028186483788886e-06,
       "decision_source": "model"
     },
     {
@@ -1411,7 +1411,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.1543360711741002e-09,
+      "action_confidence": 0.013854250311851501,
       "decision_source": "model"
     },
     {
@@ -1423,7 +1423,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 5.8704572438728064e-06,
+      "action_confidence": 0.009796244092285633,
       "decision_source": "model"
     },
     {
@@ -1435,7 +1435,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.001439592451788485,
+      "action_confidence": 0.01144593395292759,
       "decision_source": "model"
     },
     {
@@ -1447,7 +1447,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 0.0003385111631359905,
+      "action_confidence": 0.00029654530226252973,
       "decision_source": "model"
     },
     {
@@ -1459,7 +1459,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.9377718823961914e-05,
+      "action_confidence": 5.894383775739698e-06,
       "decision_source": "model"
     },
     {
@@ -1471,7 +1471,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 6.371777544700308e-06,
+      "action_confidence": 1.2819460835089558e-06,
       "decision_source": "model"
     },
     {
@@ -1483,7 +1483,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.729554469420691e-06,
+      "action_confidence": 7.300556603695441e-07,
       "decision_source": "model"
     },
     {
@@ -1495,7 +1495,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.0615550394277307e-07,
+      "action_confidence": 1.4070354154682718e-05,
       "decision_source": "model"
     },
     {
@@ -1507,7 +1507,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.6138284869858808e-09,
+      "action_confidence": 0.0020261257886886597,
       "decision_source": "model"
     },
     {
@@ -1519,7 +1519,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.9003123647463056e-11,
+      "action_confidence": 1.98072157218121e-05,
       "decision_source": "model"
     },
     {
@@ -1531,7 +1531,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.1541258360402438e-12,
+      "action_confidence": 7.461704853994888e-08,
       "decision_source": "model"
     },
     {
@@ -1543,7 +1543,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 7.144916711228355e-13,
+      "action_confidence": 5.377629452851806e-10,
       "decision_source": "model"
     },
     {
@@ -1555,7 +1555,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 3.219033858372321e-14,
+      "action_confidence": 1.6549185632985797e-11,
       "decision_source": "model"
     },
     {
@@ -1567,7 +1567,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.102553812137863e-12,
+      "action_confidence": 5.760077202536518e-13,
       "decision_source": "model"
     },
     {
@@ -1579,7 +1579,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 8.958972452788316e-11,
+      "action_confidence": 8.158957450626891e-13,
       "decision_source": "model"
     },
     {
@@ -1591,7 +1591,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 5.112281087349402e-07,
+      "action_confidence": 1.7079270289710458e-11,
       "decision_source": "model"
     },
     {
@@ -1603,7 +1603,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.033499415825645e-06,
+      "action_confidence": 3.5159161693165686e-10,
       "decision_source": "model"
     },
     {
@@ -1615,7 +1615,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.2674501451547258e-05,
+      "action_confidence": 5.482596598938017e-10,
       "decision_source": "model"
     },
     {
@@ -1627,7 +1627,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 4.156616341788322e-06,
+      "action_confidence": 5.739939079596468e-10,
       "decision_source": "model"
     },
     {
@@ -1639,7 +1639,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.078451441571815e-05,
+      "action_confidence": 6.5628980028265e-10,
       "decision_source": "model"
     },
     {
@@ -1651,7 +1651,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 6.439131539082155e-06,
+      "action_confidence": 2.2987316494749166e-09,
       "decision_source": "model"
     },
     {
@@ -1663,7 +1663,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.7069779662269866e-06,
+      "action_confidence": 2.6756390436588617e-09,
       "decision_source": "model"
     },
     {
@@ -1675,7 +1675,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 1.7936284280040127e-07,
+      "action_confidence": 2.9556121439178185e-10,
       "decision_source": "model"
     },
     {
@@ -1687,7 +1687,7 @@
         "confidence": 0.8
       },
       "action": "GRASP",
-      "action_confidence": 2.265720766558843e-08,
+      "action_confidence": 5.247663414920112e-12,
       "decision_source": "model"
     }
   ],
@@ -1699,7 +1699,7 @@
       "start_time": 0.0,
       "end_time": 0.467,
       "duration": 0.467,
-      "avg_confidence": 3.0160727457465934e-06
+      "avg_confidence": 3.0155649710650323e-06
     },
     {
       "action": "HOVER",
@@ -1708,7 +1708,7 @@
       "start_time": 0.5003571428571428,
       "end_time": 1.401,
       "duration": 0.9006428571428572,
-      "avg_confidence": 0.9831010145800454
+      "avg_confidence": 0.9840755420071738
     },
     {
       "action": "GRASP",
@@ -1717,7 +1717,7 @@
       "start_time": 1.4343571428571429,
       "end_time": 4.636642857142857,
       "duration": 3.2022857142857144,
-      "avg_confidence": 0.20953366827065223
+      "avg_confidence": 0.2081543273201077
     }
   ],
   "tracking_summary": {
