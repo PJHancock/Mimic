@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 import yaml
 from pydantic import ValidationError
+from scipy.interpolate import CubicSpline
 
 from mimic.config import Config
 from mimic.robot import (
@@ -16,6 +17,7 @@ from mimic.robot import (
     process_path,
     retarget_task,
 )
+from mimic.robot.path_processing import _minimum_distances_to_polyline
 
 
 def _retargeted(extracted_task, mapping_config_values, points=None):
@@ -98,6 +100,46 @@ def test_cubic_uses_scipy_spline_with_exact_endpoints_and_spatial_sampling(
     segment_lengths = np.linalg.norm(np.diff(np.asarray(result.xy_m), axis=0), axis=1)
     assert np.max(segment_lengths) <= 0.025 + 1e-8
     assert len(result.xy_m) > len(points)
+
+
+def test_cubic_samples_the_natural_spline_not_the_corner_polyline(
+    extracted_task, mapping_config_values
+):
+    """A bent control polygon must leave the chords; linear corner interpolation would not."""
+    points = (
+        (0.0, 0.0),
+        (0.1, 0.02),
+        (0.2, 0.08),
+        (0.3, 0.16),
+        (0.4, 0.22),
+        (0.5, 0.24),
+        (0.6, 0.24),
+    )
+    task = _retargeted(extracted_task, mapping_config_values, points)
+    cubic = process_path(
+        task,
+        {
+            "interpolation": "cubic",
+            "corner_max_deviation_m": 0.001,
+            "output_spacing_m": 0.025,
+            "maximum_spline_deviation_m": 0.02,
+        },
+    )
+    direct = process_path(task, {"interpolation": "direct"})
+    sampled = np.asarray(cubic.xy_m)
+    controls = np.asarray(cubic.control_points_xy_m)
+    assert len(controls) >= 3
+    assert len(sampled) > len(direct.xy_m)
+
+    chords = np.linalg.norm(np.diff(controls, axis=0), axis=1)
+    parameters = np.concatenate(([0.0], np.cumsum(chords)))
+    parameters /= parameters[-1]
+    spline = CubicSpline(parameters, controls, axis=0, bc_type="natural", extrapolate=False)
+    dense = spline(np.linspace(0.0, 1.0, 20001))
+    spline_error = np.max(_minimum_distances_to_polyline(sampled, dense))
+    polyline_error = np.max(_minimum_distances_to_polyline(sampled, controls))
+    assert spline_error < 1e-8
+    assert polyline_error > 1e-3
 
 
 def test_cubic_keeps_a_straight_path_straight(extracted_task, mapping_config_values):
