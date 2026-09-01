@@ -108,25 +108,35 @@ const flowboxData: Record<string, FlowboxInfo> = {
   mujoco: { title: '🤖 MUJOCO SIM', technical: 'Execute trajectories and verify manipulation success in physics simulation', skills: ['Physics simulation', 'Dynamics modeling', 'Real-time control'] },
 }
 
-function FlowboxModal({ info, onClose }: { info: FlowboxInfo | null; onClose: () => void }) {
-  return <div className={`flowbox-side-panel ${info ? 'open' : ''}`}>
-    {info && (
-      <>
-        <div className="panel-header">
-          <div className="flowbox-modal-title">{info.title}</div>
-          <button className="panel-close" onClick={onClose}>✕</button>
-        </div>
-        <div className="panel-content">
-          <div className="flowbox-modal-technical">{info.technical}</div>
-          {info.video && <video src={info.video} controls style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px', backgroundColor: '#000' }} />}
-          {info.image && <img src={info.image} alt={info.title} style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px' }} />}
-          <div className="flowbox-modal-skills">
-            {info.skills.map((skill) => <span key={skill} className="skill-badge">{skill}</span>)}
+function FlowboxModal({ info, onClose, expandedImage, setExpandedImage }: { info: FlowboxInfo | null; onClose: () => void; expandedImage: string | null; setExpandedImage: (img: string | null) => void }) {
+  return <>
+    <div className={`flowbox-side-panel ${info ? 'open' : ''}`}>
+      {info && (
+        <>
+          <div className="panel-header">
+            <div className="flowbox-modal-title">{info.title}</div>
+            <button className="panel-close" onClick={onClose}>✕</button>
           </div>
+          <div className="panel-content">
+            <div className="flowbox-modal-technical">{info.technical}</div>
+            {info.video && <video src={info.video} controls style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px', backgroundColor: '#000' }} />}
+            {info.image && <img src={info.image} alt={info.title} onClick={() => setExpandedImage(info.image!)} style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px', cursor: 'pointer', opacity: expandedImage === info.image ? 0.7 : 1 }} title="Click to expand" />}
+            <div className="flowbox-modal-skills">
+              {info.skills.map((skill) => <span key={skill} className="skill-badge">{skill}</span>)}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+    {expandedImage && (
+      <div onClick={() => setExpandedImage(null)} style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0, 0, 0, 0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, cursor: 'pointer' }}>
+        <div onClick={(e) => e.stopPropagation()} style={{ position: 'relative', maxWidth: '90vw', maxHeight: '90vh' }}>
+          <img src={expandedImage} alt="Expanded view" style={{ width: '100%', height: 'auto', borderRadius: '8px' }} />
+          <button onClick={() => setExpandedImage(null)} style={{ position: 'absolute', top: '16px', right: '16px', background: '#fff', border: 'none', width: '32px', height: '32px', borderRadius: '50%', cursor: 'pointer', fontSize: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
-      </>
+      </div>
     )}
-  </div>
+  </>
 }
 
 export default function App() {
@@ -136,6 +146,7 @@ export default function App() {
   const [pipelineJob, setPipelineJob] = useState<PipelineJob | null>(null); const [pipelineError, setPipelineError] = useState(''); const [artifactRevision, setArtifactRevision] = useState(0)
   const [phaseSync, setPhaseSync] = useState(false); const [syncPlaying, setSyncPlaying] = useState(false); const [syncRate, setSyncRate] = useState(1); const [syncPhase, setSyncPhase] = useState('—'); const [simDuration, setSimDuration] = useState(0)
   const [flowboxModal, setFlowboxModal] = useState<FlowboxInfo | null>(null)
+  const [expandedImage, setExpandedImage] = useState<string | null>(null)
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const videoRef = useRef<HTMLVideoElement>(null)
   const simVideoRef = useRef<HTMLVideoElement>(null)
@@ -387,7 +398,7 @@ export default function App() {
       </div>
 
       {/* Modal */}
-      <FlowboxModal info={flowboxModal} onClose={() => setFlowboxModal(null)} />
+      <FlowboxModal info={flowboxModal} onClose={() => setFlowboxModal(null)} expandedImage={expandedImage} setExpandedImage={setExpandedImage} />
     </div>
     <main id="section-demo">
       <section className="panel process-panel"><PanelTitle eyebrow="Local pipeline" title="Process raw demonstration" end={<span className={`job-status ${pipelineJob?.status ?? 'idle'}`}><i />{pipelineJob?.status ?? 'IDLE'}</span>} /><div className="process-body"><div className="process-controls"><label><span>RAW VIDEO</span><select value={selectedRaw} onChange={(event) => setSelectedRaw(event.target.value)} disabled={pipelineJob?.status === 'running'}>{rawVideos.map((video) => <option key={video.name} value={video.name}>{video.name}{video.has_results ? ' · processed' : ' · new'}</option>)}</select></label><label><span>ROBOT CONFIG</span><select value={selectedConfig} onChange={(event) => setSelectedConfig(event.target.value)} disabled={pipelineJob?.status === 'running'}>{robotConfigs.map((config) => <option key={config.id} value={config.id}>{config.name}{config.default ? ' · default' : ''}</option>)}</select></label><label><span>INFERENCE DEVICE</span><select value={device} onChange={(event) => setDevice(event.target.value)} disabled={pipelineJob?.status === 'running'}><option value="cpu">CPU</option><option value="mps">Apple MPS</option><option value="cuda">CUDA</option></select></label><button type="button" onClick={startProcessing} disabled={!selectedRaw || !selectedConfig || pipelineJob?.status === 'running'}>{pipelineJob?.status === 'running' ? 'PROCESSING…' : selectedVideo?.has_results ? 'REPROCESS RUN' : 'PROCESS VIDEO'}<b>▶</b></button></div><div className="process-monitor"><div><strong>{pipelineJob?.stage ?? 'Ready'}</strong><span>{pipelineJob?.progress ?? 0}%</span></div><div className={`process-progress ${pipelineJob?.status ?? 'idle'}`}><i style={{ width: `${pipelineJob?.progress ?? 0}%` }} /></div><small>{pipelineError || pipelineJob?.message || 'Select a video from data/raw/.'}</small></div></div></section>
