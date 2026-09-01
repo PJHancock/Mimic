@@ -224,7 +224,7 @@ export default function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><span>DEMONSTRATION</span><i>→</i><span>SKILL MODEL</span><i>→</i><span>RETARGET</span><i>→</i><span>PANDA</span></div></header>
+    <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><button onClick={() => document.getElementById('section-demonstration')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>DEMONSTRATION</button><i>→</i><button onClick={() => document.getElementById('section-skill-model')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>SKILL MODEL</button><i>→</i><button onClick={() => document.getElementById('section-retarget')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>RETARGET</button><i>→</i><button onClick={() => document.getElementById('section-panda')?.scrollIntoView({ behavior: 'smooth' })} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', font: 'inherit', padding: 0}}>PANDA</button></div></header>
 
     {/* Job Description Section */}
     <div className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
@@ -242,6 +242,7 @@ export default function App() {
       <div className="flowchart-section">
         <div className="flowchart-title">TECHNOLOGY PIPELINE</div>
         <div className="flowchart-subtitle">Click any box to learn more about that stage</div>
+        <div id="section-demonstration" style={{ position: 'absolute', visibility: 'hidden' }} />
 
         <svg viewBox="0 0 1000 1300" style={{ width: '100%', maxWidth: '1000px', margin: '40px auto', display: 'block' }}>
           <defs>
@@ -289,6 +290,9 @@ export default function App() {
           </g>
           <line x1="160" y1="230" x2="160" y2="310" stroke="var(--cyan)" strokeWidth="2" />
 
+          {/* SKILL MODEL ANCHOR */}
+          <foreignObject x="0" y="310" width="0" height="0"><div id="section-skill-model" style={{ visibility: 'hidden' }} /></foreignObject>
+
           {/* MIDDLE: CLASSIFIER */}
           <g onClick={() => setFlowboxModal(flowboxData.classifier)} style={{ cursor: 'pointer' }}>
             <rect x="375" y="310" width="250" height="70" fill="#0f0822" stroke="#4c1d95" strokeWidth="2" rx="4" />
@@ -327,6 +331,9 @@ export default function App() {
             <text x="500" y="633" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">GRAPH</text>
           </g>
 
+          {/* RETARGET ANCHOR */}
+          <foreignObject x="0" y="690" width="0" height="0"><div id="section-retarget" style={{ visibility: 'hidden' }} /></foreignObject>
+
           {/* TASK EXTRACTION */}
           <line x1="500" y1="650" x2="500" y2="690" stroke="var(--cyan)" strokeWidth="2" />
           {/* Coordinates path down to task extraction */}
@@ -347,6 +354,9 @@ export default function App() {
             <rect x="375" y="810" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
             <text x="500" y="855" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">🛤️ PATH PROCESSING</text>
           </g>
+
+          {/* PANDA ANCHOR */}
+          <foreignObject x="0" y="920" width="0" height="0"><div id="section-panda" style={{ visibility: 'hidden' }} /></foreignObject>
 
           {/* SKILL EXPANDER */}
           <line x1="500" y1="880" x2="500" y2="920" stroke="var(--cyan)" strokeWidth="2" />
