@@ -89,7 +89,7 @@ function Trajectory({ detail }: { detail: Detail }) {
   </div>
 }
 
-type FlowboxInfo = { title: string; technical: string; desc: string; skills: string[]; image?: string }
+type FlowboxInfo = { title: string; technical: string; desc: string; skills: string[]; image?: string; video?: string }
 
 const flowboxData: Record<string, FlowboxInfo> = {
   video: { title: '📹 VIDEO INPUT', technical: 'Raw video frames from human demonstrations', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['RGB-D data', 'Dataset inspection', 'Sensory inputs'] },
@@ -100,7 +100,7 @@ const flowboxData: Record<string, FlowboxInfo> = {
   audio: { title: '🎵 AUDIO INPUT', technical: 'Capture audio events and vocal cues corresponding to actions', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['Sensory data', 'Multimodal learning'] },
   labels: { title: '📊 LABELS', technical: 'Wav2vec + CTC decoder generates labels from audio automatically', desc: '"Analyze successful and failed robot trials to identify learnable patterns and production-relevant failure modes."', skills: ['Failure analysis', 'Pattern recognition', 'Data debugging'] },
   probs: { title: '📤 PROBABILITIES', technical: 'Output confidence scores for each predicted skill/phase', desc: '"Present clear technical findings, including what worked, what failed, and what should be tested next."', skills: ['Model evaluation', 'Confidence scoring', 'Technical analysis'] },
-  postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', desc: 'Filter predictions and generate skill sequence graph from state probabilities. Smooth temporal sequences and extract transition patterns for task planning. View demonstration videos: Sidebyside', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'] },
+  postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', desc: 'Filter predictions and generate skill sequence graph from state probabilities. Smooth temporal sequences and extract transition patterns for task planning.', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'], video: '/sidebyside.webm' },
   taskext: { title: '🎯 TASK EXTRACTION', technical: 'Combine skill graph and object coordinates to extract task primitives', desc: 'Extract task-level actions from skill predictions and object coordinates. Decompose complex manipulation tasks into executable skill sequences.', skills: ['Task decomposition', 'Action sequencing', 'Coordinate integration'] },
   pathproc: { title: '🛤️ PATH PROCESSING', technical: 'Convert task sequences and coordinates into robot waypoint trajectories', desc: 'Convert skill sequences to robot waypoints and trajectories', skills: ['Trajectory planning', 'Path optimization', 'Collision avoidance'] },
   skillexp: { title: '⚙️ SKILL EXPANDER', technical: 'Expand abstract skills into parametrized motion primitives and sub-skills', desc: 'Expand abstract skills into detailed motion primitives', skills: ['Motion planning', 'Skill libraries', 'Parameter tuning'] },
@@ -119,6 +119,7 @@ function FlowboxModal({ info, onClose }: { info: FlowboxInfo | null; onClose: ()
         <div className="panel-content">
           <div className="flowbox-modal-technical">{info.technical}</div>
           <div className="flowbox-modal-desc">{info.desc}</div>
+          {info.video && <video src={info.video} controls style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px', backgroundColor: '#000' }} />}
           {info.image && <img src={info.image} alt={info.title} style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px' }} />}
           <div className="flowbox-modal-skills">
             {info.skills.map((skill) => <span key={skill} className="skill-badge">{skill}</span>)}
