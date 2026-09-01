@@ -230,9 +230,13 @@ export default function App() {
     {/* Job Description Section */}
     <div className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
       <div className="job-header">
-        <div className="job-title">🤖 Anyware Robotics · Robot Learning Intern</div>
-        <div className="job-company">Manipulation Policy Learning · Fall 2026 · Fremont, CA</div>
+        <div className="job-title">MIMIC</div>
+        <div className="job-company">Robot Skill Learning System</div>
         <div className="job-description">
+          <strong>What We Built:</strong> We created MIMIC, a system that learns robot manipulation skills from human demonstrations. The project implements visual imitation learning from video input, uses computer vision to understand human actions, trains a temporal classifier to recognize individual manipulation subskills, and chains these predicted skills together to execute new robot tasks. The interactive dashboard visualizes the complete pipeline from raw video through computer vision, temporal modeling, and robot control execution.
+          <br /><br />
+          <strong>Why We Built This:</strong> This project was created for a hackathon where we selected the Anyware Robotics Robot Learning Intern position and built a working demonstration system around the key skills in the job description. It showcases practical robotics engineering across multiple domains: imitation learning, computer vision, temporal classification, and robot control—demonstrating the integration needed to solve real-world manipulation problems.
+          <br /><br />
           <strong>About Anyware Robotics:</strong> Anyware Robotics builds general-purpose mobile manipulator robots for industrial applications, deployed in real warehouse and logistics environments supporting truck unloading, mobile palletizing, and machine tending.
           <br /><br />
           <strong>The Role:</strong> Work on applied manipulation learning using real robot data collected from production and in-house operations. Take a scoped robot learning problem from data understanding to model training, evaluation, and technical recommendation. Example directions include vision-language-action models, imitation learning, diffusion policies, action prediction, failure-mode analysis, or policy evaluation using multimodal robot data.
@@ -254,10 +258,6 @@ export default function App() {
             <li>Data debugging and failure analysis</li>
             <li>Familiarity with ROS, RGB-D data, point clouds, or robot kinematics</li>
           </ul>
-          <br />
-          <strong>Why We Built This:</strong> This project was created for a hackathon where we selected the Anyware Robotics Robot Learning Intern position and built a working demonstration system around the key skills in the job description. We implemented visual imitation learning from human demonstrations, trained a temporal classifier to recognize manipulation skills, and created an interactive visualization showing how each component of the pipeline maps to specific job responsibilities. The dashboard demonstrates practical robotics engineering: from raw video input through computer vision, temporal modeling, and robot control.
-          <br /><br />
-          <strong>What We Did:</strong> We trained a model and built a system that learns robot skills from human demonstrations. The system uses computer vision to understand human actions, predicts the individual manipulation subskills being performed, and chains these inferred subskills together to execute new robot manipulation tasks.
         </div>
       </div>
 
