@@ -1,0 +1,3053 @@
+{
+  "metadata": {
+    "created": "2026-08-31T19:35:02.627506",
+    "fps": 29.983585628305672,
+    "total_frames": 274,
+    "duration": 9.104981751824818
+  },
+  "per_frame": [
+    {
+      "frame_index": 0,
+      "timestamp": 0.0,
+      "position": {
+        "x": 849.5,
+        "y": 678.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9608975648880005
+    },
+    {
+      "frame_index": 1,
+      "timestamp": 0.03335158150851582,
+      "position": {
+        "x": 849.5,
+        "y": 678.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9963274598121643
+    },
+    {
+      "frame_index": 2,
+      "timestamp": 0.06670316301703164,
+      "position": {
+        "x": 849.5,
+        "y": 678.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9976885318756104
+    },
+    {
+      "frame_index": 3,
+      "timestamp": 0.10005474452554744,
+      "position": {
+        "x": 849.5,
+        "y": 678.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9978426694869995
+    },
+    {
+      "frame_index": 4,
+      "timestamp": 0.13340632603406327,
+      "position": {
+        "x": 849.5,
+        "y": 678.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9976517558097839
+    },
+    {
+      "frame_index": 5,
+      "timestamp": 0.16675790754257908,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9976611137390137
+    },
+    {
+      "frame_index": 6,
+      "timestamp": 0.20010948905109488,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9974260926246643
+    },
+    {
+      "frame_index": 7,
+      "timestamp": 0.2334610705596107,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9972633123397827
+    },
+    {
+      "frame_index": 8,
+      "timestamp": 0.26681265206812654,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.997100293636322
+    },
+    {
+      "frame_index": 9,
+      "timestamp": 0.30016423357664235,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9968959093093872
+    },
+    {
+      "frame_index": 10,
+      "timestamp": 0.33351581508515815,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9963893890380859
+    },
+    {
+      "frame_index": 11,
+      "timestamp": 0.36686739659367396,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9958311915397644
+    },
+    {
+      "frame_index": 12,
+      "timestamp": 0.40021897810218976,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9953187108039856
+    },
+    {
+      "frame_index": 13,
+      "timestamp": 0.4335705596107056,
+      "position": {
+        "x": 849.5,
+        "y": 678.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9944702386856079
+    },
+    {
+      "frame_index": 14,
+      "timestamp": 0.4669221411192214,
+      "position": {
+        "x": 849.5,
+        "y": 678.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9938456416130066
+    },
+    {
+      "frame_index": 15,
+      "timestamp": 0.5002737226277372,
+      "position": {
+        "x": 849.5,
+        "y": 678.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.992526650428772
+    },
+    {
+      "frame_index": 16,
+      "timestamp": 0.5336253041362531,
+      "position": {
+        "x": 849.5,
+        "y": 678.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9916996955871582
+    },
+    {
+      "frame_index": 17,
+      "timestamp": 0.5669768856447689,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9902513027191162
+    },
+    {
+      "frame_index": 18,
+      "timestamp": 0.6003284671532847,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9883463978767395
+    },
+    {
+      "frame_index": 19,
+      "timestamp": 0.6336800486618005,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.984983503818512
+    },
+    {
+      "frame_index": 20,
+      "timestamp": 0.6670316301703163,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9802986979484558
+    },
+    {
+      "frame_index": 21,
+      "timestamp": 0.7003832116788321,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9750465154647827
+    },
+    {
+      "frame_index": 22,
+      "timestamp": 0.7337347931873479,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9687677025794983
+    },
+    {
+      "frame_index": 23,
+      "timestamp": 0.7670863746958637,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9545739889144897
+    },
+    {
+      "frame_index": 24,
+      "timestamp": 0.8004379562043795,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9395076036453247
+    },
+    {
+      "frame_index": 25,
+      "timestamp": 0.8337895377128953,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.9146904945373535
+    },
+    {
+      "frame_index": 26,
+      "timestamp": 0.8671411192214112,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.8886098861694336
+    },
+    {
+      "frame_index": 27,
+      "timestamp": 0.900492700729927,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.8568722605705261
+    },
+    {
+      "frame_index": 28,
+      "timestamp": 0.9338442822384428,
+      "position": {
+        "x": 849.5,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.8132277131080627
+    },
+    {
+      "frame_index": 29,
+      "timestamp": 0.9671958637469587,
+      "position": {
+        "x": 849.5,
+        "y": 678.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.7586577534675598
+    },
+    {
+      "frame_index": 30,
+      "timestamp": 1.0005474452554743,
+      "position": {
+        "x": 849.5,
+        "y": 678.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.6970728039741516
+    },
+    {
+      "frame_index": 31,
+      "timestamp": 1.0338990267639903,
+      "position": {
+        "x": 849.5,
+        "y": 679.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.6230589151382446
+    },
+    {
+      "frame_index": 32,
+      "timestamp": 1.0672506082725062,
+      "position": {
+        "x": 849.5,
+        "y": 679.5,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.5490611791610718
+    },
+    {
+      "frame_index": 33,
+      "timestamp": 1.1006021897810219,
+      "position": {
+        "x": 849.5,
+        "y": 680.0,
+        "confidence": 0.8
+      },
+      "action": "IDLE",
+      "action_confidence": 0.4755239188671112
+    },
+    {
+      "frame_index": 34,
+      "timestamp": 1.1339537712895378,
+      "position": {
+        "x": 849.5,
+        "y": 680.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.47704970836639404
+    },
+    {
+      "frame_index": 35,
+      "timestamp": 1.1673053527980535,
+      "position": {
+        "x": 849.5,
+        "y": 680.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.5219036340713501
+    },
+    {
+      "frame_index": 36,
+      "timestamp": 1.2006569343065694,
+      "position": {
+        "x": 849.5,
+        "y": 680.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.5665976405143738
+    },
+    {
+      "frame_index": 37,
+      "timestamp": 1.234008515815085,
+      "position": {
+        "x": 849.5,
+        "y": 680.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6164674162864685
+    },
+    {
+      "frame_index": 38,
+      "timestamp": 1.267360097323601,
+      "position": {
+        "x": 849.5,
+        "y": 681.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6523986458778381
+    },
+    {
+      "frame_index": 39,
+      "timestamp": 1.3007116788321167,
+      "position": {
+        "x": 849.5,
+        "y": 681.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6891396045684814
+    },
+    {
+      "frame_index": 40,
+      "timestamp": 1.3340632603406326,
+      "position": {
+        "x": 849.5,
+        "y": 681.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.7127343416213989
+    },
+    {
+      "frame_index": 41,
+      "timestamp": 1.3674148418491485,
+      "position": {
+        "x": 849.5,
+        "y": 681.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.7469319701194763
+    },
+    {
+      "frame_index": 42,
+      "timestamp": 1.4007664233576642,
+      "position": {
+        "x": 849.5,
+        "y": 681.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.7715893983840942
+    },
+    {
+      "frame_index": 43,
+      "timestamp": 1.4341180048661801,
+      "position": {
+        "x": 849.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8001348972320557
+    },
+    {
+      "frame_index": 44,
+      "timestamp": 1.4674695863746958,
+      "position": {
+        "x": 849.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8308337926864624
+    },
+    {
+      "frame_index": 45,
+      "timestamp": 1.5008211678832117,
+      "position": {
+        "x": 849.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8457684516906738
+    },
+    {
+      "frame_index": 46,
+      "timestamp": 1.5341727493917274,
+      "position": {
+        "x": 849.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8562371730804443
+    },
+    {
+      "frame_index": 47,
+      "timestamp": 1.5675243309002433,
+      "position": {
+        "x": 849.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8547790050506592
+    },
+    {
+      "frame_index": 48,
+      "timestamp": 1.600875912408759,
+      "position": {
+        "x": 849.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8685452342033386
+    },
+    {
+      "frame_index": 49,
+      "timestamp": 1.634227493917275,
+      "position": {
+        "x": 867.5,
+        "y": 661.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8805257081985474
+    },
+    {
+      "frame_index": 50,
+      "timestamp": 1.6675790754257906,
+      "position": {
+        "x": 849.0,
+        "y": 681.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8844895958900452
+    },
+    {
+      "frame_index": 51,
+      "timestamp": 1.7009306569343066,
+      "position": {
+        "x": 849.0,
+        "y": 679.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8850570321083069
+    },
+    {
+      "frame_index": 52,
+      "timestamp": 1.7342822384428225,
+      "position": {
+        "x": 849.0,
+        "y": 677.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.88979572057724
+    },
+    {
+      "frame_index": 53,
+      "timestamp": 1.7676338199513382,
+      "position": {
+        "x": 849.0,
+        "y": 677.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8892605304718018
+    },
+    {
+      "frame_index": 54,
+      "timestamp": 1.800985401459854,
+      "position": {
+        "x": 849.0,
+        "y": 676.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8900827765464783
+    },
+    {
+      "frame_index": 55,
+      "timestamp": 1.8343369829683698,
+      "position": {
+        "x": 847.0,
+        "y": 666.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8852413296699524
+    },
+    {
+      "frame_index": 56,
+      "timestamp": 1.8676885644768857,
+      "position": {
+        "x": 839.0,
+        "y": 666.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8845105767250061
+    },
+    {
+      "frame_index": 57,
+      "timestamp": 1.9010401459854014,
+      "position": {
+        "x": 839.0,
+        "y": 671.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8858242034912109
+    },
+    {
+      "frame_index": 58,
+      "timestamp": 1.9343917274939173,
+      "position": {
+        "x": 838.5,
+        "y": 666.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8864670991897583
+    },
+    {
+      "frame_index": 59,
+      "timestamp": 1.967743309002433,
+      "position": {
+        "x": 838.0,
+        "y": 672.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8877032995223999
+    },
+    {
+      "frame_index": 60,
+      "timestamp": 2.0010948905109487,
+      "position": {
+        "x": 848.0,
+        "y": 674.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8899696469306946
+    },
+    {
+      "frame_index": 61,
+      "timestamp": 2.034446472019465,
+      "position": {
+        "x": 858.0,
+        "y": 666.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8993993997573853
+    },
+    {
+      "frame_index": 62,
+      "timestamp": 2.0677980535279805,
+      "position": {
+        "x": 858.0,
+        "y": 665.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9015589952468872
+    },
+    {
+      "frame_index": 63,
+      "timestamp": 2.101149635036496,
+      "position": {
+        "x": 858.0,
+        "y": 664.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9006732702255249
+    },
+    {
+      "frame_index": 64,
+      "timestamp": 2.1345012165450123,
+      "position": {
+        "x": 858.5,
+        "y": 664.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8982155323028564
+    },
+    {
+      "frame_index": 65,
+      "timestamp": 2.167852798053528,
+      "position": {
+        "x": 859.5,
+        "y": 663.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9005764126777649
+    },
+    {
+      "frame_index": 66,
+      "timestamp": 2.2012043795620437,
+      "position": {
+        "x": 845.5,
+        "y": 672.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8928619623184204
+    },
+    {
+      "frame_index": 67,
+      "timestamp": 2.2345559610705594,
+      "position": {
+        "x": 848.0,
+        "y": 675.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.89594966173172
+    },
+    {
+      "frame_index": 68,
+      "timestamp": 2.2679075425790756,
+      "position": {
+        "x": 867.0,
+        "y": 669.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8833088874816895
+    },
+    {
+      "frame_index": 69,
+      "timestamp": 2.3012591240875913,
+      "position": {
+        "x": 855.0,
+        "y": 681.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8903098702430725
+    },
+    {
+      "frame_index": 70,
+      "timestamp": 2.334610705596107,
+      "position": {
+        "x": 856.0,
+        "y": 682.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9041747450828552
+    },
+    {
+      "frame_index": 71,
+      "timestamp": 2.367962287104623,
+      "position": {
+        "x": 860.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9041871428489685
+    },
+    {
+      "frame_index": 72,
+      "timestamp": 2.401313868613139,
+      "position": {
+        "x": 855.0,
+        "y": 682.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8957984447479248
+    },
+    {
+      "frame_index": 73,
+      "timestamp": 2.4346654501216545,
+      "position": {
+        "x": 855.0,
+        "y": 681.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.884339451789856
+    },
+    {
+      "frame_index": 74,
+      "timestamp": 2.46801703163017,
+      "position": {
+        "x": 869.0,
+        "y": 677.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8811408281326294
+    },
+    {
+      "frame_index": 75,
+      "timestamp": 2.5013686131386863,
+      "position": {
+        "x": 869.5,
+        "y": 671.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8652997612953186
+    },
+    {
+      "frame_index": 76,
+      "timestamp": 2.534720194647202,
+      "position": {
+        "x": 869.5,
+        "y": 675.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8569482564926147
+    },
+    {
+      "frame_index": 77,
+      "timestamp": 2.5680717761557177,
+      "position": {
+        "x": 869.0,
+        "y": 668.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8486654162406921
+    },
+    {
+      "frame_index": 78,
+      "timestamp": 2.6014233576642334,
+      "position": {
+        "x": 869.0,
+        "y": 663.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8551255464553833
+    },
+    {
+      "frame_index": 79,
+      "timestamp": 2.6347749391727495,
+      "position": {
+        "x": 858.0,
+        "y": 676.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8761751651763916
+    },
+    {
+      "frame_index": 80,
+      "timestamp": 2.668126520681265,
+      "position": {
+        "x": 869.0,
+        "y": 671.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8872267007827759
+    },
+    {
+      "frame_index": 81,
+      "timestamp": 2.701478102189781,
+      "position": {
+        "x": 847.0,
+        "y": 671.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.88917076587677
+    },
+    {
+      "frame_index": 82,
+      "timestamp": 2.734829683698297,
+      "position": {
+        "x": 857.0,
+        "y": 668.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8665047883987427
+    },
+    {
+      "frame_index": 83,
+      "timestamp": 2.7681812652068127,
+      "position": {
+        "x": 849.0,
+        "y": 668.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.876707911491394
+    },
+    {
+      "frame_index": 84,
+      "timestamp": 2.8015328467153284,
+      "position": {
+        "x": 848.5,
+        "y": 667.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8536278605461121
+    },
+    {
+      "frame_index": 85,
+      "timestamp": 2.834884428223844,
+      "position": {
+        "x": 846.5,
+        "y": 667.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8769934177398682
+    },
+    {
+      "frame_index": 86,
+      "timestamp": 2.8682360097323603,
+      "position": {
+        "x": 845.0,
+        "y": 666.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8715147972106934
+    },
+    {
+      "frame_index": 87,
+      "timestamp": 2.901587591240876,
+      "position": {
+        "x": 843.5,
+        "y": 667.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8750165700912476
+    },
+    {
+      "frame_index": 88,
+      "timestamp": 2.9349391727493916,
+      "position": {
+        "x": 841.0,
+        "y": 660.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8832992315292358
+    },
+    {
+      "frame_index": 89,
+      "timestamp": 2.9682907542579073,
+      "position": {
+        "x": 837.5,
+        "y": 656.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8328732848167419
+    },
+    {
+      "frame_index": 90,
+      "timestamp": 3.0016423357664235,
+      "position": {
+        "x": 850.0,
+        "y": 652.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8572673797607422
+    },
+    {
+      "frame_index": 91,
+      "timestamp": 3.034993917274939,
+      "position": {
+        "x": 847.5,
+        "y": 650.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8463671207427979
+    },
+    {
+      "frame_index": 92,
+      "timestamp": 3.068345498783455,
+      "position": {
+        "x": 830.0,
+        "y": 643.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8410959243774414
+    },
+    {
+      "frame_index": 93,
+      "timestamp": 3.101697080291971,
+      "position": {
+        "x": 842.0,
+        "y": 647.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8352406024932861
+    },
+    {
+      "frame_index": 94,
+      "timestamp": 3.1350486618004867,
+      "position": {
+        "x": 839.0,
+        "y": 644.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.838245689868927
+    },
+    {
+      "frame_index": 95,
+      "timestamp": 3.1684002433090024,
+      "position": {
+        "x": 816.5,
+        "y": 641.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8579064011573792
+    },
+    {
+      "frame_index": 96,
+      "timestamp": 3.201751824817518,
+      "position": {
+        "x": 806.5,
+        "y": 635.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9089375138282776
+    },
+    {
+      "frame_index": 97,
+      "timestamp": 3.235103406326034,
+      "position": {
+        "x": 794.0,
+        "y": 624.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9193874597549438
+    },
+    {
+      "frame_index": 98,
+      "timestamp": 3.26845498783455,
+      "position": {
+        "x": 781.0,
+        "y": 626.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9182643294334412
+    },
+    {
+      "frame_index": 99,
+      "timestamp": 3.3018065693430656,
+      "position": {
+        "x": 765.0,
+        "y": 610.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.92039954662323
+    },
+    {
+      "frame_index": 100,
+      "timestamp": 3.3351581508515813,
+      "position": {
+        "x": 750.0,
+        "y": 600.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9236533045768738
+    },
+    {
+      "frame_index": 101,
+      "timestamp": 3.3685097323600974,
+      "position": {
+        "x": 731.0,
+        "y": 588.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9256177544593811
+    },
+    {
+      "frame_index": 102,
+      "timestamp": 3.401861313868613,
+      "position": {
+        "x": 710.0,
+        "y": 572.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9227548241615295
+    },
+    {
+      "frame_index": 103,
+      "timestamp": 3.435212895377129,
+      "position": {
+        "x": 684.5,
+        "y": 550.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9216219186782837
+    },
+    {
+      "frame_index": 104,
+      "timestamp": 3.468564476885645,
+      "position": {
+        "x": 661.0,
+        "y": 535.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.920907199382782
+    },
+    {
+      "frame_index": 105,
+      "timestamp": 3.5019160583941606,
+      "position": {
+        "x": 636.0,
+        "y": 518.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9173875451087952
+    },
+    {
+      "frame_index": 106,
+      "timestamp": 3.5352676399026763,
+      "position": {
+        "x": 610.0,
+        "y": 498.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9134340882301331
+    },
+    {
+      "frame_index": 107,
+      "timestamp": 3.568619221411192,
+      "position": {
+        "x": 582.0,
+        "y": 483.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9081873893737793
+    },
+    {
+      "frame_index": 108,
+      "timestamp": 3.601970802919708,
+      "position": {
+        "x": 555.0,
+        "y": 466.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9130862355232239
+    },
+    {
+      "frame_index": 109,
+      "timestamp": 3.635322384428224,
+      "position": {
+        "x": 530.0,
+        "y": 450.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9205731749534607
+    },
+    {
+      "frame_index": 110,
+      "timestamp": 3.6686739659367396,
+      "position": {
+        "x": 506.0,
+        "y": 436.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.9114832282066345
+    },
+    {
+      "frame_index": 111,
+      "timestamp": 3.7020255474452557,
+      "position": {
+        "x": 484.0,
+        "y": 424.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8971594572067261
+    },
+    {
+      "frame_index": 112,
+      "timestamp": 3.7353771289537714,
+      "position": {
+        "x": 467.0,
+        "y": 414.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8872648477554321
+    },
+    {
+      "frame_index": 113,
+      "timestamp": 3.768728710462287,
+      "position": {
+        "x": 454.0,
+        "y": 406.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8874783515930176
+    },
+    {
+      "frame_index": 114,
+      "timestamp": 3.8020802919708028,
+      "position": {
+        "x": 444.0,
+        "y": 401.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8868919610977173
+    },
+    {
+      "frame_index": 115,
+      "timestamp": 3.835431873479319,
+      "position": {
+        "x": 437.5,
+        "y": 397.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8879886865615845
+    },
+    {
+      "frame_index": 116,
+      "timestamp": 3.8687834549878346,
+      "position": {
+        "x": 433.0,
+        "y": 394.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8902842402458191
+    },
+    {
+      "frame_index": 117,
+      "timestamp": 3.9021350364963503,
+      "position": {
+        "x": 428.5,
+        "y": 392.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8933852910995483
+    },
+    {
+      "frame_index": 118,
+      "timestamp": 3.935486618004866,
+      "position": {
+        "x": 425.5,
+        "y": 392.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8901403546333313
+    },
+    {
+      "frame_index": 119,
+      "timestamp": 3.968838199513382,
+      "position": {
+        "x": 425.0,
+        "y": 391.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8907673358917236
+    },
+    {
+      "frame_index": 120,
+      "timestamp": 4.002189781021897,
+      "position": {
+        "x": 425.0,
+        "y": 390.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8928702473640442
+    },
+    {
+      "frame_index": 121,
+      "timestamp": 4.035541362530414,
+      "position": {
+        "x": 424.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8909746408462524
+    },
+    {
+      "frame_index": 122,
+      "timestamp": 4.06889294403893,
+      "position": {
+        "x": 424.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.886835515499115
+    },
+    {
+      "frame_index": 123,
+      "timestamp": 4.102244525547445,
+      "position": {
+        "x": 423.5,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.884860634803772
+    },
+    {
+      "frame_index": 124,
+      "timestamp": 4.135596107055961,
+      "position": {
+        "x": 423.0,
+        "y": 385.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8814324736595154
+    },
+    {
+      "frame_index": 125,
+      "timestamp": 4.168947688564477,
+      "position": {
+        "x": 423.0,
+        "y": 384.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8794990181922913
+    },
+    {
+      "frame_index": 126,
+      "timestamp": 4.202299270072992,
+      "position": {
+        "x": 424.0,
+        "y": 384.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8785154223442078
+    },
+    {
+      "frame_index": 127,
+      "timestamp": 4.235650851581508,
+      "position": {
+        "x": 426.0,
+        "y": 384.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8800944685935974
+    },
+    {
+      "frame_index": 128,
+      "timestamp": 4.269002433090025,
+      "position": {
+        "x": 429.0,
+        "y": 385.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8781763315200806
+    },
+    {
+      "frame_index": 129,
+      "timestamp": 4.30235401459854,
+      "position": {
+        "x": 430.5,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.876136302947998
+    },
+    {
+      "frame_index": 130,
+      "timestamp": 4.335705596107056,
+      "position": {
+        "x": 432.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8726508617401123
+    },
+    {
+      "frame_index": 131,
+      "timestamp": 4.369057177615572,
+      "position": {
+        "x": 434.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8718579411506653
+    },
+    {
+      "frame_index": 132,
+      "timestamp": 4.4024087591240875,
+      "position": {
+        "x": 435.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8719212412834167
+    },
+    {
+      "frame_index": 133,
+      "timestamp": 4.435760340632603,
+      "position": {
+        "x": 437.0,
+        "y": 389.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8686437010765076
+    },
+    {
+      "frame_index": 134,
+      "timestamp": 4.469111922141119,
+      "position": {
+        "x": 437.5,
+        "y": 390.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8694695234298706
+    },
+    {
+      "frame_index": 135,
+      "timestamp": 4.502463503649635,
+      "position": {
+        "x": 437.0,
+        "y": 390.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8695049285888672
+    },
+    {
+      "frame_index": 136,
+      "timestamp": 4.535815085158151,
+      "position": {
+        "x": 438.0,
+        "y": 394.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8752565979957581
+    },
+    {
+      "frame_index": 137,
+      "timestamp": 4.569166666666667,
+      "position": {
+        "x": 439.0,
+        "y": 393.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.878794252872467
+    },
+    {
+      "frame_index": 138,
+      "timestamp": 4.6025182481751825,
+      "position": {
+        "x": 440.0,
+        "y": 394.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8828195929527283
+    },
+    {
+      "frame_index": 139,
+      "timestamp": 4.635869829683698,
+      "position": {
+        "x": 439.0,
+        "y": 393.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8766164779663086
+    },
+    {
+      "frame_index": 140,
+      "timestamp": 4.669221411192214,
+      "position": {
+        "x": 439.0,
+        "y": 393.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8684784173965454
+    },
+    {
+      "frame_index": 141,
+      "timestamp": 4.70257299270073,
+      "position": {
+        "x": 461.0,
+        "y": 393.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8643714189529419
+    },
+    {
+      "frame_index": 142,
+      "timestamp": 4.735924574209246,
+      "position": {
+        "x": 457.5,
+        "y": 394.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8608962297439575
+    },
+    {
+      "frame_index": 143,
+      "timestamp": 4.769276155717762,
+      "position": {
+        "x": 456.0,
+        "y": 389.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8615506887435913
+    },
+    {
+      "frame_index": 144,
+      "timestamp": 4.802627737226278,
+      "position": {
+        "x": 455.0,
+        "y": 394.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.864820659160614
+    },
+    {
+      "frame_index": 145,
+      "timestamp": 4.835979318734793,
+      "position": {
+        "x": 454.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8678538203239441
+    },
+    {
+      "frame_index": 146,
+      "timestamp": 4.869330900243309,
+      "position": {
+        "x": 455.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8744345307350159
+    },
+    {
+      "frame_index": 147,
+      "timestamp": 4.902682481751825,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8747814893722534
+    },
+    {
+      "frame_index": 148,
+      "timestamp": 4.93603406326034,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8711333274841309
+    },
+    {
+      "frame_index": 149,
+      "timestamp": 4.969385644768856,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8711034059524536
+    },
+    {
+      "frame_index": 150,
+      "timestamp": 5.002737226277373,
+      "position": {
+        "x": 455.0,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8730550408363342
+    },
+    {
+      "frame_index": 151,
+      "timestamp": 5.036088807785888,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8755507469177246
+    },
+    {
+      "frame_index": 152,
+      "timestamp": 5.069440389294404,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.877856433391571
+    },
+    {
+      "frame_index": 153,
+      "timestamp": 5.10279197080292,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.87788325548172
+    },
+    {
+      "frame_index": 154,
+      "timestamp": 5.136143552311435,
+      "position": {
+        "x": 455.0,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8791171312332153
+    },
+    {
+      "frame_index": 155,
+      "timestamp": 5.169495133819951,
+      "position": {
+        "x": 455.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8792096376419067
+    },
+    {
+      "frame_index": 156,
+      "timestamp": 5.202846715328467,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8782541751861572
+    },
+    {
+      "frame_index": 157,
+      "timestamp": 5.236198296836983,
+      "position": {
+        "x": 455.0,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8804118633270264
+    },
+    {
+      "frame_index": 158,
+      "timestamp": 5.269549878345499,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8817095160484314
+    },
+    {
+      "frame_index": 159,
+      "timestamp": 5.302901459854015,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8815090656280518
+    },
+    {
+      "frame_index": 160,
+      "timestamp": 5.33625304136253,
+      "position": {
+        "x": 455.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8798347115516663
+    },
+    {
+      "frame_index": 161,
+      "timestamp": 5.369604622871046,
+      "position": {
+        "x": 455.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8807585835456848
+    },
+    {
+      "frame_index": 162,
+      "timestamp": 5.402956204379562,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8800246715545654
+    },
+    {
+      "frame_index": 163,
+      "timestamp": 5.4363077858880775,
+      "position": {
+        "x": 455.0,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8796563744544983
+    },
+    {
+      "frame_index": 164,
+      "timestamp": 5.469659367396594,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8799888491630554
+    },
+    {
+      "frame_index": 165,
+      "timestamp": 5.50301094890511,
+      "position": {
+        "x": 455.0,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8792252540588379
+    },
+    {
+      "frame_index": 166,
+      "timestamp": 5.5363625304136255,
+      "position": {
+        "x": 455.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8790324926376343
+    },
+    {
+      "frame_index": 167,
+      "timestamp": 5.569714111922141,
+      "position": {
+        "x": 455.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.876344621181488
+    },
+    {
+      "frame_index": 168,
+      "timestamp": 5.603065693430657,
+      "position": {
+        "x": 455.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8761044144630432
+    },
+    {
+      "frame_index": 169,
+      "timestamp": 5.6364172749391726,
+      "position": {
+        "x": 455.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8758906722068787
+    },
+    {
+      "frame_index": 170,
+      "timestamp": 5.669768856447688,
+      "position": {
+        "x": 455.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8771471977233887
+    },
+    {
+      "frame_index": 171,
+      "timestamp": 5.703120437956204,
+      "position": {
+        "x": 455.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8798137307167053
+    },
+    {
+      "frame_index": 172,
+      "timestamp": 5.7364720194647205,
+      "position": {
+        "x": 455.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8817878365516663
+    },
+    {
+      "frame_index": 173,
+      "timestamp": 5.769823600973236,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8811168670654297
+    },
+    {
+      "frame_index": 174,
+      "timestamp": 5.803175182481752,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8812813758850098
+    },
+    {
+      "frame_index": 175,
+      "timestamp": 5.836526763990268,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8836269974708557
+    },
+    {
+      "frame_index": 176,
+      "timestamp": 5.869878345498783,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8835706114768982
+    },
+    {
+      "frame_index": 177,
+      "timestamp": 5.903229927007299,
+      "position": {
+        "x": 434.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8822661638259888
+    },
+    {
+      "frame_index": 178,
+      "timestamp": 5.936581508515815,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8786587715148926
+    },
+    {
+      "frame_index": 179,
+      "timestamp": 5.969933090024331,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.877496063709259
+    },
+    {
+      "frame_index": 180,
+      "timestamp": 6.003284671532847,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8774228096008301
+    },
+    {
+      "frame_index": 181,
+      "timestamp": 6.036636253041363,
+      "position": {
+        "x": 455.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8769423961639404
+    },
+    {
+      "frame_index": 182,
+      "timestamp": 6.069987834549878,
+      "position": {
+        "x": 455.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8787194490432739
+    },
+    {
+      "frame_index": 183,
+      "timestamp": 6.103339416058394,
+      "position": {
+        "x": 455.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8785445690155029
+    },
+    {
+      "frame_index": 184,
+      "timestamp": 6.13669099756691,
+      "position": {
+        "x": 434.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8757379651069641
+    },
+    {
+      "frame_index": 185,
+      "timestamp": 6.170042579075425,
+      "position": {
+        "x": 434.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8765779137611389
+    },
+    {
+      "frame_index": 186,
+      "timestamp": 6.203394160583942,
+      "position": {
+        "x": 432.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8768505454063416
+    },
+    {
+      "frame_index": 187,
+      "timestamp": 6.236745742092458,
+      "position": {
+        "x": 432.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8776178359985352
+    },
+    {
+      "frame_index": 188,
+      "timestamp": 6.270097323600973,
+      "position": {
+        "x": 455.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8763905763626099
+    },
+    {
+      "frame_index": 189,
+      "timestamp": 6.303448905109489,
+      "position": {
+        "x": 455.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8774971961975098
+    },
+    {
+      "frame_index": 190,
+      "timestamp": 6.336800486618005,
+      "position": {
+        "x": 433.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8783022165298462
+    },
+    {
+      "frame_index": 191,
+      "timestamp": 6.3701520681265205,
+      "position": {
+        "x": 436.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8778461217880249
+    },
+    {
+      "frame_index": 192,
+      "timestamp": 6.403503649635036,
+      "position": {
+        "x": 435.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8777333498001099
+    },
+    {
+      "frame_index": 193,
+      "timestamp": 6.436855231143553,
+      "position": {
+        "x": 434.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8756065964698792
+    },
+    {
+      "frame_index": 194,
+      "timestamp": 6.470206812652068,
+      "position": {
+        "x": 435.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.874351441860199
+    },
+    {
+      "frame_index": 195,
+      "timestamp": 6.503558394160584,
+      "position": {
+        "x": 434.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8759700655937195
+    },
+    {
+      "frame_index": 196,
+      "timestamp": 6.5369099756691,
+      "position": {
+        "x": 433.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8743942379951477
+    },
+    {
+      "frame_index": 197,
+      "timestamp": 6.5702615571776155,
+      "position": {
+        "x": 432.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8756905198097229
+    },
+    {
+      "frame_index": 198,
+      "timestamp": 6.603613138686131,
+      "position": {
+        "x": 434.0,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8773654699325562
+    },
+    {
+      "frame_index": 199,
+      "timestamp": 6.636964720194647,
+      "position": {
+        "x": 433.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8790442943572998
+    },
+    {
+      "frame_index": 200,
+      "timestamp": 6.670316301703163,
+      "position": {
+        "x": 432.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8799224495887756
+    },
+    {
+      "frame_index": 201,
+      "timestamp": 6.703667883211679,
+      "position": {
+        "x": 431.0,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8807986378669739
+    },
+    {
+      "frame_index": 202,
+      "timestamp": 6.737019464720195,
+      "position": {
+        "x": 432.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8830611705780029
+    },
+    {
+      "frame_index": 203,
+      "timestamp": 6.7703710462287106,
+      "position": {
+        "x": 432.5,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.881878674030304
+    },
+    {
+      "frame_index": 204,
+      "timestamp": 6.803722627737226,
+      "position": {
+        "x": 433.5,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8796104192733765
+    },
+    {
+      "frame_index": 205,
+      "timestamp": 6.837074209245742,
+      "position": {
+        "x": 433.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8800840973854065
+    },
+    {
+      "frame_index": 206,
+      "timestamp": 6.870425790754258,
+      "position": {
+        "x": 433.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8767480850219727
+    },
+    {
+      "frame_index": 207,
+      "timestamp": 6.903777372262773,
+      "position": {
+        "x": 433.0,
+        "y": 389.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8744280934333801
+    },
+    {
+      "frame_index": 208,
+      "timestamp": 6.93712895377129,
+      "position": {
+        "x": 433.5,
+        "y": 389.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8736741542816162
+    },
+    {
+      "frame_index": 209,
+      "timestamp": 6.970480535279806,
+      "position": {
+        "x": 433.5,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.871980607509613
+    },
+    {
+      "frame_index": 210,
+      "timestamp": 7.003832116788321,
+      "position": {
+        "x": 434.0,
+        "y": 389.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8694949150085449
+    },
+    {
+      "frame_index": 211,
+      "timestamp": 7.037183698296837,
+      "position": {
+        "x": 434.0,
+        "y": 389.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8700775504112244
+    },
+    {
+      "frame_index": 212,
+      "timestamp": 7.070535279805353,
+      "position": {
+        "x": 433.0,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8705909848213196
+    },
+    {
+      "frame_index": 213,
+      "timestamp": 7.103886861313868,
+      "position": {
+        "x": 434.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.873460590839386
+    },
+    {
+      "frame_index": 214,
+      "timestamp": 7.137238442822384,
+      "position": {
+        "x": 432.0,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8757556676864624
+    },
+    {
+      "frame_index": 215,
+      "timestamp": 7.170590024330901,
+      "position": {
+        "x": 432.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8767722845077515
+    },
+    {
+      "frame_index": 216,
+      "timestamp": 7.203941605839416,
+      "position": {
+        "x": 433.0,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8749281167984009
+    },
+    {
+      "frame_index": 217,
+      "timestamp": 7.237293187347932,
+      "position": {
+        "x": 434.0,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8753343820571899
+    },
+    {
+      "frame_index": 218,
+      "timestamp": 7.270644768856448,
+      "position": {
+        "x": 434.0,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8771626949310303
+    },
+    {
+      "frame_index": 219,
+      "timestamp": 7.303996350364963,
+      "position": {
+        "x": 434.0,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8770065307617188
+    },
+    {
+      "frame_index": 220,
+      "timestamp": 7.337347931873479,
+      "position": {
+        "x": 434.0,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8732349276542664
+    },
+    {
+      "frame_index": 221,
+      "timestamp": 7.370699513381995,
+      "position": {
+        "x": 434.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8696408867835999
+    },
+    {
+      "frame_index": 222,
+      "timestamp": 7.404051094890511,
+      "position": {
+        "x": 455.5,
+        "y": 389.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8726156949996948
+    },
+    {
+      "frame_index": 223,
+      "timestamp": 7.437402676399027,
+      "position": {
+        "x": 434.0,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8712992668151855
+    },
+    {
+      "frame_index": 224,
+      "timestamp": 7.470754257907543,
+      "position": {
+        "x": 434.0,
+        "y": 388.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8688367009162903
+    },
+    {
+      "frame_index": 225,
+      "timestamp": 7.5041058394160585,
+      "position": {
+        "x": 434.0,
+        "y": 389.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.868986189365387
+    },
+    {
+      "frame_index": 226,
+      "timestamp": 7.537457420924574,
+      "position": {
+        "x": 435.0,
+        "y": 391.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8680447936058044
+    },
+    {
+      "frame_index": 227,
+      "timestamp": 7.57080900243309,
+      "position": {
+        "x": 434.5,
+        "y": 391.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8712291121482849
+    },
+    {
+      "frame_index": 228,
+      "timestamp": 7.6041605839416055,
+      "position": {
+        "x": 434.0,
+        "y": 391.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8732572793960571
+    },
+    {
+      "frame_index": 229,
+      "timestamp": 7.637512165450121,
+      "position": {
+        "x": 436.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8718243837356567
+    },
+    {
+      "frame_index": 230,
+      "timestamp": 7.670863746958638,
+      "position": {
+        "x": 436.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8724828958511353
+    },
+    {
+      "frame_index": 231,
+      "timestamp": 7.7042153284671535,
+      "position": {
+        "x": 436.5,
+        "y": 388.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.872789740562439
+    },
+    {
+      "frame_index": 232,
+      "timestamp": 7.737566909975669,
+      "position": {
+        "x": 437.0,
+        "y": 390.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8736007809638977
+    },
+    {
+      "frame_index": 233,
+      "timestamp": 7.770918491484185,
+      "position": {
+        "x": 437.0,
+        "y": 391.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8776613473892212
+    },
+    {
+      "frame_index": 234,
+      "timestamp": 7.804270072992701,
+      "position": {
+        "x": 455.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8794577121734619
+    },
+    {
+      "frame_index": 235,
+      "timestamp": 7.837621654501216,
+      "position": {
+        "x": 433.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.882311999797821
+    },
+    {
+      "frame_index": 236,
+      "timestamp": 7.870973236009732,
+      "position": {
+        "x": 432.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8810825347900391
+    },
+    {
+      "frame_index": 237,
+      "timestamp": 7.904324817518249,
+      "position": {
+        "x": 434.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8800771832466125
+    },
+    {
+      "frame_index": 238,
+      "timestamp": 7.937676399026764,
+      "position": {
+        "x": 433.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8783971071243286
+    },
+    {
+      "frame_index": 239,
+      "timestamp": 7.97102798053528,
+      "position": {
+        "x": 433.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8806725144386292
+    },
+    {
+      "frame_index": 240,
+      "timestamp": 8.004379562043795,
+      "position": {
+        "x": 444.5,
+        "y": 387.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8795812129974365
+    },
+    {
+      "frame_index": 241,
+      "timestamp": 8.037731143552312,
+      "position": {
+        "x": 433.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8840497732162476
+    },
+    {
+      "frame_index": 242,
+      "timestamp": 8.071082725060828,
+      "position": {
+        "x": 431.5,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8865950703620911
+    },
+    {
+      "frame_index": 243,
+      "timestamp": 8.104434306569344,
+      "position": {
+        "x": 431.5,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.890354573726654
+    },
+    {
+      "frame_index": 244,
+      "timestamp": 8.13778588807786,
+      "position": {
+        "x": 431.5,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.894493818283081
+    },
+    {
+      "frame_index": 245,
+      "timestamp": 8.171137469586375,
+      "position": {
+        "x": 431.5,
+        "y": 386.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8917824625968933
+    },
+    {
+      "frame_index": 246,
+      "timestamp": 8.20448905109489,
+      "position": {
+        "x": 431.5,
+        "y": 386.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.893552303314209
+    },
+    {
+      "frame_index": 247,
+      "timestamp": 8.237840632603406,
+      "position": {
+        "x": 431.5,
+        "y": 385.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8940536975860596
+    },
+    {
+      "frame_index": 248,
+      "timestamp": 8.271192214111922,
+      "position": {
+        "x": 431.5,
+        "y": 385.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8956042528152466
+    },
+    {
+      "frame_index": 249,
+      "timestamp": 8.304543795620438,
+      "position": {
+        "x": 431.5,
+        "y": 385.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8917579054832458
+    },
+    {
+      "frame_index": 250,
+      "timestamp": 8.337895377128953,
+      "position": {
+        "x": 432.0,
+        "y": 385.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8865442276000977
+    },
+    {
+      "frame_index": 251,
+      "timestamp": 8.37124695863747,
+      "position": {
+        "x": 433.0,
+        "y": 386.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8848667740821838
+    },
+    {
+      "frame_index": 252,
+      "timestamp": 8.404598540145985,
+      "position": {
+        "x": 455.5,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8858288526535034
+    },
+    {
+      "frame_index": 253,
+      "timestamp": 8.4379501216545,
+      "position": {
+        "x": 455.5,
+        "y": 386.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8867103457450867
+    },
+    {
+      "frame_index": 254,
+      "timestamp": 8.471301703163016,
+      "position": {
+        "x": 455.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8834691047668457
+    },
+    {
+      "frame_index": 255,
+      "timestamp": 8.504653284671534,
+      "position": {
+        "x": 455.0,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8757668137550354
+    },
+    {
+      "frame_index": 256,
+      "timestamp": 8.53800486618005,
+      "position": {
+        "x": 453.5,
+        "y": 387.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8699836730957031
+    },
+    {
+      "frame_index": 257,
+      "timestamp": 8.571356447688565,
+      "position": {
+        "x": 453.5,
+        "y": 390.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.873779833316803
+    },
+    {
+      "frame_index": 258,
+      "timestamp": 8.60470802919708,
+      "position": {
+        "x": 407.0,
+        "y": 394.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8717764019966125
+    },
+    {
+      "frame_index": 259,
+      "timestamp": 8.638059610705596,
+      "position": {
+        "x": 401.5,
+        "y": 400.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.865203857421875
+    },
+    {
+      "frame_index": 260,
+      "timestamp": 8.671411192214112,
+      "position": {
+        "x": 402.0,
+        "y": 362.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8420273065567017
+    },
+    {
+      "frame_index": 261,
+      "timestamp": 8.704762773722628,
+      "position": {
+        "x": 412.0,
+        "y": 366.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8320696949958801
+    },
+    {
+      "frame_index": 262,
+      "timestamp": 8.738114355231144,
+      "position": {
+        "x": 403.0,
+        "y": 362.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.8156870603561401
+    },
+    {
+      "frame_index": 263,
+      "timestamp": 8.77146593673966,
+      "position": {
+        "x": 402.0,
+        "y": 362.0,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.7928560376167297
+    },
+    {
+      "frame_index": 264,
+      "timestamp": 8.804817518248175,
+      "position": {
+        "x": 403.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.7776962518692017
+    },
+    {
+      "frame_index": 265,
+      "timestamp": 8.83816909975669,
+      "position": {
+        "x": 402.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.762140691280365
+    },
+    {
+      "frame_index": 266,
+      "timestamp": 8.871520681265206,
+      "position": {
+        "x": 403.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.7353204488754272
+    },
+    {
+      "frame_index": 267,
+      "timestamp": 8.904872262773722,
+      "position": {
+        "x": 403.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.7228350639343262
+    },
+    {
+      "frame_index": 268,
+      "timestamp": 8.938223844282238,
+      "position": {
+        "x": 403.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.705541729927063
+    },
+    {
+      "frame_index": 269,
+      "timestamp": 8.971575425790753,
+      "position": {
+        "x": 402.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6881659626960754
+    },
+    {
+      "frame_index": 270,
+      "timestamp": 9.00492700729927,
+      "position": {
+        "x": 402.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6763816475868225
+    },
+    {
+      "frame_index": 271,
+      "timestamp": 9.038278588807787,
+      "position": {
+        "x": 404.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6479084491729736
+    },
+    {
+      "frame_index": 272,
+      "timestamp": 9.071630170316302,
+      "position": {
+        "x": 403.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6397038698196411
+    },
+    {
+      "frame_index": 273,
+      "timestamp": 9.104981751824818,
+      "position": {
+        "x": 402.0,
+        "y": 361.5,
+        "confidence": 0.8
+      },
+      "action": "CARRY",
+      "action_confidence": 0.6764102578163147
+    }
+  ],
+  "action_segments": [
+    {
+      "action": "IDLE",
+      "start_frame": 0,
+      "end_frame": 33,
+      "start_time": 0.0,
+      "end_time": 1.1006021897810219,
+      "duration": 1.1006021897810219,
+      "avg_confidence": 0.9192761252908146
+    },
+    {
+      "action": "CARRY",
+      "start_frame": 34,
+      "end_frame": 273,
+      "start_time": 1.1339537712895378,
+      "end_time": 9.104981751824818,
+      "duration": 7.97102798053528,
+      "avg_confidence": 0.8626031875610352
+    }
+  ],
+  "tracking_summary": {
+    "total_positions": 274,
+    "fps": 29.983585628305672
+  },
+  "simulation": {
+    "status": "failed",
+    "error": "No module named 'mink'",
+    "log_file": "results/IMG_2013_with_sim/simulation/IMG_2013_execution.jsonl"
+  }
+}
