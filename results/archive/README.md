@@ -7,6 +7,13 @@ failures. Superseded schemas and duplicate demonstration trees have been removed
 
 - `failed_runs/short_demo/` contains the pre-fix IMG_2067 IK and placement-failure traces.
 
-The active results remain in `results/short_demo/` and `results/long_demo/`.
-`results/short_demo/IMG_2067_execution.jsonl` is the successful guarded-placement
-MuJoCo run (`2.80 mm` final placement error).
+## 2026-09-01
+
+Moved superseded result trees out of the active `results/` layout:
+
+- `IMG_2067_test/`
+- `IMG_2068/` (pre-continuous-playback traces)
+- `long_demo/`
+- `short_demo/`
+
+The active demonstrations are `results/IMG_2067/` and `results/IMG_2068/`.
