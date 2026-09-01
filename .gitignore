@@ -86,3 +86,7 @@ sbatch_example.sh
 # MuJoCo models
 *.xml~
 *.xml.bak
+
+# Web dashboard
+web/node_modules/
+*.tsbuildinfo
