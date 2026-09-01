@@ -69,22 +69,27 @@ uv run --group robot python scripts/simulate_robot.py \
   --log outputs/robot_attempt.jsonl
 ```
 
-To build those world waypoints from existing postprocessed actions and pixel
-tracking results without rerunning video inference:
+To watch the execution on macOS, run the same command with `mjpython` and
+`--viewer`; see [Robot Execution](docs/ROBOT_EXECUTION.md) for the full command.
+
+To build those world waypoints from an existing consolidated post-model task
+input without rerunning video inference:
 
 ```bash
 uv run mimic-robot-pipeline \
-  --actions results/demo/demo_robot_actions.json \
-  --results results/demo/demo_results.json \
+  --task-input results/demo/demo_task_input.json \
   --calibration data/annotations/calibrations.json \
-  --pipeline-config path/to/experiment_robot_pipeline.yaml \
+  --pipeline-config configs/robot_pipeline.yaml \
   --waypoints results/demo/demo_world_waypoints.json
 ```
 
 Add `--robot-config path/to/experiment_robot.yaml --log outputs/robot_attempt.jsonl`
 to execute the generated waypoints immediately. The committed
-`configs/robot_pipeline.yaml` is a fail-closed template: copy it and explicitly
-set the scene's world-Z coordinates and fixed tool quaternion before use.
+`configs/robot_pipeline.yaml` contains the simulation-only 4 cm cube fixture
+geometry; use a separate experiment config for another object or scene.
+Add `--video-out outputs/simulation.mp4` to record that execution, or pass
+`--video-out` without a path to create a timestamp-named MP4 in the working
+directory.
 
 Requires explicit scene/tool geometry and acceptance criteria; the Panda config is
 an unconfigured template. See [Robot Execution](docs/ROBOT_EXECUTION.md) for setup,
@@ -108,7 +113,8 @@ All modules use common types in `src/mimic/common/types.py`:
 - `Video`, `Frame`, `ObjectTrack`, `HandTrack`
 - `ActionPhase`, `TaskRepresentation`, `RobotCommand`
 
-Configuration is centralized in `src/mimic/config.py`. Experiment parameters go in `configs/`.
+`configs/default.yaml` is the single source of project defaults. `src/mimic/config.py`
+loads it and layers experiment-specific and local YAML overrides on top.
 
 ### Offline Task Definition
 
@@ -117,7 +123,8 @@ predictions and table-space object tracks keyed by shared source-video frame IDs
 Tracking coordinates are meters (top-left origin, +X right, +Y down).
 Tasks and retargeting preserve every demonstration sample. The robot-independent
 Path Processor then selects `direct`, `corners_only`, exact `none`, or `cubic`
-geometry. `direct` remains the default. Retargeting requires explicit mapping
+geometry. `cubic` is the configured default; `direct` remains available for
+endpoint-only paths. Retargeting requires explicit mapping
 values; `configs/retargeting.yaml` intentionally leaves deployment values unset.
 
 See [Task Extraction and Retargeting](docs/TASK_EXTRACTION_AND_RETARGETING.md)

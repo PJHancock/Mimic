@@ -10,9 +10,10 @@ coordinates and mandatory second-based timing at these two boundaries.
 - Step 2: `TaskExtractor` recovers task geometry and phase boundaries.
 - Step 3: `CoordinateRetargeter` maps source geometry into a named target frame.
 - Step 4: `PathProcessor` explicitly selects or interpolates mapped XY geometry.
-- State post-processing occurs upstream of this boundary. The extractor accepts
-  only the single resolved phase per timestep from `mimic.robot_actions.v1`;
-  invalid phase sequences are still rejected, not repaired here.
+- State post-processing occurs upstream of this boundary. The persisted
+  `mimic.demo_task_input.v1` handoff exposes only its single resolved phase per
+  classifier timestep; invalid phase sequences are still rejected, not repaired
+  here.
 - No robot actuation, IK, collision planning, heights, velocities, or
   demonstration-speed replay happens here.
 
@@ -24,16 +25,25 @@ Frame IDs must be positive integers, unique and strictly increasing within
 each stream. Predictions and tracks may have different sampling rates.
 
 `ActionPrediction.phase` supplies a resolved label. After collapsing adjacent
-repeats, each episode must contain exactly:
+repeats, each successful episode must contain either:
 
 `IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> HOVER -> IDLE`
+
+or:
+
+`IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> IDLE`
+
+IDLE is a legal terminal state from every classifier state, but an earlier IDLE
+ends an incomplete/aborted sequence and does not make it extractable.
 
 Adjacent episodes share their boundary `IDLE`. `extract_task` requires exactly
 one episode; `extract_tasks` returns every complete episode in the timeline.
 The extractor does not apply the relationship graph or repair incomplete input.
-`mimic.integration.load_robot_actions` is the validated JSON adapter for this
-sequence. Raw `state_scores` and legacy top-one classifier files are rejected at
-that boundary, so the robot-side extractor never selects among model labels.
+`mimic.integration.load_task_actions` is the validated persisted adapter for this
+sequence. `load_robot_actions` remains the equivalent adapter for classifier-only
+action artifacts. Raw `state_scores` and legacy top-one classifier files are
+rejected at that boundary, so the robot-side extractor never selects among model
+labels.
 
 `ActionPrediction.timestamp` is optional. If supplied, it remains nonnegative,
 finite video time in seconds. Extraction uses frames; it never substitutes frame
@@ -115,27 +125,29 @@ coordinates. Do not put source or target meters into its normalized fields.
 ## Required mapping configuration
 
 `configs/retargeting.yaml` defines the default tabletop clone in `mujoco_world`.
-The robot/base origin is the center of the filmed table's left edge. Positive X
-points into the table, positive Y points left from the robot's perspective, and
-positive Z points upward. A deployment with a different scene must override the
-mapping explicitly rather than silently reusing this placement.
+The Panda base is the world origin, 0.15 m behind the center of the filmed
+table's left/near long edge. Positive X points into the table, positive Y points
+left from the robot's perspective, and positive Z points upward. A deployment
+with a different scene must override the mapping explicitly rather than silently
+reusing this placement.
 
 The sibling `tabletop_clone` section supplies the measured `0.508 m x 0.762 m`
-footprint to `add_tabletop_clone`. Its minimal `0.01 m` thickness extends below
-the `z=0` top surface and is a simulation default, not a measured property. The
-builder adds no robot geometry; it only creates the bounded table and a named
-base-frame marker at the left-edge center.
+footprint and explicit `0.15 m` robot setback to `add_tabletop_clone`. Its minimal
+`0.01 m` thickness extends below the `z=0` top surface and is a simulation
+default, not a measured property. The builder adds no robot geometry; it creates
+the bounded table in front of a named robot-base marker.
 
 For this default `0.762 m` table depth, the configured mapping reduces to:
 
 ```text
-x_mujoco = x_table
+x_mujoco = 0.15 + x_table
 y_mujoco = 0.381 - y_table
 ```
 
-Thus table `(0, 0.381)` is the robot/base origin, the tabletop occupies
-`x in [0, 0.508]` and `y in [-0.381, 0.381]`, and no Panda workspace dimensions
-participate in the conversion.
+Thus table `(0, 0.381)` is its near-edge center at world `(0.15, 0)`, the Panda
+base is world `(0, 0)`, and the tabletop occupies `x in [0.15, 0.658]` and
+`y in [-0.381, 0.381]`. No Panda workspace dimensions participate in the
+conversion.
 
 Required fields:
 
@@ -206,6 +218,10 @@ cubic = process_path(
 ```
 
 The numerical values above demonstrate the API and are not deployment tuning.
+The authoritative project default is the `cubic` configuration in
+`configs/default.yaml`; the simulation pipeline repeats those explicit values in
+`configs/robot_pipeline.yaml` because pipeline artifacts are validated as a
+self-contained execution configuration.
 The supported policies are:
 
 | `interpolation` | Geometry |
@@ -258,18 +274,52 @@ The builder preserves every processed XY point and never derives height or
 orientation from a Panda model. Complete tool poses are subsequently checked
 against the selected robot profile by the execution stack. The internal executor
 skill label remains `FOLLOW_PATH`; it is execution metadata rather than a
-path-processing option.
+path-processing option. Execution may approximate intermediate path waypoints
+under its explicit online-handoff radius; source, retargeted, processed, and
+serialized waypoint geometry remain unchanged. Final path arrival remains exact
+under the configured measured pose tolerance.
 
 The package exposes extraction/retargeting without importing MuJoCo, Mink, or
 Torch. Existing execution exports load their dependencies only when requested.
 
-## Saved-results integration
+## Saved task-input integration
 
 `mimic.integration.build_robot_pipeline` connects the committed offline contracts
 without rerunning perception:
 
+```json
+{
+  "schema": "mimic.demo_task_input.v1",
+  "video": {
+    "created_at": "...",
+    "fps": 30.0,
+    "frame_count": 140,
+    "duration_s": 4.67,
+    "tracking_coordinate_frame": "image_pixels",
+    "image_width_px": 1920,
+    "image_height_px": 1080
+  },
+  "catalog": { "schema_version": 2, "fingerprint": "...", "labels": ["..."] },
+  "checkpoint_sha256": "...",
+  "postprocessing": { "fingerprint": "...", "settings": {}, "guard_policy": "..." },
+  "resolved_actions": [
+    { "frame_idx": 1, "timestamp_s": 0.0, "phase": "IDLE", "confidence": 0.9,
+      "decision_source": "model" }
+  ],
+  "object_tracks": [
+    { "frame_idx": 1, "timestamp_s": 0.0,
+      "position": { "x": 100.0, "y": 200.0, "confidence": 0.8 } }
+  ]
+}
+```
+
+`position` is `null` when the tracker has no observation. Action and tracking
+arrays are independently ordered by the same one-based source-video frame IDs;
+they need not contain the same frames.
+
 ```text
-mimic.robot_actions.v1 + mimic.demo_results.v2 image pixels + calibration homography
+mimic.demo_task_input.v1 (resolved actions + independent image-pixel tracks)
+  + calibration homography
   -> ObjectTrack(table_xy_m)
   -> ExtractedTask
   -> RetargetedTask
@@ -277,31 +327,40 @@ mimic.robot_actions.v1 + mimic.demo_results.v2 image pixels + calibration homogr
   -> PickPlaceWaypoints
 ```
 
-The adapter verifies that classifier catalog and post-processing fingerprints
-match the combined results, and that calibration table dimensions match the
+The consolidated artifact stores classifier catalog, checkpoint, and
+post-processing provenance once. Its `resolved_actions` array contains exactly
+one accepted phase per classifier timestep, while `object_tracks` preserves the
+independently sampled tracker stream. The adapter exposes only resolved actions
+to task extraction and verifies that calibration table dimensions match the
 configured MuJoCo tabletop clone. Missing pixel detections remain missing; exact
 GRASP and RELEASE observations are still required by task extraction. With more
 than one complete episode, the caller must explicitly select a one-based episode.
-New `mimic.demo_results.v2` files preserve tracker-native observations in
-`object_tracks`, independently of potentially sparse classifier `per_frame`
-records. The loader falls back to `per_frame` for existing v2 files.
+Calibration JSON also declares the decoded image width and height. Pixel tracks
+outside that frame are rejected with a rotation/resolution error instead of
+being extrapolated through the homography. The committed short-demo homography
+is expressed in the same `1920 x 1080` landscape frame used by tracking. Derived
+action segments and tracking summaries are computed for display only and are not
+persisted in the robot handoff.
 
 The command-line entry point writes the existing executor JSON contract:
 
 ```bash
 uv run mimic-robot-pipeline \
-  --actions results/demo/demo_robot_actions.json \
-  --results results/demo/demo_results.json \
+  --task-input results/demo/demo_task_input.json \
   --calibration data/annotations/calibrations.json \
   --retargeting-config configs/retargeting.yaml \
-  --pipeline-config path/to/experiment_robot_pipeline.yaml \
+  --pipeline-config configs/robot_pipeline.yaml \
   --waypoints results/demo/demo_world_waypoints.json
 ```
 
 Supplying `--robot-config` and a new `--log` path invokes the existing headless
-MuJoCo executor after waypoint generation. `configs/robot_pipeline.yaml` is only
-a contract template: its unresolved world-Z and orientation values deliberately
-fail validation rather than deriving grasp geometry from a robot model.
+MuJoCo executor after waypoint generation. `configs/robot_pipeline.yaml` uses the
+verified simulation fixture assumptions: a z=0 tabletop, a 4 cm cube centered at
+z=0.02 m, 0.17 m clearance poses, and a fixed downward Panda tool orientation.
+At reset-only simulation initialization, the named free-joint cube is placed at
+the selected task's retargeted grasp pose before any physics or command step.
+Those values are explicit fixture settings, not physical-robot calibration or a
+general default for differently sized objects.
 
 ## Verification
 

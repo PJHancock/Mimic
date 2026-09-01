@@ -24,7 +24,8 @@ logs/
 # Experiments
 experiments/*/results/
 experiments/*/checkpoints/
-models/
+models/*
+!models/panda_pick_place_scene.xml
 
 # Local config
 config.local.yaml

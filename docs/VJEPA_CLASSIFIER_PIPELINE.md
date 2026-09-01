@@ -8,8 +8,11 @@ relationship graph, and complete handler registry.
 Robot-facing inference never exports classifier argmax directly. The classifier
 returns every label probability, the inference pipeline applies
 `GraphStatePostProcessor`, and only its one accepted state per timestep is
-written to `mimic.robot_actions.v1`. The full distributions are retained
-separately in `mimic.skill_scores.v2` for auditing and replay.
+written to the narrow `mimic.robot_actions.v1` classifier-only contract. In the
+full video pipeline those resolved action records are embedded in
+`mimic.demo_task_input.v1` with the independent tracker stream. The full
+distributions are retained separately in `mimic.skill_scores.v2` for auditing
+and replay.
 
 ## Architecture Overview
 

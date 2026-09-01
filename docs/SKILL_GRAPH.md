@@ -18,9 +18,10 @@ using catalog order for exact ties. It evaluates the highest-probability label
 first. If that graph edge is unavailable, it may evaluate only the runner-up,
 and only when the configured top-to-second score gap permits it. It never scans
 lower-ranked labels. A transition must also pass the explicit confidence,
-margin, persistence, and named guard checks.
-Named guards fail closed when the runtime has not supplied an observation-based
-guard evaluator.
+margin, and persistence checks. Named guards carry an explicit scope. The
+postprocessor defaults to failing named guards closed when no observation-based
+evaluator is supplied; offline classifier export deliberately defers `runtime`
+guards to robot execution and records that policy in artifact provenance.
 
 Every call returns a `StateDecision` containing the previous and accepted skill,
 top two labels, selected rank, confidence, graph edge, reason, pending count,
@@ -30,15 +31,21 @@ current skill; it does not invent a graph path.
 Missing detection is separate from classifier uncertainty. After the configured
 timeout, execution is suspended in `IDLE`; no gripper-open action is generated.
 The previous skill is retained as `suspended_from`, allowing a subsequent valid
-prediction to resume against the correct graph context. All five post-state
-thresholds are deliberately `null` in the committed template and must be chosen
-from validation data.
+prediction to resume against the correct graph context. The committed
+pick/place preset supplies explicit post-state defaults; these remain
+model/design settings and are not execution feedback.
 
 ## Default relationship graph
 
 The canonical complete episode is:
 
 `IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> HOVER -> IDLE`
+
+`IDLE` is also a legal terminal transition from every state. A successfully
+observed pick/place may therefore end `RELEASE -> IDLE` when the classifier has
+no terminal HOVER observation. Earlier transitions to IDLE terminate/abort the
+state stream and do not turn an incomplete manipulation into an executable
+task.
 
 All skills have explicit self-edges for persistence. Contextual edges define:
 
@@ -47,8 +54,10 @@ All skills have explicit self-edges for persistence. Contextual edges define:
 - `GRASP -> HOVER` (`TO_HOME_ABORT`): return home only when `grasp_empty` passes.
 - `IDLE`: emit no arm or gripper action, preserving the previous measured state.
 
-Other guards (`grasp_confirmed`, `transport_complete`, and `home_reached`) are
-injected by the runtime because they depend on simulation observations. The
+Runtime-scoped guards (`grasp_confirmed`, `transport_complete`, and
+`grasp_empty`) depend on simulation observations. Offline export preserves the
+semantic transition and the deterministic executor independently fails closed
+if its measured grasp, contact, transport, or arrival criteria are not met. The
 postprocessor validates graph intent but does not execute robot motion.
 
 ## Skill execution modules
@@ -77,9 +86,10 @@ velocity, acceleration, jerk, measured-speed, joint-limit, and tracking-error
 checks as Cartesian execution, but bypasses IK. Measured per-joint arrival
 tolerances remain explicit configuration.
 
-## Deliberately unresolved values
+## Explicit experiment values
 
-The following are model/design settings and stay `null` in committed templates:
+The following remain model/design settings even when a committed experiment
+configuration supplies explicit values:
 
 - minimum accepted confidence;
 - minimum transition margin over the current state;
@@ -99,18 +109,25 @@ maps its columns through the active `SkillCatalog` into `SkillPrediction`
 records, then calls `GraphStatePostProcessor` in timestamp order. Graph logic is
 not embedded in the neural classifier.
 
-Two deliberately different JSON contracts are produced:
+The classifier-only runner can produce two deliberately different JSON contracts:
 
 - `mimic.skill_scores.v2` is a diagnostic artifact. Every valid frame contains
   `frame_idx`, `timestamp_s`, `detection_valid`, and a complete `state_scores`
   mapping. It records the catalog and checkpoint fingerprints.
-- `mimic.robot_actions.v1` is the only accepted robot action artifact. Every
+- `mimic.robot_actions.v1` is the narrow action-only artifact. Every
   frame contains exactly one post-processed `phase`, its corresponding model
   confidence when available, and the decision source. It contains no competing
   scores or raw classifier label.
 
+The full video pipeline embeds that same narrow frame structure as
+`resolved_actions` inside `mimic.demo_task_input.v1`, alongside an independently
+sampled `object_tracks` stream and provenance stored once. This consolidated
+artifact is the persisted input accepted by waypoint generation and simulation;
+the adapter never exposes score distributions to the robot framework.
+
 `mimic.integration.load_robot_actions` rejects diagnostic score files and old
-top-one-only result formats. This makes it impossible for task extraction to
+top-one-only result formats. `load_task_actions` applies that same narrow adapter
+to the consolidated artifact. This makes it impossible for task extraction to
 accidentally bypass graph post-processing. Existing legacy JSON cannot be
 converted to the score schema because its unreported probability mass is lost;
 inference must be rerun.
@@ -118,5 +135,7 @@ inference must be rerun.
 Classifier checkpoint v2 embeds the ordered labels and catalog fingerprint.
 Robot-facing inference requires that metadata and rejects a checkpoint trained
 against another catalog. The robot artifact also fingerprints the graph and
-post-state settings. Named runtime-observation guards retain their existing
-fail-closed behavior when offline inference cannot evaluate them.
+post-state settings. Offline inference records
+`defer_runtime_guards_to_execution`; direct/runtime postprocessor construction
+retains fail-closed behavior unless an explicit observation evaluator is
+provided.

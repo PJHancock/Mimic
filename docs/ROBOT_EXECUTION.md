@@ -42,7 +42,7 @@ Run downloads into a fresh directory; the downloader refuses overwrites.
 | `GripperLogic` | Open/close/hold lifecycle and candidate-grasp evidence. |
 | `RobotController` | Arm/gripper scheduling and single-use control samples. |
 | `RobotIO` / `MuJoCoAdapter` | Detached observations, validated actuator writes, and physics stepping. |
-| `SkillExecutor` | Feedback-gated hover, descent, closure, lift, path following, lowering, opening, and retreat. |
+| `SkillExecutor` | Feedback-gated hover, descent, closure, lift, path following, guarded placement, opening, and retreat. |
 
 Another fixed-base arm with scalar position-controlled joints needs a profile,
 per-joint trajectory limits, a gripper driver/observer if the hand differs, and
@@ -75,6 +75,30 @@ uses either a MuJoCo keyframe or an explicit full mapping of named arm joints;
 its measured per-joint arrival tolerances are also required.
 The template retains existing 100 Hz arm / 10 Hz gripper settings and existing
 workspace bounds. No conflicting height defaults are selected.
+
+`models/panda_pick_place_scene.xml` is the checked-in simulation scene wrapper
+used by `configs/robots/panda_complete.yaml`. After the one-time pinned asset
+download, it loads the unmodified Menagerie Panda, the approved left-edge
+tabletop clone with its near edge 0.15 m in front of the Panda base, and a 4 cm,
+30 g free-joint cube. The scene-specific `pick_place_home` keyframe includes all
+Panda, finger, and cube coordinates. Before physics starts, the simulation-only
+executor replaces the cube's keyframe translation with the selected task's
+retargeted grasp pose and clears its free-joint velocity. Mid-execution object
+teleportation is rejected.
+The complete simulation config uses Mink's supported full-correction
+`task_gain: 1.0`, matching the verified fixed Panda fixture; it is not an actuator
+gain and remains subject to the configured IK and trajectory limits.
+The complete config still uses `orientation_cost: 0.1` and
+`posture_cost: 0.01`. A read-only diagnostic on the corrected/setback grasp hover
+showed that combination settling outside the configured pose tolerances after
+2,000 steps, while either disabling the posture objective or raising orientation
+cost to `1.0` reached the same pose. The separately verified fixture uses both
+`posture_cost: 0` and `orientation_cost: 1`. These objective weights remain an
+explicit experiment decision; tolerances and planning bounds were not weakened.
+The same config uses the verified fixture's gripper completion criteria:
+`0.001 m` width tolerance, `0.002 m` empty-grasp threshold, `0.1 N` contact force,
+`0.1 s` contact duration, and `2.0 s` movement timeout. These remain
+simulation-fixture settings rather than validated physical-object thresholds.
 
 `measured_gripper_joint_tolerance_m: 0.00001` is a user-authorized allowance for
 each named Panda finger's **measured position** at either joint limit. This
@@ -109,6 +133,40 @@ stalled or poorly tracking servo before reference wind-up. These arrays are
 ordered by `profile.arm_joints`, so a different robot can provide its own count,
 names, units, and sourced limits without changing the controller.
 
+During `FOLLOW_PATH`, the complete Panda simulation config uses online handoff
+within a measured `0.03 m` Cartesian radius for every intermediate waypoint.
+Intermediate points do not require `AT_TARGET` or zero velocity: the executor
+commits the current Ruckig tick, then replaces the target while preserving its
+position, velocity, and acceleration reference. The final path waypoint still
+requires measured `AT_TARGET` arrival. Contact, slip, timeout, joint-limit, and
+tracking-error gates remain active through every handoff. Each handoff is logged
+with its waypoint index, measured distance, radius, and IK status.
+
+Release uses a separate guarded-placement primitive. `PLACE_APPROACH` first moves
+to the configured clearance above the final tool pose. `LOWER` then advances an
+online Cartesian Z reference while holding the goal XY and fixed orientation.
+The configured descent acceleration ramps the reference-speed request; measured
+downward TCP speed consumes the remaining speed budget, and execution fails
+closed if measured descent exceeds the configured maximum. Intermediate descent
+references do not require zero velocity or `AT_TARGET`.
+
+The simulation adapter supplies an active-contact predicate between the named
+object subtree and the configured `support_geom`. On first object-support contact,
+the executor holds the measured tool pose. Release begins only after support and
+object-speed stability persist for `placement_contact_confirmation_s` and the
+measured object position is inside `placement_tolerance_m`. The airborne
+object/tool slip and finger-contact-loss gates remain active through
+`PLACE_APPROACH` and free-space `LOWER`; after support onset, expected table
+constraint motion is evaluated by the placement gate instead of the airborne
+rigid-offset rule. Contact onset, loss, confirmation, commanded pose, and measured
+descent speed are retained in the execution log.
+
+For the checked-in cube scene, `configs/robots/panda_complete.yaml` uses a
+`0.015 m` approach clearance, `0.05 m/s` maximum measured descent,
+`0.5 m/s^2` reference acceleration, and `0.05 s` support confirmation. These are
+explicit simulation-fixture settings, not Panda constants or hardware-safe
+values. The generic Panda template leaves them unresolved.
+
 Contextual `HOVER` return-home actions bypass Cartesian IK and send the saved
 joint configuration through the same persistent Ruckig reference, measured-speed
 checks, tracking-error bound, and model limits. Only named arm joints are read
@@ -123,6 +181,33 @@ uv run --group robot python scripts/simulate_robot.py \
   --waypoints path/to/world_waypoints.json \
   --log outputs/robot_attempt.jsonl
 ```
+
+Add `--viewer` for a live, approximately real-time display. On macOS, passive
+MuJoCo rendering must run under `mjpython`:
+
+```sh
+uv run --group robot mjpython scripts/simulate_robot.py \
+  --config configs/robots/panda_complete.yaml \
+  --waypoints results/short_demo/IMG_2067_world_waypoints.json \
+  --log results/short_demo/IMG_2067_viewed_execution.jsonl \
+  --viewer
+```
+
+The viewer observes the same validated physics steps as headless execution; it
+does not introduce a second physics loop or change simulation/control rates. The
+runner holds the final frame until the window is closed. Use a new log filename
+for each attempt because execution logs are never overwritten.
+
+The integrated saved-results command also accepts `--viewer`. It selects
+`mjpython` for the simulation child process automatically on macOS.
+
+Both `scripts/simulate_robot.py` and `mimic-robot-pipeline` accept
+`--video-out PATH` to record the simulation as MP4. Omitting only the PATH (for
+example, `--video-out`) writes `mimic-simulation-<current-time>.mp4` in the
+working directory. Recording samples completed validated physics intervals at
+30 FPS; it does not step or pace the simulation. Existing video files are not
+overwritten. On macOS, offscreen recording also requires `mjpython`; the
+integrated pipeline selects it automatically.
 
 The waypoint JSON fields are `approach`, `grasp`, `lift`, `path` (a nonempty list),
 `lower`, `retreat`, and `goal_position`. Each pose contains `position` and

@@ -121,11 +121,20 @@ python scripts/run_inference.py --video data/raw/demo_test.mp4 --model outputs/m
 ```
 
 ### simulate_robot.py
-Execute explicitly configured, processed world-space waypoints in headless MuJoCo.
+Execute explicitly configured, processed world-space waypoints in MuJoCo.
 ```bash
 uv run --group robot python scripts/simulate_robot.py \
   --config path/to/experiment.yaml --waypoints path/to/world_waypoints.json \
   --log outputs/robot_attempt.jsonl
+```
+
+On macOS, view and real-time-pace the same execution with:
+
+```bash
+uv run --group robot mjpython scripts/simulate_robot.py \
+  --config configs/robots/panda_complete.yaml \
+  --waypoints results/short_demo/IMG_2067_world_waypoints.json \
+  --log results/short_demo/IMG_2067_viewed_execution.jsonl --viewer
 ```
 
 Use `fetch_panda_model.py` for the one-time pinned asset download. Use
@@ -136,23 +145,26 @@ for unresolved general configuration and the successful fixed-fixture result.
 
 ### Existing JSON to robot waypoints
 
-Use the integration runner when inference and tracking JSON already exist:
+Use the integration runner when a consolidated post-model task input already exists:
 
 ```bash
 uv run python integration/run_robot_pipeline.py \
-  --actions results/demo/demo_robot_actions.json \
-  --results results/demo/demo_results.json \
+  --task-input results/demo/demo_task_input.json \
   --calibration data/annotations/calibrations.json \
-  --pipeline-config path/to/experiment_robot_pipeline.yaml \
+  --pipeline-config configs/robot_pipeline.yaml \
   --waypoints results/demo/demo_world_waypoints.json
 ```
 
-The runner validates action/catalog provenance, applies the saved pixel-to-table
+The runner validates the task input, applies the saved pixel-to-table
 homography, verifies that the calibrated table dimensions match the tabletop
 clone, extracts one complete episode, retargets it using `configs/retargeting.yaml`,
 and invokes the configured path processor and waypoint builder. Add
 `--robot-config ... --log ...` to run the simulator. If multiple complete episodes
 exist, select one explicitly with `--episode N`.
+
+`process_demo_video.py` writes `<video>_task_input.json` as the canonical robot
+handoff and `<video>_scores.json` as optional classifier diagnostics. It no longer
+writes a joined results file or a duplicate robot-actions file.
 
 ## Utilities
 
