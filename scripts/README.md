@@ -31,16 +31,12 @@ uv run mimic-robot-pipeline \
 - `extract_calibration_frame.py` — save a selected video frame for calibration.
 - `calibrate_camera.py` — interactively compute and save a pixel-to-table homography.
 - `extract_labels.py` — derive frame labels from narrated demonstrations.
-- `extract_tracks.py` — extract hand/object tracks.
 
 ## Features and classification
 
 - `extract_vjepa_embeddings.py` — cache frame features. See the encoder-status warning in `docs/VJEPA_CLASSIFIER_PIPELINE.md`.
-- `validate_vjepa_embeddings.py` — inspect feature statistics and projections.
 - `train_action_classifier.py` — train the temporal classifier and record its catalog provenance.
-- `inference_action_classifier.py` — run classifier/postprocessor inference from cached embeddings.
 - `process_demo_video.py` — implementation used by the installed video pipeline.
-- `visualize_results.py` — render action/tracking overlays from `mimic.demo_task_input.v1`.
 
 ## Robot simulation
 

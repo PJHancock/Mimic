@@ -32,7 +32,6 @@ dependencies = [
     "torchvision>=0.15.0",
     # Computer Vision & Tracking
     "opencv-python>=4.8.0",
-    "mediapipe>=0.10.0",
     # Video Processing
     "moviepy>=1.0.0",
     "imageio>=2.31.0",

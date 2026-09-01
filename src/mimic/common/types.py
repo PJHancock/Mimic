@@ -35,18 +35,6 @@ class ObjectTrack:
 
 
 @dataclass
-class HandTrack:
-    """Tracked hand position and properties over time."""
-
-    frame_idx: int
-    wrist_2d: Tuple[float, float]  # (x, y) in image coordinates
-    wrist_3d: Optional[Tuple[float, float, float]] = None  # (x, y, z) in world coords
-    fingertips_2d: Optional[List[Tuple[float, float]]] = None  # 5 fingertips
-    finger_closure: Optional[float] = None  # 0.0 = open, 1.0 = closed
-    confidence: float = 1.0
-
-
-@dataclass
 class VideoClip:
     """A segment of video with temporal boundaries."""
 

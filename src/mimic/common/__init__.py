@@ -11,7 +11,6 @@ __all__ = [
     "ExtractedTask",
     "RetargetedTask",
     "ObjectTrack",
-    "HandTrack",
     "TaskRepresentation",
     "RobotCommand",
 ]

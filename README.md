@@ -8,7 +8,7 @@ A system that learns manipulation skills from human video demonstrations and exe
 
 **Core Idea:** Separate visual understanding (What is happening?) from geometry (Where is it happening?), then retarget to robot control.
 
-See [docs/PROJECT_OVERVIEW.md](./docs/PROJECT_OVERVIEW.md) for detailed technical specification.
+See [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for the current component boundaries.
 
 ## Project Structure
 
@@ -27,6 +27,7 @@ mimic/
 ├── configs/                 # Configuration files
 ├── tests/                   # Unit & integration tests
 ├── results/                 # Selected reproducible pipeline artifacts
+├── web/                     # Local run-inspector dashboard
 └── docs/                    # Documentation
 ```
 
@@ -75,9 +76,9 @@ npm install
 npm run dev
 ```
 
-The read-only dashboard discovers existing artifacts in `results/`; it does not
-modify or rerun the Python pipeline. See [`web/README.md`](web/README.md) for
-source-video discovery behavior.
+The dashboard discovers artifacts in `results/` and can rerun a video already
+present under `data/raw/` through the existing `mimic` pipeline. See
+[`web/README.md`](web/README.md) for source-video discovery and process controls.
 
 ```text
 results/demo_test/
@@ -142,7 +143,7 @@ Each subsystem is independently maintained:
 
 - **Data Pipeline** (`src/mimic/data_pipeline/`) — Audio-derived label preparation
 - **Vision** (`src/mimic/vision/`) — Frame features and temporal classifier training
-- **Tracking** (`src/mimic/tracking/`) — Hand/object tracking, coordinate transforms
+- **Tracking** (`src/mimic/tracking/`) — Object tracking, coordinate transforms
 - **Robot** (`src/mimic/robot/`) — Task representation, state machine, IK, control
 - **Integration** (`src/mimic/integration/`) — End-to-end inference pipeline
 
@@ -187,9 +188,8 @@ for the input contract, mapping, path-processing behavior, and failure handling.
   IDLE, HOVER, GRASP, CARRY, RELEASE.
 
 ### Geometric Tracking
-- **Hand**: MediaPipe landmarks
-- **Object**: current HSV/CSRT tracking path; SAM2 remains optional future work
-- **Mapping**: Camera → table coordinates → robot workspace
+- **Object**: per-frame HSV detection of the demonstrated object
+- **Mapping**: Camera → calibrated table meters → MuJoCo workspace
 
 ### Robot Execution
 - **Task Representation**: Composite skills and separately tracked path geometry
@@ -218,7 +218,6 @@ for the input contract, mapping, path-processing behavior, and failure handling.
 
 ## References
 
-- MediaPipe: Hand tracking
 - MuJoCo: Physics simulation
 - Franka Research 3: Robot control
 

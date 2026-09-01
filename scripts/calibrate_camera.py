@@ -226,10 +226,9 @@ def main():
     print("\n" + "=" * 60)
     print("Calibration complete!")
     print("=" * 60)
-    print("\nNext step: Extract tracks from your demo videos:")
-    print(f"  uv run python scripts/extract_tracks.py \\")
-    print(f"    --calibration {args.output} \\")
-    print(f"    --output-dir data/tracks/")
+    print("\nNext step: run the video-to-robot pipeline with this calibration:")
+    print("  uv run --group robot mimic --video path/to/demo.mov --robot panda")
+    print("The panda profile reads data/annotations/calibrations.json by default.")
 
     return 0
 

@@ -37,7 +37,7 @@ video
 
 - `src/mimic/common/` — shared records and constants.
 - `src/mimic/vision/` — frame feature encoder and temporal classifier.
-- `src/mimic/tracking/` — hand/object tracking and camera calibration.
+- `src/mimic/tracking/` — object tracking and camera calibration.
 - `src/mimic/skills/` — versioned catalog, transition graph, postprocessor, and handler registry.
 - `src/mimic/robot/` — extraction, retargeting, paths, waypoints, IK, control, and MuJoCo I/O.
 - `src/mimic/integration/` — persisted schemas and pipeline entry points.

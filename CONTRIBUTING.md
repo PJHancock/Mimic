@@ -7,7 +7,7 @@ Read `AGENTS.md` before changing the project. Preserve the distinction between i
 - `src/mimic/common/` — shared records and constants.
 - `src/mimic/data_pipeline/` — audio-derived label preparation.
 - `src/mimic/vision/` — frame features and temporal classification.
-- `src/mimic/tracking/` — hand/object tracking and calibration.
+- `src/mimic/tracking/` — object tracking and calibration
 - `src/mimic/skills/` — catalog, transition graph, postprocessing, and handlers.
 - `src/mimic/robot/` — task geometry and deterministic simulation execution.
 - `src/mimic/integration/` — persisted schemas and pipeline orchestration.
