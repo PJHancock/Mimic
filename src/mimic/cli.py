@@ -6,7 +6,6 @@ import argparse
 import shlex
 import sys
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 from typing import Mapping, Optional, Sequence, Tuple
 
@@ -18,7 +17,8 @@ from mimic.integration.run_video_pipeline import main as run_video_pipeline
 class RobotDefaults:
     """Repository-relative inputs selected by one public robot name."""
 
-    execution_config: Path
+    execution_configs: Mapping[str, Path]
+    default_execution: str
     calibration: Path
     retargeting_config: Path
     pipeline_config: Path
@@ -26,17 +26,32 @@ class RobotDefaults:
 
     def resolve(self, repository_root: Path) -> "RobotDefaults":
         return RobotDefaults(
-            execution_config=repository_root / self.execution_config,
+            execution_configs={
+                name: repository_root / path for name, path in self.execution_configs.items()
+            },
+            default_execution=self.default_execution,
             calibration=repository_root / self.calibration,
             retargeting_config=repository_root / self.retargeting_config,
             pipeline_config=repository_root / self.pipeline_config,
             skill_config=repository_root / self.skill_config,
         )
 
+    def select_execution(self, name: Optional[str]) -> tuple[str, Path]:
+        chosen = self.default_execution if name in (None, "") else name
+        try:
+            return chosen, self.execution_configs[chosen]
+        except KeyError:
+            allowed = ", ".join(sorted(self.execution_configs))
+            raise ValueError(f"--config must be one of: {allowed}")
+
 
 ROBOT_DEFAULTS: Mapping[str, RobotDefaults] = {
     "panda": RobotDefaults(
-        execution_config=Path("configs/robots/panda_complete.yaml"),
+        execution_configs={
+            "slow": Path("configs/robots/panda/slow.yaml"),
+            "fast": Path("configs/robots/panda/fast.yaml"),
+        },
+        default_execution="slow",
         calibration=Path("data/annotations/calibrations.json"),
         retargeting_config=Path("configs/retargeting.yaml"),
         pipeline_config=Path("configs/robot_pipeline.yaml"),
@@ -60,6 +75,10 @@ def _parser() -> argparse.ArgumentParser:
         required=True,
         choices=tuple(sorted(ROBOT_DEFAULTS)),
         help="Robot defaults and MuJoCo execution target",
+    )
+    parser.add_argument(
+        "--config",
+        help="Named robot execution config; for panda: slow or fast (default: slow)",
     )
     parser.add_argument(
         "--output",
@@ -110,30 +129,19 @@ def _resolve_path(path: Path, caller_directory: Path) -> Path:
     return path.resolve() if path.is_absolute() else (caller_directory / path).resolve()
 
 
-def _timestamped_collision_path(path: Path, now: Optional[datetime] = None) -> Path:
-    """Retain the requested stem while preserving an existing default video."""
-
-    current = now or datetime.now().astimezone()
-    timestamp = current.strftime("%Y%m%d-%H%M%S-%f")
-    return path.with_name(f"{path.stem}.{timestamp}{path.suffix}")
+def _default_video_path(output_directory: Path, video_stem: str) -> Path:
+    return output_directory / f"{video_stem}.mimic.mp4"
 
 
-def _default_video_path(
-    output_directory: Path,
-    video_stem: str,
-    *,
-    now: Optional[datetime] = None,
-) -> Path:
-    requested = output_directory / f"{video_stem}.mimic.mp4"
-    if not requested.exists():
-        return requested
-    timestamped = _timestamped_collision_path(requested, now)
-    candidate = timestamped
-    index = 2
-    while candidate.exists():
-        candidate = timestamped.with_name(f"{timestamped.stem}.{index}{timestamped.suffix}")
-        index += 1
-    return candidate
+def _remove_previous_simulation_videos(output_directory: Path, video_stem: str) -> None:
+    """Replace the canonical recording and any earlier timestamped copies."""
+
+    if not output_directory.is_dir():
+        return
+    prefix = f"{video_stem}.mimic."
+    for path in output_directory.iterdir():
+        if path.is_file() and path.suffix.lower() == ".mp4" and path.name.startswith(prefix):
+            path.unlink()
 
 
 def _explicit_video_path(path: Path, caller_directory: Path) -> Path:
@@ -190,6 +198,11 @@ def main(
         else root / "models" / "action_classifier_lstm.pt"
     )
     robot = ROBOT_DEFAULTS[args.robot].resolve(root)
+    try:
+        config_name, execution_config = robot.select_execution(args.config)
+    except ValueError as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        return 2
 
     try:
         if args.video_out is _DEFAULT_VIDEO_OUTPUT:
@@ -206,7 +219,7 @@ def main(
         (video, "Input video"),
         (model, "Classifier checkpoint"),
         (robot.skill_config, "Skill configuration"),
-        (robot.execution_config, "Robot execution configuration"),
+        (execution_config, "Robot execution configuration"),
         (robot.calibration, "Camera calibration"),
         (robot.retargeting_config, "Retargeting configuration"),
         (robot.pipeline_config, "Robot pipeline configuration"),
@@ -248,7 +261,7 @@ def main(
         str(world_waypoints),
         "--overwrite",
         "--robot-config",
-        str(robot.execution_config),
+        str(execution_config),
         "--log",
         str(execution_log),
     )
@@ -267,6 +280,7 @@ def main(
         return 0
 
     print(f"Processing {video.name} for robot {args.robot}")
+    print(f"Robot config: {config_name} ({execution_config})")
     print(f"Artifacts: {output}")
     video_status = run_video_pipeline(video_arguments, repository_root=root)
     if video_status != 0:
@@ -276,6 +290,9 @@ def main(
         for path in missing_video_artifacts:
             print(f"ERROR: Video stage did not create expected artifact: {path}", file=sys.stderr)
         return 1
+
+    if video_output is not None and args.video_out is _DEFAULT_VIDEO_OUTPUT:
+        _remove_previous_simulation_videos(output, video.stem)
 
     robot_status = run_robot_pipeline(robot_arguments)
     required_robot_artifacts = (world_waypoints, execution_log)

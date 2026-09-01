@@ -16,13 +16,12 @@ UPSTREAM = ROOT / "models" / "franka_emika_panda" / "upstream" / "panda.xml"
 
 
 def test_robot_config_references_scene_specific_complete_keyframe() -> None:
-    config = yaml.safe_load((ROOT / "configs" / "robots" / "panda_complete.yaml").read_text())[
-        "robot_execution"
-    ]
+    config_path = ROOT / "configs" / "robots" / "panda" / "slow.yaml"
+    config = yaml.safe_load(config_path.read_text())["robot_execution"]
     scene_root = ET.parse(SCENE).getroot()
     key_names = {key.attrib["name"] for key in scene_root.findall("./keyframe/key")}
 
-    assert (ROOT / "configs" / "robots" / config["model_path"]).resolve() == SCENE
+    assert (config_path.parent / config["model_path"]).resolve() == SCENE
     assert config["home_keyframe"] == "pick_place_home"
     assert config["presets"]["home"]["keyframe"] == "pick_place_home"
     assert config["ik"]["task_gain"] == pytest.approx(1.0)

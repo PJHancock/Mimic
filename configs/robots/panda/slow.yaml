@@ -1,0 +1,61 @@
+# Known-good 0.5 rad/s Panda cube-scene fixture.
+# Paths are relative to this file.
+robot_execution:
+  model_path: "../../../models/panda_pick_place_scene.xml"
+  home_keyframe: pick_place_home
+  presets:
+    home:
+      source: keyframe
+      keyframe: pick_place_home
+  preset_position_tolerances: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+  object_body: cube
+  support_geom: tabletop_clone
+  gripper_driver: panda_standard_tendon
+  measured_gripper_joint_tolerance_m: 0.00001
+  arm_control_hz: 100
+  gripper_control_hz: 10
+  profile:
+    arm_joints: [joint1, joint2, joint3, joint4, joint5, joint6, joint7]
+    arm_actuators: [actuator1, actuator2, actuator3, actuator4, actuator5, actuator6, actuator7]
+    tool_body: hand
+    tool_offset:
+      position: [0.0, 0.0, 0.1]
+      quaternion_wxyz: [1.0, 0.0, 0.0, 0.0]
+    velocity_limits: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+    workspace_min: [0.2, -0.4, 0.0]
+    workspace_max: [0.8, 0.4, 0.5]
+  ik:
+    position_tolerance_m: 0.001
+    orientation_tolerance_rad: 0.01
+    position_cost: 1.0
+    orientation_cost: 0.1
+    posture_cost: 0.0
+    damping: 0.001
+    task_gain: 1.0
+  trajectory:
+    hardware_velocity_limits: [2.175, 2.175, 2.175, 2.175, 2.61, 2.61, 2.61]
+    acceleration_limits: [15.0, 7.5, 10.0, 12.5, 15.0, 20.0, 20.0]
+    jerk_limits: [7500.0, 3750.0, 5000.0, 6250.0, 7500.0, 10000.0, 10000.0]
+    maximum_tracking_errors: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+    maximum_planning_steps: 2000
+  gripper:
+    open_command_width_m: 0.0799
+    width_tolerance_m: 0.001
+    empty_width_m: 0.002
+    contact_force_n: 0.1
+    contact_duration_s: 0.1
+    movement_timeout_s: 2.0
+  execution:
+    step_timeout_s: 10.0
+    minimum_lift_m: 0.05
+    maximum_slip_m: 0.01
+    waypoint_handoff_radius_m: 0.03
+    contact_loss_timeout_s: 1.0
+    settle_time_s: 0.5
+    settled_speed_m_s: 0.01
+    placement_tolerance_m: 0.01
+    # Guarded placement values for the checked-in 4 cm cube simulation scene.
+    placement_approach_clearance_m: 0.015
+    placement_maximum_descent_speed_m_s: 0.05
+    placement_maximum_descent_acceleration_m_s2: 0.5
+    placement_contact_confirmation_s: 0.05

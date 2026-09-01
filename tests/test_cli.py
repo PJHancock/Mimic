@@ -1,6 +1,5 @@
 """Public one-command video-to-robot orchestration."""
 
-from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -12,7 +11,7 @@ def _repository_fixture(tmp_path: Path) -> Path:
     root = tmp_path / "repository"
     required = (
         Path("models/action_classifier_lstm.pt"),
-        ROBOT_DEFAULTS["panda"].execution_config,
+        *ROBOT_DEFAULTS["panda"].execution_configs.values(),
         ROBOT_DEFAULTS["panda"].calibration,
         ROBOT_DEFAULTS["panda"].retargeting_config,
         ROBOT_DEFAULTS["panda"].pipeline_config,
@@ -85,7 +84,7 @@ def test_cli_runs_both_stages_with_panda_defaults_and_prints_video(
         output / "VIDEO_NAME_task_input.json"
     )
     assert robot_arguments[robot_arguments.index("--robot-config") + 1] == str(
-        root / "configs/robots/panda_complete.yaml"
+        root / "configs/robots/panda/slow.yaml"
     )
     assert robot_arguments[robot_arguments.index("--calibration") + 1] == str(
         root / "data/annotations/calibrations.json"
@@ -94,17 +93,108 @@ def test_cli_runs_both_stages_with_panda_defaults_and_prints_video(
     assert f"Simulation video: {expected_video}" in capsys.readouterr().out
 
 
-def test_default_video_uses_timestamped_variant_on_collision(tmp_path: Path) -> None:
+def test_cli_config_selects_named_robot_execution(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _repository_fixture(tmp_path)
+    video = tmp_path / "demo.mp4"
+    video.write_bytes(b"video")
+    observed: dict[str, object] = {}
+
+    def fake_video_stage(arguments, *, repository_root):
+        _write_video_outputs(arguments)
+        return 0
+
+    def fake_robot_stage(arguments):
+        observed["robot_config"] = Path(arguments[arguments.index("--robot-config") + 1])
+        _write_robot_outputs(arguments)
+        return 0
+
+    monkeypatch.setattr("mimic.cli.run_video_pipeline", fake_video_stage)
+    monkeypatch.setattr("mimic.cli.run_robot_pipeline", fake_robot_stage)
+
+    result = main(
+        ("--video", str(video), "--robot", "panda", "--config", "fast"),
+        repository_root=root,
+        caller_directory=tmp_path,
+    )
+
+    assert result == 0
+    assert observed["robot_config"] == root / "configs/robots/panda/fast.yaml"
+
+
+def test_cli_config_rejects_unknown_name(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    root = _repository_fixture(tmp_path)
+    video = tmp_path / "demo.mp4"
+    video.write_bytes(b"video")
+
+    def unexpected_stage(*args, **kwargs):
+        raise AssertionError("unknown --config must stop before inference")
+
+    monkeypatch.setattr("mimic.cli.run_video_pipeline", unexpected_stage)
+    monkeypatch.setattr("mimic.cli.run_robot_pipeline", unexpected_stage)
+
+    result = main(
+        ("--video", str(video), "--robot", "panda", "--config", "missing"),
+        repository_root=root,
+        caller_directory=tmp_path,
+    )
+
+    assert result == 2
+    assert "--config must be one of" in capsys.readouterr().err
+
+
+def test_default_video_keeps_canonical_path_when_a_recording_already_exists(
+    tmp_path: Path,
+) -> None:
     existing = tmp_path / "demo.mimic.mp4"
     existing.touch()
 
-    selected = _default_video_path(
-        tmp_path,
-        "demo",
-        now=datetime(2026, 9, 1, 8, 9, 10, 123456, tzinfo=timezone.utc),
+    assert _default_video_path(tmp_path, "demo") == existing
+
+
+def test_cli_replaces_existing_default_simulation_video(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _repository_fixture(tmp_path)
+    video = tmp_path / "VIDEO_NAME.mp4"
+    video.write_bytes(b"video")
+    output = root / "results" / "VIDEO_NAME"
+    output.mkdir(parents=True)
+    canonical = output / "VIDEO_NAME.mimic.mp4"
+    leftover = output / "VIDEO_NAME.mimic.20260901-080910-123456.mp4"
+    canonical.write_bytes(b"old")
+    leftover.write_bytes(b"older")
+    observed: dict[str, object] = {}
+
+    def fake_video_stage(arguments, *, repository_root):
+        _write_video_outputs(arguments)
+        return 0
+
+    def fake_robot_stage(arguments):
+        video_output = Path(arguments[arguments.index("--video-out") + 1])
+        observed["video_out"] = video_output
+        observed["canonical_exists_before_write"] = canonical.exists()
+        observed["leftover_exists_before_write"] = leftover.exists()
+        _write_robot_outputs(arguments)
+        return 0
+
+    monkeypatch.setattr("mimic.cli.run_video_pipeline", fake_video_stage)
+    monkeypatch.setattr("mimic.cli.run_robot_pipeline", fake_robot_stage)
+
+    result = main(
+        ("--video", str(video), "--robot", "panda"),
+        repository_root=root,
+        caller_directory=tmp_path,
     )
 
-    assert selected == tmp_path / "demo.mimic.20260901-080910-123456.mp4"
+    assert result == 0
+    assert observed["video_out"] == canonical
+    assert observed["canonical_exists_before_write"] is False
+    assert observed["leftover_exists_before_write"] is False
+    assert canonical.read_bytes() == b"mp4"
 
 
 def test_cli_can_disable_video_and_forward_device(
@@ -137,6 +227,38 @@ def test_cli_can_disable_video_and_forward_device(
     assert result == 0
     assert calls[0][calls[0].index("--device") + 1] == "mps"
     assert "--video-out" not in calls[1]
+
+
+def test_disabled_video_output_does_not_delete_an_existing_recording(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    root = _repository_fixture(tmp_path)
+    video = tmp_path / "demo.mp4"
+    video.write_bytes(b"video")
+    output = root / "results" / "demo"
+    output.mkdir(parents=True)
+    existing = output / "demo.mimic.mp4"
+    existing.write_bytes(b"keep")
+
+    def fake_video_stage(arguments, *, repository_root):
+        _write_video_outputs(arguments)
+        return 0
+
+    def fake_robot_stage(arguments):
+        _write_robot_outputs(arguments)
+        return 0
+
+    monkeypatch.setattr("mimic.cli.run_video_pipeline", fake_video_stage)
+    monkeypatch.setattr("mimic.cli.run_robot_pipeline", fake_robot_stage)
+
+    result = main(
+        ("--video", str(video), "--robot", "panda", "--no-video-out"),
+        repository_root=root,
+        caller_directory=tmp_path,
+    )
+
+    assert result == 0
+    assert existing.read_bytes() == b"keep"
 
 
 def test_video_stage_failure_stops_before_robot_stage(
@@ -217,7 +339,7 @@ def test_preflight_reports_missing_default_before_inference(
     root = _repository_fixture(tmp_path)
     video = tmp_path / "demo.mp4"
     video.write_bytes(b"video")
-    (root / "configs/robots/panda_complete.yaml").unlink()
+    (root / "configs/robots/panda/slow.yaml").unlink()
 
     def unexpected_stage(*args, **kwargs):
         raise AssertionError("preflight failure must stop before inference")
