@@ -256,7 +256,15 @@ def predict_actions(
         num_actions=skill_system.catalog.class_count,
         model_type="lstm",
     )
-    classifier.load(model_path, catalog=skill_system.catalog)
+    # Load model - try with catalog first (v2 format), fall back to legacy format
+    try:
+        classifier.load(model_path, catalog=skill_system.catalog)
+    except ValueError as e:
+        if "Legacy checkpoint" in str(e):
+            print(f"   ⚠ Using legacy model checkpoint (no catalog metadata)")
+            classifier.load(model_path, catalog=None)
+        else:
+            raise
     print(f"   ✓ Model loaded from: {model_path}")
 
     probabilities = classifier.predict_probabilities(embeddings, context_window=context_window)

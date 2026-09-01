@@ -24,8 +24,8 @@ skill_system:
       - {source: RELEASE, target: RELEASE}
       - {source: RELEASE, target: HOVER, variant: TO_HOME}
   post_state:
-    minimum_confidence: null
-    minimum_transition_margin: null
-    maximum_second_choice_gap: null
-    required_consecutive_observations: null
-    missing_detection_timeout_s: null
+    minimum_confidence: 0.5
+    minimum_transition_margin: 0.1
+    maximum_second_choice_gap: 0.2
+    required_consecutive_observations: 1
+    missing_detection_timeout_s: 0.5
