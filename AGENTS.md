@@ -286,7 +286,7 @@ This section contains the durable project-specific contract for the hackathon sy
   1. Upstream perception provides timestamped temporal-state predictions and timestamped object positions.
   2. State post-processing converts noisy predictions into stable phase segments.
   3. Task extraction combines phase timing with the tracked object path into a robot-independent `PickPlaceTask`.
-  4. Coordinate retargeting maps normalized human/table coordinates into the Panda/MuJoCo workspace.
+  4. Coordinate retargeting maps calibrated table coordinates in meters into the Panda/MuJoCo workspace.
   5. Path processing selects or interpolates the retargeted XY object path without assigning robot timing, height, or orientation.
   6. Robot waypoint construction adds configured vertical motion and fixed tool orientation; the skill executor expands semantic phases into robot-native skills such as hover, descend, close gripper, lift, follow path, lower, open gripper, and retreat.
   7. IK converts desired end-effector poses into Panda joint targets.
@@ -312,7 +312,7 @@ These are logical contracts. Concrete Python classes, dataclasses, dictionaries,
 - `PathProcessor.interpolation` accepts exactly `direct`, `corners_only`, `none`, or `cubic`. `direct` returns grasp/release endpoints and preserves the former endpoint-only behavior. `none` returns every mapped sample unchanged. `corners_only` uses an explicit maximum polyline deviation in meters. `cubic` uses those retained corners as cumulative-chord-length SciPy cubic-spline control points and resamples by explicit spatial spacing. Cubic output must preserve exact endpoints and remain within its configured maximum deviation from the mapped demonstration; invalid paths are rejected rather than silently changed to another mode. The authoritative project default is the explicit cubic policy in `configs/default.yaml`; execution-specific pipeline YAML must state its path-processing policy explicitly.
 - Path-processing thresholds are model/design settings. Keep corner deviation, cubic output spacing, and maximum spline deviation explicit; do not silently tune them to make an execution succeed. Path processing does not assign timestamps, tool height, orientation, IK, joint timing, or safety limits.
 - Source and target tasks are separate immutable records. Existing normalized `TaskRepresentation` semantics are unchanged; these new tasks must not be passed directly to the tool-pose executor.
-- This approved contract supersedes the earlier normalized-coordinate and required-seconds assumptions below for steps 2 and 3 and defines path selection for step 4. See `docs/TASK_EXTRACTION_AND_RETARGETING.md` for the concrete API and numerical validation rules. Robot execution and safety constraints remain unchanged.
+- See `docs/TASK_EXTRACTION_AND_RETARGETING.md` for the concrete API and numerical validation rules. Robot execution and safety constraints remain unchanged.
 
 #### `SkillPrediction` — upstream temporal model -> graph-aware postprocessor
 - `timestamp_s: float` — synchronized video time in seconds.
@@ -321,19 +321,18 @@ These are logical contracts. Concrete Python classes, dataclasses, dictionaries,
 - Training output order and robot handler IDs are bijective within a catalog version. Log and verify the catalog fingerprint with predictions/checkpoints.
 - Robot-side code must not depend on V-JEPA internals, embedding dimensions, audio transcripts, or model architecture.
 
-#### `TrackSample` — upstream object tracker -> robot harness
-- `timestamp_s: float` — same timebase as temporal predictions or explicitly alignable to it.
-- `x_norm: float`, `y_norm: float` — object position normalized to the demonstrated tabletop/workspace, nominally in `[0, 1]`.
-- Optional tracker confidence may be included.
+#### `ObjectTrack` — calibrated tracker -> task extractor
+- `frame_idx: int` — positive one-based source-video frame shared with action predictions.
+- `table_xy_m` — calibrated table coordinates in meters, top-left origin, +X right, +Y down.
+- Optional seconds, tracker confidence, bounding box, and object identity may be included without replacing the frame key.
 - The tracker provides the demonstrated path; the temporal model does not generate coordinates.
 
-#### `PickPlaceTask` — internal robot-independent task representation
-- `start_xy` — normalized or explicitly tagged source-frame start position.
-- `goal_xy` — normalized or explicitly tagged source-frame destination.
-- `trajectory_xy[]` — ordered object path during the `CARRY` phase.
-- `grasp_time_s` — approximate grasp transition time.
-- `release_time_s` — approximate release transition time.
-- Optional confidence/metadata may be carried through without changing task semantics.
+#### `ExtractedTask` — internal robot-independent task representation
+- complete phase boundaries for one accepted episode;
+- every available tracking sample from GRASP onset through RELEASE onset inclusive;
+- exact GRASP and RELEASE observations as start and goal endpoints;
+- separately identifiable CARRY-only samples;
+- optional seconds, confidence, and object identity preserved without changing geometry.
 
 #### Robot execution command
 At the skill/controller boundary, represent intent as:
@@ -345,7 +344,7 @@ At the skill/controller boundary, represent intent as:
 - **Human/task state:** Labels represent configurable composite skills. The default pick/place catalog is exactly `IDLE`, `HOVER`, `GRASP`, `CARRY`, `RELEASE`; changing an active catalog version or label semantics requires explicit authorization.
 - **Default episode:** `IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> HOVER -> IDLE`. A successfully observed episode may omit the terminal HOVER and end `RELEASE -> IDLE`. IDLE is a legal terminal transition from every state, emits no arm or gripper command, and an earlier transition to IDLE terminates an incomplete/aborted episode rather than making it executable. `HOVER` means move to grasp hover when entered from IDLE, and return to the configured home joint preset when entered from RELEASE. `GRASP -> HOVER` is an abort-to-home edge guarded by an empty grasp.
 - **Robot-side skill expansion:** Composite handlers deterministically expand labels into low-level Cartesian, joint-preset, and gripper actions. These primitives are execution details, not learned labels.
-- **Inputs / measurements:** Timestamped state predictions and timestamped 2D object positions from a fixed-camera tabletop demonstration.
+- **Inputs / measurements:** Frame-aligned state predictions and calibrated 2D table positions from a fixed-camera tabletop demonstration; seconds remain optional metadata.
 - **Outputs / commands:** Cartesian end-effector targets in meters, Panda joint targets in radians where applicable, and gripper commands using the active MuJoCo Panda model's documented actuator semantics.
 - **Dynamics/model assumptions:**
   - MVP is tabletop pick-and-place.
@@ -362,7 +361,7 @@ At the skill/controller boundary, represent intent as:
   - The default Panda simulation uses measured-proximity online handoff for intermediate `FOLLOW_PATH` waypoints with an explicit `0.03 m` radius. Intermediate waypoints need not reach `AT_TARGET` or zero velocity; the final path waypoint retains measured `AT_TARGET` arrival. Ruckig state remains persistent across target changes, and all existing joint, contact, slip, and timeout gates remain active.
   - Default release expands into `PLACE_APPROACH`, guarded `LOWER`, and `OPEN`. Guarded lowering advances a fixed-XY/orientation Cartesian Z reference under explicit descent speed and acceleration settings, uses measured TCP descent speed as feedback, and fails closed on measured overspeed. MuJoCo support contact is resolved from configured object/support geometry names rather than Panda assumptions. Airborne slip/contact-loss checks remain active until support onset; release requires persistent support, settled object motion, and placement tolerance.
 - **Coordinate frames / conventions:**
-  - Human demonstration coordinates arrive as normalized 2D tabletop/workspace coordinates.
+  - Offline human demonstration coordinates arrive as calibrated table XY meters with the explicit convention above.
   - The `CoordinateRetargeter` is the only subsystem responsible for mapping source coordinates into MuJoCo/Panda coordinates.
   - Exact source-axis orientation, MuJoCo world-axis convention, table origin, workspace bounds, and sign conventions must be defined explicitly in code/config/documentation before use. Agents must not silently infer or flip axes to make a demo work.
   - All robot-space linear positions use meters; joint angles use radians unless the active API explicitly documents otherwise.
@@ -391,9 +390,9 @@ At the skill/controller boundary, represent intent as:
 
 ### Interfaces That Must Remain Stable
 - Temporal-model boundary: timestamp + a complete score mapping for the active catalog, plus explicit detection validity.
-- Tracker boundary: timestamp + normalized 2D object position.
+- Tracker boundary: one-based source frame + calibrated table XY meters, with optional timestamp and confidence.
 - Default learned skill vocabulary: `IDLE`, `HOVER`, `GRASP`, `CARRY`, `RELEASE`; other deployments use a separately versioned catalog and matching handler registry.
-- Task boundary: `PickPlaceTask` semantics of start, goal, demonstrated path, grasp time, and release time.
+- Task boundary: immutable `ExtractedTask` semantics of phase boundaries, exact endpoints, and the complete retained demonstrated path.
 - Robot-side code must remain independent of the particular upstream encoder (V-JEPA, geometric baseline, or hybrid). Swapping the upstream classifier must not require rewriting the Panda harness.
 - Position/path tracking remains separate from manipulation-state classification. Do not collapse these interfaces without explicit authorization.
 - A saved `home` is a complete named arm-joint configuration resolved from either an explicit mapping or a MuJoCo keyframe. Normal return-home motion uses the bounded Ruckig joint-reference path without Cartesian IK. It must not reset/teleport the robot or change the gripper command.
@@ -417,7 +416,7 @@ Agents should prefer the following dependency order when implementing the robot 
 3. Add gripper actuation and validate grasp/release behavior.
 4. Add IK and robot-side skill execution.
 5. Add `PickPlaceTask` execution using a manually constructed task.
-6. Add coordinate retargeting from normalized source coordinates.
+6. Add coordinate retargeting from calibrated table coordinates in meters.
 7. Add state/task extraction from prerecorded upstream outputs.
 8. Integrate live/upstream temporal predictions and tracker output only after the robot harness works independently.
 
@@ -448,7 +447,7 @@ Any success tolerance is a design parameter. If none exists yet, surface the mis
 ### Relevant Documentation
 - `docs/ROBOT_EXECUTION.md` defines the implemented IK/gripper boundary: world-meter `ToolPose` with explicit `wxyz` quaternions and body-to-tool offset, named joint/actuator profiles, Mink IK plus a Ruckig position-reference layer, the standard Panda's safe-open command, Python >=3.10 robot dependency group, and required execution criteria. `configs/robots/panda.yaml` intentionally leaves unresolved experiment settings null. The configured measured-state allowance is 10 micrometers per named finger slide joint; preserve raw observations and all commanded/model limits, and do not apply this allowance to arm joints. The fixed cube fixture succeeds with separately logged settings, but production scene calibration, object-set validation, and task-success criteria remain unresolved.
 - `docs/TASK_EXTRACTION_AND_RETARGETING.md` defines the user-approved frame-based, meter-space contract for offline steps 2 through 4, including required mapping and path-processing configuration and deferred waypoint construction.
-- `docs/SKILL_GRAPH.md` defines the catalog, relationship graph, top-two post-state decision policy, composite handler contract, default episode, and unresolved post-processing thresholds.
+- `docs/SKILL_GRAPH.md` defines the catalog, relationship graph, top-two post-state decision policy, composite handler contract, default episode, and explicit post-processing settings that still require held-out validation.
 - This `AGENTS.md` Project Contract is authoritative for agent behavior on `main` until superseded by explicit project documentation.
 - Prefer existing repository `README`, architecture notes, configuration files, MuJoCo model documentation, and upstream interface definitions when present.
 - If implementation introduces a durable coordinate convention, message schema, or configuration contract, document it in the repository and update this section rather than leaving the convention implicit in code.

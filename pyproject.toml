@@ -84,6 +84,7 @@ Repository = "https://github.com/yourusername/Mimic.git"
 Issues = "https://github.com/yourusername/Mimic/issues"
 
 [project.scripts]
+mimic = "mimic.cli:main"
 mimic-video-pipeline = "mimic.integration.run_video_pipeline:main"
 mimic-robot-pipeline = "mimic.integration.robot_pipeline:main"
 

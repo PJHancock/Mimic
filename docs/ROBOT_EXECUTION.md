@@ -195,8 +195,8 @@ uv run --group robot mjpython scripts/simulate_robot.py \
 
 The viewer observes the same validated physics steps as headless execution; it
 does not introduce a second physics loop or change simulation/control rates. The
-runner holds the final frame until the window is closed. Use a new log filename
-for each attempt because execution logs are never overwritten.
+runner holds the final frame until the window is closed. Reusing a `--log` path
+replaces that file's previous contents before the new attempt is recorded.
 
 The integrated saved-results command also accepts `--viewer`. It selects
 `mjpython` for the simulation child process automatically on macOS.
@@ -212,8 +212,8 @@ integrated pipeline selects it automatically.
 The waypoint JSON fields are `approach`, `grasp`, `lift`, `path` (a nonempty list),
 `lower`, `retreat`, and `goal_position`. Each pose contains `position` and
 `quaternion_wxyz`; `goal_position` is the object's desired world-space center.
-The entry point consumes JSON, not the README's earlier placeholder pickle task.
-It exits nonzero on a failed execution and retains JSONL observations and reasons.
+The entry point consumes validated waypoint JSON. It exits nonzero on a failed
+execution and retains JSONL observations and reasons.
 
 ## Preserved constraints and failure behavior
 
@@ -322,8 +322,8 @@ planning, or any physical robot. Simulation success is not hardware evidence.
 | --- | --- | --- |
 | Critical | Deployment scene, object body/home state, physical tool center, downward yaw, and world/table mapping | These define the task geometry. The standard robot model supplies link geometry, but it cannot choose application frames or the intended grasp point. The general factory deliberately fails while they are null. |
 | Critical | IK objectives and acceptance criteria in the deployment configuration | Pose costs/tolerances, contact evidence, lift/slip/loss/settling checks, and placement tolerance define success for the intended object set. Fixture values only validate one cube. |
-| Critical | Bridge from retargeted 2D task geometry to the configured world-space tool waypoints | Robot execution accepts processed poses; exact scripted z heights, sampling, and deployed mapping must be fixed before a held-out demonstration can run end to end. |
-| Critical | State post-processing thresholds | Confidence, transition margin, runner-up gap, persistence, and missing-detection timeout determine which predicted skills execute. The template intentionally leaves them null pending validation data. |
+| Critical | Deployment mapping and waypoint policy | The checked-in cube fixture supplies explicit values, but another scene or object requires separately validated mapping, heights, orientation, and sampling. |
+| Critical | Validation of state post-processing settings | The committed preset is explicit and runnable; held-out temporal predictions must still justify its confidence, margin, persistence, and missing-detection values. |
 | Tunable later | Home-preset measured joint-arrival tolerances | The target joint configuration is explicit, but arrival tolerances should be selected for the active robot model and servo tracking behavior. |
 | Tunable later | 0.5 rad/s operating envelope, 0.1 rad tracking bound, and 2000-step private planning bound | They are explicit, bounded, and successful in the fixed fixture. Broader workspace trials can optimize them without changing subsystem semantics. |
 | Tunable later | 0.0799 m OPEN target, 10-micrometer measured-finger allowance, and 15 mm fixture slip bound | They are measured simulation policies rather than manufacturer constants. Recheck them when the gripper model or intended object set changes. |

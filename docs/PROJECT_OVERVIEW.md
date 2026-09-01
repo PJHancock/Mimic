@@ -20,7 +20,7 @@ Separate the problem into two parallel questions:
 
 ### 1. What is happening?
 
-Use a pretrained video representation model such as **V-JEPA 2** followed by a small temporal classifier that we train.
+Use a frozen visual feature encoder followed by a small temporal classifier that we train. V-JEPA 2 is the intended representation experiment; the current integrated backend is documented separately.
 
 The classifier predicts:
 
@@ -47,7 +47,7 @@ Human Video
     │
     ├─────────────── Visual understanding ──────────────┐
     │                                                   │
-    │        V-JEPA 2 → Temporal Classifier             │
+    │     Frame Feature Encoder → Temporal Classifier   │
     │                                                   │
     │   IDLE / HOVER / GRASP / CARRY / RELEASE        │
     │                                                   │
@@ -148,44 +148,26 @@ Language can still later be used separately to capture higher-level intent such 
 
 # Visual Representation
 
-We use **V-JEPA 2 as a pretrained video encoder**.
+The experimental design calls for a frozen pretrained video representation such
+as V-JEPA 2. Only the smaller temporal classifier is trained.
 
-We do not train V-JEPA from scratch.
-
-For each short window of video:
-
-```text
-Video Clip
-   ↓
-V-JEPA 2
-   ↓
-Spatiotemporal Embedding
-```
-
-The embedding is a learned numerical representation of the motion and visual interaction occurring in the clip.
-
-V-JEPA remains **frozen** during our initial training.
-
-This means:
-
-```text
-V-JEPA weights
-    ↓
-do not change
-```
-
-Only our smaller classifier is trained.
+The current integrated `VJepaEncoder` path does not yet establish that
+experiment: it selects a framewise ResNet50 backend, and the optional V-JEPA 2
+loader has no committed pretrained weights. See
+[Frame Features and Action Classification](VJEPA_CLASSIFIER_PIPELINE.md). Encoder
+identity and checkpoint provenance must be recorded before comparing feature
+families.
 
 ---
 
 # Temporal Action Model
 
-The main ML contribution is a lightweight temporal model that maps V-JEPA representations to manipulation phases.
+The main ML contribution is a lightweight temporal model that maps visual feature sequences to manipulation phases.
 
 Conceptually:
 
 ```text
-V-JEPA embeddings over time
+Visual features over time
           ↓
      Temporal Head
           ↓
@@ -219,7 +201,7 @@ The objective is specifically **not** to learn object coordinates.
 
 # Training Dataset
 
-Each demonstration produces a sequence of V-JEPA embeddings and corresponding phase labels.
+Each demonstration produces a sequence of visual features and corresponding phase labels.
 
 Conceptually:
 
@@ -235,12 +217,12 @@ Conceptually:
 | t7 | z7 | HOVER |
 | t8 | z8 | IDLE |
 
-V-JEPA embeddings should be precomputed once and cached.
+Features should be precomputed once and cached.
 
 ```text
 50 Videos
     ↓
-V-JEPA
+Frozen encoder
     ↓
 Cached Embeddings
     ↓
@@ -305,33 +287,21 @@ Once the object has been grasped, its trajectory is generally more useful than t
 
 The first version avoids full monocular 3D reconstruction.
 
-Because everything happens on a tabletop, camera coordinates can be mapped into a normalized 2D workspace.
+Because everything happens on a tabletop, image pixels are calibrated into a
+2D table frame in meters before task extraction.
 
 ```text
-Camera Pixel Coordinates
-        ↓
-Table Calibration
-        ↓
-Table Coordinates
-        ↓
-Normalize Workspace
-        ↓
-Panda Workspace Coordinates
+Camera pixels
+        ↓ explicit homography
+Table XY meters (top-left origin, +X right, +Y down)
+        ↓ explicit CoordinateRetargeter mapping
+MuJoCo world XY meters
 ```
 
-For example:
-
-```text
-Human table:
-0 ---------------- 1
-
-Robot workspace:
-0 ---------------- 1
-```
-
-A location 75% across the human workspace can therefore correspond to approximately 75% across the robot's usable workspace.
-
-This makes the system flexible across embodiments rather than copying literal human coordinates.
+Retargeting names both frames and supplies the target origin plus perpendicular
+unit source-axis directions. It does not resize, normalize, shear, clamp, or
+silently flip axes. This keeps coordinate semantics inspectable across
+embodiments.
 
 ---
 
@@ -399,13 +369,13 @@ Human demonstrations can contain:
 Instead:
 
 ```text
-Human Demonstration
+Calibrated demonstrated path
         ↓
-Extract Important Motion
+Retarget every retained sample
         ↓
-Smooth / Normalize
+Explicit path-processing policy
         ↓
-Robot-Compatible Waypoints
+Configured robot waypoints
 ```
 
 For example:
@@ -570,7 +540,7 @@ The arm controller runs much faster than the visual understanding model.
 Conceptually:
 
 ```text
-V-JEPA / Action Recognition
+Feature Encoder / Action Recognition
 ~a few updates per second
 
 Trajectory Generator
@@ -623,7 +593,7 @@ The minimum successful demonstration is:
 
 1. Record an unseen human demonstration.
 2. Track the manipulated object.
-3. Pass the video through V-JEPA.
+3. Pass the video through the declared frozen feature encoder.
 4. Classify the sequence into:
 
 ```text
@@ -669,7 +639,7 @@ Classifier
 against:
 
 ```text
-V-JEPA Features
+Declared pretrained features
        ↓
 Temporal Classifier
 ```
@@ -708,7 +678,7 @@ Suggested split:
 
 ```text
 RTX 3090
-├── V-JEPA inference
+├── feature extraction
 ├── embedding extraction
 └── temporal model training
 
@@ -721,7 +691,7 @@ M4 Pro
 └── integration
 ```
 
-The V-JEPA embeddings should be cached so that temporal-model experiments can be run without repeatedly processing all videos.
+Features should be cached so temporal-model experiments can run without repeatedly processing all videos.
 
 ---
 

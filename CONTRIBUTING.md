@@ -1,176 +1,48 @@
-# Contributing Guide
+# Contributing
 
-## Project Organization
+Read `AGENTS.md` before changing the project. Preserve the distinction between implementation fixes and model/design changes.
 
-This project is structured for **parallel, independent development**. Each subsystem has its own folder with minimal coupling.
+## Repository map
 
-### Subsystems
+- `src/mimic/common/` — shared records and constants.
+- `src/mimic/data_pipeline/` — audio-derived label preparation.
+- `src/mimic/vision/` — frame features and temporal classification.
+- `src/mimic/tracking/` — hand/object tracking and calibration.
+- `src/mimic/skills/` — catalog, transition graph, postprocessing, and handlers.
+- `src/mimic/robot/` — task geometry and deterministic simulation execution.
+- `src/mimic/integration/` — persisted schemas and pipeline orchestration.
+- `tests/` — focused unit and integration tests.
 
-| Subsystem | Path | Owner | Responsibility |
-|-----------|------|-------|---|
-| Data Pipeline | `src/mimic/data_pipeline/` | — | Video recording, transcription, annotation |
-| Vision | `src/mimic/vision/` | — | V-JEPA inference, temporal model, training |
-| Tracking | `src/mimic/tracking/` | — | Hand/object tracking, coordinate mapping |
-| Robot | `src/mimic/robot/` | — | Task representation, state machine, control |
-| Integration | `src/mimic/integration/` | — | End-to-end pipeline, visualization |
-
-**Key principle**: Each subsystem exports a clean interface via `__init__.py`. Minimize cross-module dependencies.
-
-## Shared Conventions
-
-### Data Types
-All modules use types defined in `src/mimic/common/types.py`. If you need a new type:
-1. Add it to `types.py` with clear docstring
-2. Use it consistently across modules
-3. Never duplicate type definitions
-
-### Configuration
-- Global config: `src/mimic/config.py`
-- Experiment configs: `configs/*.yaml`
-- Local overrides: Create `config.local.yaml` (in `.gitignore`)
-
-### Cached Data
-Embeddings and tracking results should be cached:
-```
-data/
-├── embeddings/       # V-JEPA embeddings (indexed by video hash)
-├── tracks/           # Cached hand/object tracks
-└── processed/        # Cleaned video frames
-```
-
-### File Naming
-- Videos: `demo_NNN.mp4` (padded number)
-- Embeddings: `demo_NNN_embeddings.pt` (PyTorch tensor)
-- Annotations: `demo_NNN_annotations.json` (JSON with timestamps)
+Use public package interfaces when they express the required contract. Deep imports are acceptable for backend-specific implementation and tests when the ownership is explicit.
 
 ## Workflow
 
-### Starting New Work
+1. Recover the intended behavior from tests, configs, and authoritative docs.
+2. Make one focused conceptual change.
+3. Add or update a regression test when behavior changes.
+4. Run the narrowest relevant tests, then expand verification in proportion to risk.
+5. Report what was and was not verified.
 
-1. **Create a feature branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
+Common commands:
 
-2. **Work in your subsystem folder** — minimize changes outside your area
-
-3. **Write tests** in `tests/` mirroring your module structure
-   ```
-   src/mimic/vision/temporal_model.py
-   tests/test_vision/test_temporal_model.py
-   ```
-
-4. **Run tests before committing**
-   ```bash
-   uv run pytest tests/test_vision/
-   # or if venv is activated:
-   pytest tests/test_vision/
-   ```
-
-5. **Commit with clear messages**
-   ```bash
-   git commit -m "vision: add GRU temporal model for action classification"
-   ```
-
-### Shared Data Access
-
-If you need to use cached data from another subsystem:
-
-```python
-from mimic.common.types import EmbeddingCache
-from mimic.vision import get_cached_embeddings
-
-# Don't recompute; load cache
-embeddings = get_cached_embeddings("demo_001")
+```bash
+uv sync
+uv run pytest tests/test_integration_action_results.py
+uv run pytest tests/test_tracking/
+uv run --group robot pytest tests/test_robot/
+uv run black --check src scripts tests
+uv run mypy src/mimic
 ```
 
-**Never**:
-- Assume intermediate files exist (check before using)
-- Modify another subsystem's cache without their knowledge
-- Skip cache creation (always save results for reuse)
+## Dependencies
 
-### Integration Testing
+Declare runtime dependencies in `pyproject.toml`, use dependency groups for scoped tooling, and commit the updated `uv.lock`. Do not add a parallel requirements file.
 
-When your subsystem feeds into another:
+## Data and artifacts
 
-```python
-# tests/test_integration.py
-def test_vision_to_robot_pipeline():
-    # Use actual output from vision module
-    actions = temporal_model.infer(embeddings)
-    
-    # Feed into robot module
-    commands = state_machine.translate(actions)
-    
-    # Verify correctness
-    assert len(commands) > 0
-```
+- Raw videos, embeddings, fetched robot assets, and generated output belong in ignored paths.
+- Keep committed result artifacts only when they provide active reproducibility or diagnostic evidence.
+- Persist robot handoff data only as `mimic.demo_task_input.v1`; raw score distributions remain separate diagnostics.
+- Do not invent new coordinate, timing, catalog, or robot-command semantics without explicit approval and documentation.
 
-## Running Experiments
-
-1. **Create a config file** in `configs/experiment_name.yaml`
-2. **Run the experiment** via script:
-   ```bash
-   uv run python scripts/train_temporal_model.py --config configs/experiment_name.yaml
-   ```
-3. **Save results** in `experiments/experiment_name/`
-   - Model weights
-   - Evaluation metrics
-   - Config file (copy)
-   - Notes on results
-
-## Adding Dependencies
-
-We use `uv` and `pyproject.toml` for dependency management. To add a dependency:
-
-1. Edit `pyproject.toml`:
-   ```toml
-   [project]
-   dependencies = [
-       # ... existing ...
-       "new-package>=1.0.0",
-   ]
-   ```
-
-2. Or for dev-only dependencies:
-   ```toml
-   [project.optional-dependencies]
-   dev = [
-       # ... existing ...
-       "new-dev-tool>=1.0.0",
-   ]
-   ```
-
-3. Sync dependencies:
-   ```bash
-   uv sync
-   ```
-
-4. Commit both `pyproject.toml` and `uv.lock` so everyone gets exact versions.
-
-## Common Pitfalls
-
-❌ **Don't**:
-- Import deeply between subsystems (use interfaces in `__init__.py`)
-- Create new data formats (use existing types in `common/types.py`)
-- Commit large data files (use `data/.gitignore`)
-- Hardcode paths or configs
-- Skip caching computation results
-
-✅ **Do**:
-- Export clean APIs from your `__init__.py`
-- Use `src/mimic/config.py` for settings
-- Cache expensive computations to `data/`
-- Write idempotent code (same input → same output)
-- Test your subsystem in isolation
-
-## Questions?
-
-Check existing subsystem patterns in:
-- `src/mimic/vision/` (reference implementation)
-- `tests/test_vision/` (test patterns)
-- `scripts/train_temporal_model.py` (script patterns)
-
----
-
-**Goal**: You should be able to work on your subsystem for days without worrying about breaking someone else's work.
+Authoritative subsystem documents are indexed in `docs/README.md`.

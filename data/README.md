@@ -1,51 +1,25 @@
-# Data Directory
+# Data
 
-Organized storage for all project data.
+Generated or private datasets are ignored by default.
 
-## Structure
+- `raw/` — source demonstration videos.
+- `processed/` — derived frames or cleaned media.
+- `embeddings/` — cached frame features.
+- `labels/` — frame-aligned classifier labels.
+- `tracks/` — cached tracker output.
+- `annotations/` — committed calibration or annotation metadata when needed for reproducibility.
 
-- **raw/** — Raw video files from human demonstrations (`.gitignore`d)
-- **processed/** — Preprocessed video frames and cleaned data
-- **embeddings/** — V-JEPA cached embeddings (`.gitignore`d)
-- **annotations/** — Manual labels, timestamps, speech transcriptions (JSON/CSV)
-- **splits/** — Train/val/test split definitions (ensuring no demonstration leakage)
+The checked-in `annotations/calibrations.json` maps image pixels into table coordinates in meters. Robot task extraction consumes those calibrated coordinates, not raw pixels or normalized workspace values.
 
-## Guidelines
+Current offline robot handoff:
 
-1. **Raw videos** should not be committed to git (too large). Use git-lfs or external storage.
-2. **Embeddings** are cached to `data/embeddings/` with naming: `demo_NNN_embeddings.pt`
-3. **Annotations** use JSON with structure:
-   ```json
-   {
-     "demo_id": "demo_001",
-     "video_path": "raw/demo_001.mp4",
-     "speech_transcript": [
-       {"start": 1.8, "end": 3.2, "text": "grab the ball", "phase": "APPROACH"}
-     ],
-     "manual_labels": [
-       {"frame": 50, "phase": "APPROACH", "confidence": 0.95}
-     ]
-   }
-   ```
-4. **Splits** prevent data leakage by keeping complete demonstrations in one split:
-   ```yaml
-   train: [demo_001, demo_002, ..., demo_040]
-   val: [demo_041, demo_042, demo_043, demo_044, demo_045]
-   test: [demo_046, demo_047, demo_048, demo_049, demo_050]
-   ```
-
-## Caching Strategy
-
-- V-JEPA embeddings are computed once and cached for fast iteration on temporal model
-- Tracking results (hand/object) can be cached if expensive
-- Preprocessed frames can be cached if storage permits
-
-## Access from Code
-
-```python
-from mimic.config import get_data_dir
-
-data_dir = get_data_dir()
-raw_videos = data_dir / "raw"
-embeddings = data_dir / "embeddings"
+```text
+mimic.demo_task_input.v1
+├── catalog/checkpoint/postprocessor provenance
+├── resolved_actions[]  # one accepted phase per classifier timestep
+└── object_tracks[]     # independently sampled source-video frames
 ```
+
+Both streams use positive one-based source-video `frame_idx` values. Seconds are optional metadata and are never substituted with frame counts.
+
+Do not commit large videos, cached features, or generated visualizations. Preserve the configuration and provenance required to reproduce any committed model or result.

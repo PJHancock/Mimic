@@ -75,16 +75,20 @@ differential IK and `RobotIO`:
    requested Cartesian pose, then applies that correction to the persistent
    commanded reference.
 3. Ruckig advances that named reference with configured velocity, acceleration,
-   and jerk limits. Finished trajectories are replanned from measured error so
-   gravity/load error is corrected rather than accepted as arrival.
+   and jerk limits. At the stationary grasp pose and confirmed supported release
+   pose, measured Cartesian arrival stops and re-anchors the persistent reference
+   before the next skill; otherwise, finished trajectories are replanned from
+   measured error so gravity/load error is corrected rather than accepted as
+   arrival.
 4. Only Ruckig's per-tick named reference is sent to position actuators.
 5. Continue to use measured pose for `AT_TARGET`, skill transitions, joint-limit
    checks, and task evaluation.
 6. Fail closed if the reference crosses a joint/actuator limit, measured speed
    crosses its allowed bound, or reference-to-measurement lag exceeds an explicit
    tracking-error limit. A stalled actuator must not permit integrator wind-up.
-7. Reset the reference only during explicit reset/recovery, never to hide lag
-   during normal motion.
+7. Reset the reference only during explicit reset/recovery or confirmed measured
+   arrival at an explicitly requested stationary manipulation boundary, never to
+   hide lag during normal motion.
 
 This keeps Mink as the robot-independent differential-IK backend and makes the
 actuation adapter explicit. A robot with velocity actuators can use a different

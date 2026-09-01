@@ -353,7 +353,7 @@ uv run mimic-robot-pipeline \
   --waypoints results/demo/demo_world_waypoints.json
 ```
 
-Supplying `--robot-config` and a new `--log` path invokes the existing headless
+Supplying `--robot-config` and a `--log` path invokes the existing headless
 MuJoCo executor after waypoint generation. `configs/robot_pipeline.yaml` uses the
 verified simulation fixture assumptions: a z=0 tabletop, a 4 cm cube centered at
 z=0.02 m, 0.17 m clearance poses, and a fixed downward Panda tool orientation.

@@ -1,251 +1,61 @@
-# System Architecture
+# Architecture
 
-High-level design and module interactions for the Mimic project.
+Mimic separates learned phase recognition, observed object geometry, and deterministic robot execution.
 
-## Overview
-
-```
-Human Video
-    ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  Vision Pipeline                            │
-│  ┌──────────────┐    ┌──────────────────┐                 │
-│  │ V-JEPA 2     │───→│ Temporal Action  │                 │
-│  │ (frozen)     │    │ Classifier (GRU) │                 │
-│  └──────────────┘    └──────────────────┘                 │
-│                  IDLE/HOVER/GRASP/CARRY/RELEASE          │
-└─────────────────────────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  Tracking Pipeline                          │
-│  ┌──────────────┐    ┌──────────────────┐                 │
-│  │ Hand Track   │    │ Object Track     │                 │
-│  │ (MediaPipe)  │────│ (SAM2)           │                 │
-│  └──────────────┘    └──────────────────┘                 │
-│         ↓                    ↓                              │
-│    ┌────────────────────────────────┐                      │
-│    │ Coordinate Mapper              │                      │
-│    │ Camera → Table → Robot Coords   │                      │
-│    └────────────────────────────────┘                      │
-└─────────────────────────────────────────────────────────────┘
-    ↓
-    ├─→ Action Predictions + Tracked Geometry
-    ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  Robot Pipeline                            │
-│  ┌──────────────┐    ┌──────────────────┐                 │
-│  │ Task Symbol  │───→│ State Machine    │                 │
-│  │ Repr.        │    │ (catalog + graph │                 │
-│  └──────────────┘    │  + handlers)     │                 │
-│                      └──────────────────┘                 │
-│                                ↓                           │
-│                      ┌──────────────────┐                 │
-│                      │ Trajectory Gen   │                 │
-│                      │ (smooth, retarget)                 │
-│                      └──────────────────┘                 │
-│                                ↓                           │
-│                      ┌──────────────────┐                 │
-│                      │ Inverse Kinematics                │
-│                      │ Cartesian→Joints │                 │
-│                      └──────────────────┘                 │
-└─────────────────────────────────────────────────────────────┘
-    ↓
-┌─────────────────────────────────────────────────────────────┐
-│                  Panda + MuJoCo                             │
-│  ┌──────────────┐    ┌──────────────────┐                 │
-│  │ Arm Control  │    │ Gripper Control  │                 │
-│  │ (~100Hz)     │    │ (~10Hz)          │                 │
-│  └──────────────┘    └──────────────────┘                 │
-└─────────────────────────────────────────────────────────────┘
-    ↓
-   Success: Object at target location
+```text
+video
+  ├─ frame features -> temporal classifier -> complete skill scores
+  │                                      -> graph state post-processing
+  └─ object tracking -> calibrated table XY in meters
+                                           │
+                                           v
+                              mimic.demo_task_input.v1
+                                           │
+          TaskExtractor -> CoordinateRetargeter -> PathProcessor
+                                           │
+                                           v
+             WaypointBuilder -> skill execution -> Mink IK
+                                           │
+                                           v
+                  Ruckig joint reference -> MuJoCo Panda
+                                           │
+                                           v
+                              evaluation and JSONL trace
 ```
 
-## Module Organization
+## Boundaries
 
-### `src/mimic/common/`
-**Shared types and constants**
-- `types.py` — Data classes (`ActionPhase`, `ObjectTrack`, `TaskRepresentation`, etc.)
-- `constants.py` — Shared constants and defaults
+- The learned model classifies `IDLE`, `HOVER`, `GRASP`, `CARRY`, and `RELEASE`. It does not estimate object motion or control the robot.
+- Tracking and classifier outputs share one-based source-video frame IDs but may have different sampling rates.
+- The robot handoff stores accepted actions and the independent tracker stream. Raw scores remain a diagnostic artifact.
+- Tracking enters task extraction as calibrated table coordinates in meters: top-left origin, +X right, +Y down.
+- Retargeting alone maps table coordinates into a named target frame. It does not scale, clamp, or infer axes.
+- Path processing selects XY geometry. Waypoint construction adds configured Z values and one fixed tool orientation.
+- Robot execution is simulation-only and uses measured MuJoCo state for arrival, grasp, transport, release, and placement gates.
 
-### `src/mimic/data_pipeline/`
-**Data collection and preparation**
-- `recording.py` — Video recording utilities
-- `transcription.py` — Speech-to-text (Whisper)
-- `annotation.py` — Label generation from speech
-- Exports: Video clips, annotations, transcript timestamps
+## Package layout
 
-### `src/mimic/vision/`
-**Visual understanding**
-- `vjepa_encoder.py` — V-JEPA 2 inference and embedding caching
-- `temporal_model.py` — GRU/Transformer classifier
-- `training.py` — Training loop and evaluation
-- `inference.py` — Prediction interface
-- Exports: complete per-label `SkillPrediction` scores. The integration layer
-  applies graph-aware post-processing before producing robot-facing
-  `ActionPrediction` records.
-
-### `src/mimic/tracking/`
-**Geometric tracking**
-- `hand_tracker.py` — MediaPipe hand landmark detection
-- `object_tracker.py` — SAM2 or similar object tracking
-- `coordinate_mapping.py` — Camera ↔ table ↔ robot coordinate transforms
-- `trajectory.py` — Trajectory smoothing and resampling
-- Exports: `HandTrack` and `ObjectTrack` sequences
-
-### `src/mimic/robot/`
-**Robot control logic**
-- `task.py` — Task representation (action sequence + geometry)
-- `path_processing.py` — Explicit direct, corner, exact-sample, or cubic XY processing
-- `waypoint_builder.py` — Add caller-supplied world Z and fixed tool orientation
-- `state_machine.py` — Deterministic state-based behavior
-- `trajectory_gen.py` — Waypoint generation and smoothing
-- `inverse_kinematics.py` — Cartesian to joint-space conversion
-- `controller.py` — Panda arm and gripper control
-- `simulation.py` — MuJoCo interface
-- Exports: `RobotCommand` sequence for simulation/hardware
-
-### `src/mimic/integration/`
-**End-to-end pipeline**
-- `pipeline.py` — Orchestrates all modules
-- `visualization.py` — Debugging and result visualization
-- Exports: Full video → robot execution
-
-## Data Flow
-
-### Inference Pipeline
-```
-Input: Video file
-  ↓
-Vision Module:
-  • Extract V-JEPA embeddings (cached)
-  • Temporal model predicts actions
-  ↓
-Tracking Module:
-  • Hand & object tracking
-  • Coordinate mapping
-  ↓
-Robot Module:
-  • Build task representation
-  • Generate robot commands
-  ↓
-Output: MuJoCo simulation or hardware commands
-```
-
-### Training Pipeline
-```
-Input: Annotated demonstrations
-  ↓
-Vision:
-  • Precompute V-JEPA embeddings (once)
-  • Create dataset from embeddings + labels
-  • Train temporal model
-  ↓
-Output: Trained model checkpoint
-```
-
-## Key Design Decisions
-
-### 1. Frozen V-JEPA
-- V-JEPA 2 weights are not trained
-- Only temporal classifier is learned
-- Rationale: V-JEPA is expensive to train; good pretrained features exist
-
-### 2. Separate Geometry
-- Tracking is independent of action recognition
-- Rationale: Decouples concerns; easier to debug; allows swapping trackers
-
-### 3. Symbolic Task Representation
-- Task is independent of robot embodiment
-- Rationale: Can transfer to different robots; easier to reason about
-
-### 4. State Machine Control
-- Robot uses deterministic rules based on action phases
-- Rationale: Interpretable, safe, not requiring learned control policy
-
-### 5. Coordinate Normalization
-- Workspace coordinates are normalized [0,1]
-- Rationale: Generalizes across different table sizes; robot-agnostic
-
-## Interfaces
-
-### Between Vision and Tracking
-```python
-# Vision outputs
-predictions: List[SkillPrediction]  # complete scores per model timestep
-
-# Integration output accepted by the robot task extractor
-resolved_actions: List[ActionPrediction]  # exactly one phase per timestep
-
-# Tracking consumes
-action_phase: ActionPhase  # current phase (from vision)
-```
-
-### Between Tracking and Robot
-```python
-# Tracking outputs
-hand_tracks: List[HandTrack]
-object_tracks: List[ObjectTrack]
-trajectory: List[Tuple[float, float]]  # normalized coords
-
-# Robot consumes
-task: TaskRepresentation
-```
-
-### Between Robot and Simulation
-```python
-# Robot outputs
-commands: List[RobotCommand]
-
-# Simulation consumes
-commands: List[RobotCommand]
-```
+- `src/mimic/common/` — shared records and constants.
+- `src/mimic/vision/` — frame feature encoder and temporal classifier.
+- `src/mimic/tracking/` — hand/object tracking and camera calibration.
+- `src/mimic/skills/` — versioned catalog, transition graph, postprocessor, and handler registry.
+- `src/mimic/robot/` — extraction, retargeting, paths, waypoints, IK, control, and MuJoCo I/O.
+- `src/mimic/integration/` — persisted schemas and pipeline entry points.
 
 ## Configuration
 
-Global configuration in `src/mimic/config.py`:
-```python
-from mimic.config import get_config
+- `configs/default.yaml` — general project defaults and authoritative path-processing default.
+- `configs/skills/pick_place.yaml` — active skill catalog, graph, and post-state settings.
+- `configs/retargeting.yaml` — explicit table-to-MuJoCo mapping and tabletop clone.
+- `configs/robot_pipeline.yaml` — path and waypoint policy for the checked-in cube fixture.
+- `configs/robots/panda.yaml` — fail-fast contract template.
+- `configs/robots/panda_complete.yaml` — runnable simulation fixture.
 
-cfg = get_config()
-device = cfg["device"]  # "cuda", "cpu", "mps"
-fps = cfg["fps"]
-```
+## Authoritative details
 
-Experiment-specific configs override defaults:
-```bash
-python scripts/train.py --config configs/experiment_1.yaml
-```
+- [Task extraction and retargeting](TASK_EXTRACTION_AND_RETARGETING.md)
+- [Skill graph](SKILL_GRAPH.md)
+- [Robot execution](ROBOT_EXECUTION.md)
+- [Classifier pipeline](VJEPA_CLASSIFIER_PIPELINE.md)
 
-## Testing Strategy
-
-- **Unit tests** in `tests/test_<module>/` for each module
-- **Integration tests** in `tests/test_integration.py` for cross-module boundaries
-- **Fixtures** for common test data (synthetic videos, embeddings, etc.)
-
-Example:
-```
-tests/
-├── test_vision/
-│   └── test_temporal_model.py
-├── test_tracking/
-│   └── test_coordinate_mapping.py
-├── test_robot/
-│   └── test_state_machine.py
-└── test_integration.py
-```
-
-## Performance Targets
-
-| Component | Latency | Throughput |
-|-----------|---------|-----------|
-| V-JEPA embedding | ~100ms/frame | RTX 3090 |
-| Temporal classifier | ~1ms/frame | CPU |
-| Hand tracking | ~50ms/frame | CPU |
-| Object tracking | ~100ms/frame | GPU optional |
-| IK solver | ~10ms/waypoint | CPU |
-| Arm controller | 10Hz | MuJoCo |
-
----
-
-See [PROJECT_OVERVIEW.md](./PROJECT_OVERVIEW.md) for detailed component specifications.
+`AGENTS.md` contains the durable engineering and safety contract.

@@ -1,185 +1,51 @@
 # Scripts
 
-Entry points for running different parts of the Mimic pipeline.
+Use `uv run python scripts/<name>.py --help` for complete options. Installed pipeline entry points are preferred for normal operation.
 
-**Note**: All scripts can be run with `uv run` or from an activated `.venv`:
+## Supported pipelines
+
+Complete video-to-Panda simulation:
+
 ```bash
-# Option 1: Using uv run (recommended)
-uv run python scripts/train_temporal_model.py --config configs/default.yaml
-
-# Option 2: Activate venv first
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-python scripts/train_temporal_model.py --config configs/default.yaml
+uv run --group robot mimic --video path/to/demo.mov --robot panda
 ```
 
-## Data Pipeline
+Inference only:
 
-### record_demo.py
-Record a human demonstration video.
 ```bash
-python scripts/record_demo.py --duration 15 --output data/raw/demo_001.mp4
+uv run mimic-video-pipeline path/to/demo.mov
 ```
 
-### transcribe_audio.py
-Transcribe speech narration using Whisper.
-```bash
-python scripts/transcribe_audio.py --video data/raw/demo_001.mp4 --output data/annotations/demo_001.json
-```
-
-### create_annotations.py
-Create frame-level labels from speech timestamps.
-```bash
-python scripts/create_annotations.py --video data/raw/demo_001.mp4 --transcript data/annotations/demo_001.json
-```
-
-## Vision Module
-
-### extract_embeddings.py
-Extract V-JEPA embeddings for all demonstrations.
-```bash
-python scripts/extract_embeddings.py --video-dir data/raw --output-dir data/embeddings
-```
-
-### train_temporal_model.py
-Train the temporal action classification model.
-```bash
-python scripts/train_temporal_model.py --config configs/default.yaml
-```
-
-### evaluate_model.py
-Evaluate trained model on test set.
-```bash
-python scripts/evaluate_model.py --model outputs/model.pth --config configs/default.yaml
-```
-
-## Tracking & Geometry
-
-### extract_tracks.py
-Extract hand and object tracks from videos.
-```bash
-python scripts/extract_tracks.py --video-dir data/raw --output-dir data/tracks
-```
-
-### calibrate_camera.py
-Perform camera calibration for coordinate mapping.
-```bash
-python scripts/calibrate_camera.py --calibration-video data/raw/calibration.mp4
-```
-
-## Robot Pipeline
-
-### One-command video pipeline
-
-From the repository root, run tracking, embedding extraction, classification,
-graph-aware post-processing, and result export with:
+Existing task input to world waypoints:
 
 ```bash
-uv run python -m mimic.integration.run_video_pipeline path/to/demo.mov
-```
-
-This defaults to `models/action_classifier_lstm.pt`,
-`configs/skills/pick_place.yaml`, CPU execution, a ±32-frame classifier context,
-and `results/<video-name>/`. Override any of those explicitly when needed:
-
-```bash
-uv run python -m mimic.integration.run_video_pipeline path/to/demo.mov \
-  --model path/to/classifier.pt \
-  --skill-config path/to/skills.yaml \
-  --device mps \
-  --output results/my_run
-```
-
-The optional `--simulate-robot` flag also requires `--robot-config`. Use
-`--dry-run` to validate inputs and print the delegated pipeline command without
-processing the video. After the project entry points are installed, the shorter
-equivalent is `uv run mimic-video-pipeline path/to/demo.mov`.
-
-### inference_action_classifier.py
-
-Run classifier inference, graph-aware post-processing, and export separate
-diagnostic and robot-action files:
-
-```bash
-uv run python scripts/inference_action_classifier.py \
-  --embeddings data/embeddings/demo.npy \
-  --model models/action_classifier_lstm.pt \
-  --fps 30 \
-  --skill-config path/to/experiment_skill.yaml \
-  --output results/demo_robot_actions.json
-```
-
-The supplied skill config must contain explicit post-state thresholds. The
-committed `configs/skills/pick_place.yaml` intentionally retains `null` template
-values and therefore fails closed for inference. The robot output contains one
-resolved phase per timestep; a sibling `_scores.json` file retains all model
-probabilities. Load robot actions with `mimic.integration.load_robot_actions`.
-
-### run_inference.py
-Run the full inference pipeline on a video.
-```bash
-python scripts/run_inference.py --video data/raw/demo_test.mp4 --model outputs/model.pth --visualize
-```
-
-### simulate_robot.py
-Execute explicitly configured, processed world-space waypoints in MuJoCo.
-```bash
-uv run --group robot python scripts/simulate_robot.py \
-  --config path/to/experiment.yaml --waypoints path/to/world_waypoints.json \
-  --log outputs/robot_attempt.jsonl
-```
-
-On macOS, view and real-time-pace the same execution with:
-
-```bash
-uv run --group robot mjpython scripts/simulate_robot.py \
-  --config configs/robots/panda_complete.yaml \
-  --waypoints results/short_demo/IMG_2067_world_waypoints.json \
-  --log results/short_demo/IMG_2067_viewed_execution.jsonl --viewer
-```
-
-Use `fetch_panda_model.py` for the one-time pinned asset download. Use
-`verify_panda.py --output outputs/robot_verification/new_attempt` with `uv run --group robot`
-for the fixed diagnostic fixture. These entry points require explicit arguments,
-not the general default config. See [Robot Execution](../docs/ROBOT_EXECUTION.md)
-for unresolved general configuration and the successful fixed-fixture result.
-
-### Existing JSON to robot waypoints
-
-Use the integration runner when a consolidated post-model task input already exists:
-
-```bash
-uv run python integration/run_robot_pipeline.py \
+uv run mimic-robot-pipeline \
   --task-input results/demo/demo_task_input.json \
   --calibration data/annotations/calibrations.json \
   --pipeline-config configs/robot_pipeline.yaml \
   --waypoints results/demo/demo_world_waypoints.json
 ```
 
-The runner validates the task input, applies the saved pixel-to-table
-homography, verifies that the calibrated table dimensions match the tabletop
-clone, extracts one complete episode, retargets it using `configs/retargeting.yaml`,
-and invokes the configured path processor and waypoint builder. Add
-`--robot-config ... --log ...` to run the simulator. If multiple complete episodes
-exist, select one explicitly with `--episode N`.
+## Data and calibration
 
-`process_demo_video.py` writes `<video>_task_input.json` as the canonical robot
-handoff and `<video>_scores.json` as optional classifier diagnostics. It no longer
-writes a joined results file or a duplicate robot-actions file.
+- `extract_calibration_frame.py` — save a selected video frame for calibration.
+- `calibrate_camera.py` — interactively compute and save a pixel-to-table homography.
+- `extract_labels.py` — derive frame labels from narrated demonstrations.
+- `extract_tracks.py` — extract hand/object tracks.
 
-## Utilities
+## Features and classification
 
-### explore_data.py
-Quick inspection of dataset.
-```bash
-python scripts/explore_data.py --video-dir data/raw
-```
+- `extract_vjepa_embeddings.py` — cache frame features. See the encoder-status warning in `docs/VJEPA_CLASSIFIER_PIPELINE.md`.
+- `validate_vjepa_embeddings.py` — inspect feature statistics and projections.
+- `train_action_classifier.py` — train the temporal classifier and record its catalog provenance.
+- `inference_action_classifier.py` — run classifier/postprocessor inference from cached embeddings.
+- `process_demo_video.py` — implementation used by the installed video pipeline.
+- `visualize_results.py` — render action/tracking overlays from `mimic.demo_task_input.v1`.
 
-### benchmark.py
-Benchmark different components.
-```bash
-python scripts/benchmark.py --component vision
-```
+## Robot simulation
 
----
+- `fetch_panda_model.py` — fetch the pinned Menagerie Panda assets once.
+- `simulate_robot.py` — execute validated world waypoints; requires `--group robot`.
+- `verify_panda.py` — run the fixed diagnostic fixture and write detailed evidence.
 
-**Note**: All scripts read configuration from `configs/default.yaml` by default. Override with `--config path/to/config.yaml`.
+On macOS, use `mjpython` with `simulate_robot.py --viewer`. See `docs/ROBOT_EXECUTION.md` for the exact command and simulation constraints.
