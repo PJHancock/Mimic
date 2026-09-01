@@ -89,12 +89,53 @@ function Trajectory({ detail }: { detail: Detail }) {
   </div>
 }
 
+type FlowboxInfo = { title: string; technical: string; desc: string; skills: string[]; image?: string }
+
+const flowboxData: Record<string, FlowboxInfo> = {
+  video: { title: '📹 VIDEO INPUT', technical: 'Raw video frames from human demonstrations', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['RGB-D data', 'Dataset inspection', 'Sensory inputs'] },
+  tracking: { title: '👁️ OBJECT TRACKING', technical: 'OpenCV HSV color detection to track red solo cup position', desc: '"Familiarity with ROS, ROS2, robot logs, RGB-D data, point clouds, or robot kinematics."', skills: ['Computer vision', 'Object detection', 'RGB-D data'] },
+  coords: { title: '📍 COORDINATES', technical: 'Extract and normalize 2D/3D object position for retargeting', desc: '"Build data pipelines, training scripts, evaluation metrics, and experiment reports."', skills: ['Position estimation', 'Data validation', 'Metric design'] },
+  embeddings: { title: '🧠 EMBEDDINGS', technical: 'V-JEPA self-supervised visual feature extraction from frames', desc: '"Design, implement, and deliver approaches that bridge exploration and production readiness with imitation learning, diffusion policy, VLA models, or representation learning."', skills: ['Representation learning', 'VLA models', 'PyTorch/JAX'] },
+  classifier: { title: '⏱️ CLASSIFIER', technical: 'LSTM model predicts manipulation phases from temporal embeddings', desc: '"Develop and evaluate robot learning models for a range of manipulation-related tasks." Strong hands-on experience with PyTorch, JAX, or similar ML frameworks.', skills: ['Imitation learning', 'Policy learning', 'PyTorch'], image: '/loss_curves.png' },
+  audio: { title: '🎵 AUDIO INPUT', technical: 'Capture audio events and vocal cues corresponding to actions', desc: '"Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes."', skills: ['Sensory data', 'Multimodal learning'] },
+  labels: { title: '📊 LABELS', technical: 'Wav2vec + CTC decoder generates labels from audio automatically', desc: '"Analyze successful and failed robot trials to identify learnable patterns and production-relevant failure modes."', skills: ['Failure analysis', 'Pattern recognition', 'Data debugging'] },
+  probs: { title: '📤 PROBABILITIES', technical: 'Output confidence scores for each predicted skill/phase', desc: '"Present clear technical findings, including what worked, what failed, and what should be tested next."', skills: ['Model evaluation', 'Confidence scoring', 'Technical analysis'] },
+  postproc: { title: '📋 POST PROCESSING & SKILL GRAPH', technical: 'Filter noise, smooth predictions, and build skill state transition graph', desc: 'Filter predictions and generate skill sequence graph from state probabilities. Smooth temporal sequences and extract transition patterns for task planning.', skills: ['Signal processing', 'Graph algorithms', 'Sequence planning', 'State transitions'] },
+  taskext: { title: '🎯 TASK EXTRACTION', technical: 'Combine skill graph and object coordinates to extract task primitives', desc: 'Extract task-level actions from skill predictions and object coordinates. Decompose complex manipulation tasks into executable skill sequences.', skills: ['Task decomposition', 'Action sequencing', 'Coordinate integration'] },
+  pathproc: { title: '🛤️ PATH PROCESSING', technical: 'Convert task sequences and coordinates into robot waypoint trajectories', desc: 'Convert skill sequences to robot waypoints and trajectories', skills: ['Trajectory planning', 'Path optimization', 'Collision avoidance'] },
+  skillexp: { title: '⚙️ SKILL EXPANDER', technical: 'Expand abstract skills into parametrized motion primitives and sub-skills', desc: 'Expand abstract skills into detailed motion primitives', skills: ['Motion planning', 'Skill libraries', 'Parameter tuning'] },
+  ikctrl: { title: '🔧 IK / MOTOR CTRL', technical: 'Solve inverse kinematics and convert to joint angles and motor commands', desc: 'Solve inverse kinematics and generate motor commands', skills: ['Inverse kinematics', 'Joint control', 'Motor control'] },
+  mujoco: { title: '🤖 MUJOCO SIM', technical: 'Execute trajectories and verify manipulation success in physics simulation', desc: 'Execute trajectories in MuJoCo physics simulator', skills: ['Physics simulation', 'Dynamics modeling', 'Real-time control'] },
+}
+
+function FlowboxModal({ info, onClose }: { info: FlowboxInfo | null; onClose: () => void }) {
+  return <div className={`flowbox-side-panel ${info ? 'open' : ''}`}>
+    {info && (
+      <>
+        <div className="panel-header">
+          <div className="flowbox-modal-title">{info.title}</div>
+          <button className="panel-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="panel-content">
+          <div className="flowbox-modal-technical">{info.technical}</div>
+          <div className="flowbox-modal-desc">{info.desc}</div>
+          {info.image && <img src={info.image} alt={info.title} style={{ width: '100%', marginTop: '16px', marginBottom: '16px', borderRadius: '4px' }} />}
+          <div className="flowbox-modal-skills">
+            {info.skills.map((skill) => <span key={skill} className="skill-badge">{skill}</span>)}
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+}
+
 export default function App() {
   const [runs, setRuns] = useState<Run[]>([]); const [runId, setRunId] = useState('')
   const [detail, setDetail] = useState<Detail | null>(null); const [loading, setLoading] = useState(true); const [error, setError] = useState(''); const [progress, setProgress] = useState(0)
   const [rawVideos, setRawVideos] = useState<RawVideo[]>([]); const [selectedRaw, setSelectedRaw] = useState(''); const [robotConfigs, setRobotConfigs] = useState<RobotConfig[]>([]); const [selectedConfig, setSelectedConfig] = useState(''); const [device, setDevice] = useState('cpu')
   const [pipelineJob, setPipelineJob] = useState<PipelineJob | null>(null); const [pipelineError, setPipelineError] = useState(''); const [artifactRevision, setArtifactRevision] = useState(0)
   const [phaseSync, setPhaseSync] = useState(false); const [syncPlaying, setSyncPlaying] = useState(false); const [syncRate, setSyncRate] = useState(1); const [syncPhase, setSyncPhase] = useState('—'); const [simDuration, setSimDuration] = useState(0)
+  const [flowboxModal, setFlowboxModal] = useState<FlowboxInfo | null>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const simVideoRef = useRef<HTMLVideoElement>(null)
 
@@ -184,6 +225,168 @@ export default function App() {
 
   return <div className="app-shell">
     <header className="topbar"><div className="brand"><div className="mark">M</div><div><strong>MIMIC</strong><span>RUN INSPECTOR</span></div></div><div className="pipeline"><span>DEMONSTRATION</span><i>→</i><span>SKILL MODEL</span><i>→</i><span>RETARGET</span><i>→</i><span>PANDA</span></div><div className="run-control"><span className="status-dot" /><label htmlFor="run-select">Artifact set</label><select id="run-select" value={runId} onChange={(e) => setRunId(e.target.value)}>{runs.map((run) => <option key={run.id} value={run.id}>{run.name} · {run.success ? 'success' : run.completed ? 'failed' : 'partial'}</option>)}</select></div></header>
+
+    {/* Job Description Section */}
+    <div className={`job-section ${flowboxModal ? 'panel-open' : ''}`}>
+      <div className="job-header">
+        <div className="job-title">🤖 Anyware Robotics · Robot Learning Intern</div>
+        <div className="job-company">Manipulation Policy Learning · Fall 2026 · Fremont, CA</div>
+        <div className="job-description">
+          <strong>About Anyware Robotics:</strong> We build general-purpose mobile manipulator robots for industrial applications, deployed in real warehouse and logistics environments supporting truck unloading, mobile palletizing, and machine tending.
+          <br /><br />
+          <strong>The Role:</strong> Work on applied manipulation learning using real robot data collected from production and in-house operations. Take a scoped robot learning problem from data understanding to model training, evaluation, and technical recommendation. Example directions include vision-language-action models, imitation learning, diffusion policies, action prediction, failure-mode analysis, or policy evaluation using multimodal robot data.
+          <br /><br />
+          <strong>What You'll Do:</strong>
+          <ul>
+            <li>Work with real robot datasets, including various sensory inputs and system information related to robot behavior and outcomes</li>
+            <li>Develop and evaluate robot learning models for manipulation-related tasks</li>
+            <li>Design and deliver approaches with imitation learning, diffusion policy, VLA models, or representation learning</li>
+            <li>Build data pipelines, training scripts, evaluation metrics, and experiment reports</li>
+            <li>Analyze successful and failed robot trials to identify learnable patterns and production-relevant failure modes</li>
+            <li>Collaborate with planning, perception, and controls engineers</li>
+          </ul>
+          <strong>Required Skills:</strong> MS/PhD in robotics or ML · Experience with robot learning, imitation learning, diffusion policies, or visuomotor policy learning · Strong Python + PyTorch/JAX · Strong data debugging and failure analysis · Familiarity with ROS, RGB-D data, point clouds, or robot kinematics
+          <br /><br />
+          <strong>What We Did:</strong> Built a complete imitation learning pipeline that processes real robot demonstrations through computer vision, temporal modeling, and learned policy execution. The system extracts visual embeddings using V-JEPA, predicts manipulation skills with LSTM classifiers, and executes actions in MuJoCo simulation with inverse kinematics and joint control.
+        </div>
+      </div>
+
+      {/* Interactive Flowchart */}
+      <div className="flowchart-section">
+        <div className="flowchart-title">TECHNOLOGY PIPELINE</div>
+        <div className="flowchart-subtitle">Click any box to learn about related job skills</div>
+
+        <svg viewBox="0 0 1000 1300" style={{ width: '100%', maxWidth: '1000px', margin: '40px auto', display: 'block' }}>
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+              <polygon points="0 0, 10 3, 0 6" fill="var(--cyan)" />
+            </marker>
+          </defs>
+
+          {/* VIDEO INPUT */}
+          <g onClick={() => setFlowboxModal(flowboxData.video)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="20" width="250" height="70" fill="#0d1216" stroke="#45515d" strokeWidth="2" rx="4" />
+            <text x="500" y="65" textAnchor="middle" fill="#e7ebef" fontSize="16" fontWeight="bold">📹 VIDEO INPUT</text>
+          </g>
+
+          {/* Vertical line down */}
+          <line x1="500" y1="90" x2="500" y2="140" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* THREE BRANCHES */}
+          {/* LEFT: TRACKING */}
+          <g onClick={() => setFlowboxModal(flowboxData.tracking)} style={{ cursor: 'pointer' }}>
+            <rect x="50" y="160" width="220" height="70" fill="#0d1616" stroke="#134e4a" strokeWidth="2" rx="4" />
+            <text x="160" y="205" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">👁️ OBJECT TRACKING</text>
+          </g>
+          <line x1="500" y1="140" x2="160" y2="160" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* MIDDLE: EMBEDDINGS */}
+          <g onClick={() => setFlowboxModal(flowboxData.embeddings)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="160" width="250" height="70" fill="#0f0822" stroke="#4c1d95" strokeWidth="2" rx="4" />
+            <text x="500" y="205" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">🧠 VISUAL EMBEDDINGS</text>
+          </g>
+          <line x1="500" y1="140" x2="500" y2="160" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* RIGHT: AUDIO */}
+          <g onClick={() => setFlowboxModal(flowboxData.audio)} style={{ cursor: 'pointer' }}>
+            <rect x="730" y="160" width="220" height="70" fill="#0d1616" stroke="#134e4a" strokeWidth="2" rx="4" />
+            <text x="840" y="205" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">🎵 AUDIO INPUT</text>
+          </g>
+          <line x1="500" y1="140" x2="840" y2="160" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* SECOND LEVEL */}
+          {/* LEFT: COORDINATES */}
+          <g onClick={() => setFlowboxModal(flowboxData.coords)} style={{ cursor: 'pointer' }}>
+            <rect x="50" y="310" width="220" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="160" y="355" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">📍 COORDINATES</text>
+          </g>
+          <line x1="160" y1="230" x2="160" y2="310" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* MIDDLE: CLASSIFIER */}
+          <g onClick={() => setFlowboxModal(flowboxData.classifier)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="310" width="250" height="70" fill="#0f0822" stroke="#4c1d95" strokeWidth="2" rx="4" />
+            <text x="500" y="355" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">⏱️ TEMPORAL CLASSIFIER</text>
+          </g>
+          <line x1="500" y1="230" x2="500" y2="310" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* RIGHT: LABELS */}
+          <g onClick={() => setFlowboxModal(flowboxData.labels)} style={{ cursor: 'pointer' }}>
+            <rect x="730" y="310" width="220" height="70" fill="#0d1616" stroke="#134e4a" strokeWidth="2" rx="4" />
+            <text x="840" y="355" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">📊 LABELS</text>
+          </g>
+          {/* AUDIO TO LABELS */}
+          <line x1="840" y1="230" x2="840" y2="310" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* EMBEDDINGS TO CLASSIFIER */}
+          <line x1="500" y1="230" x2="500" y2="310" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* LABELS FEEDS INTO CLASSIFIER */}
+          <line x1="730" y1="345" x2="625" y2="345" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* CLASSIFIER OUTPUT */}
+          <line x1="500" y1="380" x2="500" y2="470" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* STATE PROBABILITIES */}
+          <g onClick={() => setFlowboxModal(flowboxData.probs)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="470" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="500" y="515" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">📤 STATE PROBABILITIES</text>
+          </g>
+
+          {/* POST PROCESSING & SKILL GRAPH (combined) */}
+          <line x1="500" y1="540" x2="500" y2="580" stroke="var(--cyan)" strokeWidth="2" />
+          <g onClick={() => setFlowboxModal(flowboxData.postproc)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="580" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="500" y="615" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">📋 POST PROC & SKILL</text>
+            <text x="500" y="633" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">GRAPH</text>
+          </g>
+
+          {/* TASK EXTRACTION */}
+          <line x1="500" y1="650" x2="500" y2="690" stroke="var(--cyan)" strokeWidth="2" />
+          {/* Coordinates path down to task extraction */}
+          <line x1="160" y1="380" x2="160" y2="710" stroke="var(--cyan)" strokeWidth="2" />
+          <line x1="160" y1="710" x2="375" y2="710" stroke="var(--cyan)" strokeWidth="2" />
+
+          <g onClick={() => setFlowboxModal(flowboxData.taskext)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="690" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="500" y="735" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">🎯 TASK EXTRACTION</text>
+          </g>
+
+          {/* Task Extraction to Path Processing */}
+          <line x1="500" y1="760" x2="500" y2="810" stroke="var(--cyan)" strokeWidth="2" />
+
+          {/* PATH PROCESSING */}
+
+          <g onClick={() => setFlowboxModal(flowboxData.pathproc)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="810" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="500" y="855" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">🛤️ PATH PROCESSING</text>
+          </g>
+
+          {/* SKILL EXPANDER */}
+          <line x1="500" y1="880" x2="500" y2="920" stroke="var(--cyan)" strokeWidth="2" />
+          <g onClick={() => setFlowboxModal(flowboxData.skillexp)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="920" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="500" y="965" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">⚙️ SKILL EXPANDER</text>
+          </g>
+
+          {/* IK / MOTOR CONTROLS */}
+          <line x1="500" y1="990" x2="500" y2="1030" stroke="var(--cyan)" strokeWidth="2" />
+          <g onClick={() => setFlowboxModal(flowboxData.ikctrl)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="1030" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="500" y="1065" textAnchor="middle" fill="#e7ebef" fontSize="13" fontWeight="bold">🔧 IK / MOTOR CTRL</text>
+          </g>
+
+          {/* MUJOCO */}
+          <line x1="500" y1="1100" x2="500" y2="1140" stroke="var(--cyan)" strokeWidth="2" />
+          <g onClick={() => setFlowboxModal(flowboxData.mujoco)} style={{ cursor: 'pointer' }}>
+            <rect x="375" y="1140" width="250" height="70" fill="#16120a" stroke="#78350f" strokeWidth="2" rx="4" />
+            <text x="500" y="1185" textAnchor="middle" fill="#e7ebef" fontSize="14" fontWeight="bold">🤖 MUJOCO SIM</text>
+          </g>
+        </svg>
+      </div>
+
+      {/* Modal */}
+      <FlowboxModal info={flowboxModal} onClose={() => setFlowboxModal(null)} />
+    </div>
     <main>
       <section className="panel process-panel"><PanelTitle eyebrow="Local pipeline" title="Process raw demonstration" end={<span className={`job-status ${pipelineJob?.status ?? 'idle'}`}><i />{pipelineJob?.status ?? 'IDLE'}</span>} /><div className="process-body"><div className="process-controls"><label><span>RAW VIDEO</span><select value={selectedRaw} onChange={(event) => setSelectedRaw(event.target.value)} disabled={pipelineJob?.status === 'running'}>{rawVideos.map((video) => <option key={video.name} value={video.name}>{video.name}{video.has_results ? ' · processed' : ' · new'}</option>)}</select></label><label><span>ROBOT CONFIG</span><select value={selectedConfig} onChange={(event) => setSelectedConfig(event.target.value)} disabled={pipelineJob?.status === 'running'}>{robotConfigs.map((config) => <option key={config.id} value={config.id}>{config.name}{config.default ? ' · default' : ''}</option>)}</select></label><label><span>INFERENCE DEVICE</span><select value={device} onChange={(event) => setDevice(event.target.value)} disabled={pipelineJob?.status === 'running'}><option value="cpu">CPU</option><option value="mps">Apple MPS</option><option value="cuda">CUDA</option></select></label><button type="button" onClick={startProcessing} disabled={!selectedRaw || !selectedConfig || pipelineJob?.status === 'running'}>{pipelineJob?.status === 'running' ? 'PROCESSING…' : selectedVideo?.has_results ? 'REPROCESS RUN' : 'PROCESS VIDEO'}<b>▶</b></button></div><div className="process-monitor"><div><strong>{pipelineJob?.stage ?? 'Ready'}</strong><span>{pipelineJob?.progress ?? 0}%</span></div><div className={`process-progress ${pipelineJob?.status ?? 'idle'}`}><i style={{ width: `${pipelineJob?.progress ?? 0}%` }} /></div><small>{pipelineError || pipelineJob?.message || 'Select a video from data/raw/.'}</small></div></div></section>
       {loading && <div className="loading"><i />INDEXING RUN ARTIFACTS…</div>}{error && <div className="error-state">{error}<small>Start with <code>npm run dev</code> from web/.</small></div>}
