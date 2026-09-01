@@ -47,12 +47,28 @@ no terminal HOVER observation. Earlier transitions to IDLE terminate/abort the
 state stream and do not turn an incomplete manipulation into an executable
 task.
 
+After one complete episode, playback also supports the demonstrated continuation
+`RELEASE -> IDLE -> GRASP -> CARRY -> RELEASE`. The graph exposes
+`IDLE -> GRASP` as `CONTINUATION_REGRASP`, while task extraction scopes the
+hoverless start to later episodes; the first episode still requires HOVER.
+
 All skills have explicit self-edges for persistence. Contextual edges define:
 
 - `IDLE -> HOVER` (`TO_GRASP`): move to the task's grasp-hover pose.
+- `IDLE -> GRASP` (`CONTINUATION_REGRASP`): begin a re-grasp only when task
+  extraction has already accepted a preceding complete episode. This edge
+  records a missed classifier HOVER; the grasp handler still emits the
+  approach pose before descend/close rather than starting at the grasp height.
 - `RELEASE -> HOVER` (`TO_HOME`): move to the saved home joint configuration.
 - `GRASP -> HOVER` (`TO_HOME_ABORT`): return home only when `grasp_empty` passes.
 - `IDLE`: emit no arm or gripper action, preserving the previous measured state.
+
+Playback through `SkillExecutor` always expands each episode with a hover
+primitive generated from that episode's approach waypoint, including a
+hoverless continuation. The hover pose is realized on a home-seeded IK branch
+so consecutive episodes can keep the live arm and object state without a
+return-to-home detour. Classifier HOVER remains the observed approach label
+when the model supplies it.
 
 Runtime-scoped guards (`grasp_confirmed`, `transport_complete`, and
 `grasp_empty`) depend on simulation observations. Offline export preserves the

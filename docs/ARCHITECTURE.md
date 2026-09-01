@@ -48,8 +48,9 @@ video
 - `configs/skills/pick_place.yaml` — active skill catalog, graph, and post-state settings.
 - `configs/retargeting.yaml` — explicit table-to-MuJoCo mapping and tabletop clone.
 - `configs/robot_pipeline.yaml` — path and waypoint policy for the checked-in cube fixture.
-- `configs/robots/panda.yaml` — fail-fast contract template.
-- `configs/robots/panda_complete.yaml` — runnable simulation fixture.
+- `configs/robots/panda/template.yaml` — fail-fast contract template.
+- `configs/robots/panda/slow.yaml` — runnable 0.5 rad/s simulation fixture.
+- `configs/robots/panda/fast.yaml` — runnable 1.0 rad/s simulation fixture.
 
 ## Authoritative details
 

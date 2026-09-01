@@ -67,7 +67,7 @@ remain upstream responsibilities.
 
 ## Configuration and execution
 
-`configs/robots/panda.yaml` is a contract template, **not a calibrated runnable
+`configs/robots/panda/template.yaml` is a contract template, **not a calibrated runnable
 experiment**. Required but unresolved fields are null and fail before execution.
 Supply the scene, named object, reset keyframe, saved home preset, physical tool
 offset, solver settings, and grasp/placement acceptance criteria. A home preset
@@ -77,7 +77,7 @@ The template retains existing 100 Hz arm / 10 Hz gripper settings and existing
 workspace bounds. No conflicting height defaults are selected.
 
 `models/panda_pick_place_scene.xml` is the checked-in simulation scene wrapper
-used by `configs/robots/panda_complete.yaml`. After the one-time pinned asset
+used by `configs/robots/panda/slow.yaml`. After the one-time pinned asset
 download, it loads the unmodified Menagerie Panda, the approved left-edge
 tabletop clone with its near edge 0.15 m in front of the Panda base, and a 4 cm,
 30 g free-joint cube. The scene-specific `pick_place_home` keyframe includes all
@@ -161,7 +161,7 @@ constraint motion is evaluated by the placement gate instead of the airborne
 rigid-offset rule. Contact onset, loss, confirmation, commanded pose, and measured
 descent speed are retained in the execution log.
 
-For the checked-in cube scene, `configs/robots/panda_complete.yaml` uses a
+For the checked-in cube scene, `configs/robots/panda/slow.yaml` uses a
 `0.015 m` approach clearance, `0.05 m/s` maximum measured descent,
 `0.5 m/s^2` reference acceleration, and `0.05 s` support confirmation. These are
 explicit simulation-fixture settings, not Panda constants or hardware-safe
@@ -172,6 +172,18 @@ joint configuration through the same persistent Ruckig reference, measured-speed
 checks, tracking-error bound, and model limits. Only named arm joints are read
 from a keyframe; gripper and object coordinates are never part of the preset.
 Normal return-home does not reset or teleport simulation and uses gripper HOLD.
+That path remains the `RELEASE -> HOVER` / abort-to-home handler, not an
+inter-episode playback requirement. Multi-episode playback keeps one physical
+timeline: the next episode's `HOVER` solves the approach pose from the saved
+home posture as an IK seed, moves there through the bounded named-joint Ruckig
+path, and then requires measured Cartesian arrival. The home joints are not a
+commanded waypoint. MuJoCo physics and the object state remain continuous; only
+the first episode performs reset-only object initialization.
+
+World-waypoint JSON remains the existing single-task object for one episode. For
+multiple episodes it is a `mimic.world_waypoint_sequence.v1` object whose
+`episodes` list contains those same waypoint records in source order. Execution
+stops at the first failed episode and logs per-episode plus aggregate results.
 
 To execute an explicitly configured scene and processed task:
 
@@ -187,7 +199,7 @@ MuJoCo rendering must run under `mjpython`:
 
 ```sh
 uv run --group robot mjpython scripts/simulate_robot.py \
-  --config configs/robots/panda_complete.yaml \
+  --config configs/robots/panda/slow.yaml \
   --waypoints results/short_demo/IMG_2067_world_waypoints.json \
   --log results/short_demo/IMG_2067_viewed_execution.jsonl \
   --viewer
@@ -307,7 +319,7 @@ command velocity/acceleration/jerk bounds, fixed timing, hardware ceilings,
 tracking-lag stop behavior, measured-speed rejection, and settings dimension
 validation. Gripper tests cover the safe OPEN target and completion latch.
 
-The general `configs/robots/panda.yaml` remains a fail-fast contract template.
+The general `configs/robots/panda/template.yaml` remains a fail-fast contract template.
 It deliberately does not turn this one cube fixture into a claimed production
 calibration. A real runnable configuration still needs its scene/tool geometry,
 IK objectives, object-specific grasp evidence, and task success criteria.

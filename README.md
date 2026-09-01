@@ -62,7 +62,22 @@ The `mimic` command runs tracking and model inference, builds Panda world
 waypoints with the committed Panda defaults, executes MuJoCo, and writes all
 artifacts under `results/demo_test/`. Simulation recording is enabled by default;
 the final line prints the absolute path to
-`results/demo_test/demo_test.mimic.mp4`.
+`results/demo_test/demo_test.mimic.mp4`. Re-running the same video replaces that
+recording instead of writing a timestamped copy.
+
+### Local Results Dashboard
+
+To inspect a completed run in the presentation-focused web dashboard:
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+The read-only dashboard discovers existing artifacts in `results/`; it does not
+modify or rerun the Python pipeline. See [`web/README.md`](web/README.md) for
+source-video discovery behavior.
 
 ```text
 results/demo_test/
@@ -75,13 +90,17 @@ results/demo_test/
 
 Use `--device mps` for Apple Silicon inference or `--device cuda` for an NVIDIA
 GPU. The default `cpu` device affects only Torch video inference, not MuJoCo
-control. `--output`, `--model`, `--video-out PATH`, `--no-video-out`, `--viewer`,
-and `--dry-run` provide the supported top-level overrides.
+control. `--output`, `--model`, `--config slow|fast`, `--video-out PATH`, `--no-video-out`, `--viewer`,
+and `--dry-run` provide the supported top-level overrides. For `--robot panda`,
+`--config` is a named execution profile: `slow` (default) or `fast`, resolved from
+`configs/robots/panda/slow.yaml` and `configs/robots/panda/fast.yaml`.
 
 The current `panda` profile resolves the checked-in classifier, skill system,
 camera calibration, retargeting, path/waypoint settings, and complete Panda
 simulation configuration explicitly. Videos with multiple complete episodes
-retain the lower pipeline's fail-closed behavior.
+execute every episode in source order in one MuJoCo timeline and one output MP4.
+The object is initialized only for the first episode; later episodes use the
+measured object state left by the previous release.
 
 ### Robot Simulation
 ```bash
@@ -114,7 +133,7 @@ Add `--video-out outputs/simulation.mp4` to record that execution, or pass
 directory.
 
 The top-level `panda` profile uses the checked-in simulation fixture. The generic
-`configs/robots/panda.yaml` remains an unconfigured contract template. See
+`configs/robots/panda/template.yaml` remains an unconfigured contract template. See
 [Robot Execution](docs/ROBOT_EXECUTION.md) for setup, interfaces, and limits.
 
 ## Team Workspace

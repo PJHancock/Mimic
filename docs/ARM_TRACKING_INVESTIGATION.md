@@ -89,6 +89,12 @@ differential IK and `RobotIO`:
 7. Reset the reference only during explicit reset/recovery or confirmed measured
    arrival at an explicitly requested stationary manipulation boundary, never to
    hide lag during normal motion.
+8. When the final measured carry waypoint is exactly the configured Cartesian
+   retreat pose, retain its measured arm-joint configuration. After release,
+   return to that known redundancy branch through the same bounded named-joint
+   Ruckig path, then require measured Cartesian arrival. A bounded Cartesian
+   correction may close the load-dependent residual only after the joint return;
+   the Cartesian check remains the retreat completion gate.
 
 This keeps Mink as the robot-independent differential-IK backend and makes the
 actuation adapter explicit. A robot with velocity actuators can use a different

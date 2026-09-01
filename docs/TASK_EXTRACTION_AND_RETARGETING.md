@@ -33,11 +33,23 @@ or:
 
 `IDLE -> HOVER -> GRASP -> CARRY -> RELEASE -> IDLE`
 
+After at least one complete episode, the explicitly supported continuation may
+omit the next initial HOVER:
+
+`RELEASE -> IDLE -> GRASP -> CARRY -> RELEASE`
+
+This exception is continuation-only. A first episode beginning `IDLE -> GRASP`
+remains invalid. The missing HOVER is not reconstructed in the extracted
+sequence and is not recovered from object motion. Downstream waypoint
+construction and skill expansion still generate a grasp-approach pose before
+each descend.
+
 IDLE is a legal terminal state from every classifier state, but an earlier IDLE
 ends an incomplete/aborted sequence and does not make it extractable.
 
 Adjacent episodes share their boundary `IDLE`. `extract_task` requires exactly
-one episode; `extract_tasks` returns every complete episode in the timeline.
+one episode; `extract_tasks` returns every complete episode in the timeline,
+including an approved hoverless continuation after a prior complete episode.
 The extractor does not apply the relationship graph or repair incomplete input.
 `mimic.integration.load_task_actions` is the validated persisted adapter for this
 sequence. `load_robot_actions` remains the equivalent adapter for classifier-only
