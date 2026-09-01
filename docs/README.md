@@ -1,6 +1,6 @@
 # Documentation
 
-- [Project overview](PROJECT_OVERVIEW.md) — goals, scope, and MVP hypothesis.
+- [Project overview](PROJECT_OVERVIEW.md) — goals, scope, and the current MVP.
 - [Architecture](ARCHITECTURE.md) — current components and ownership boundaries.
 - [Setup](SETUP.md) — installation and supported commands.
 - [Frame features and classification](VJEPA_CLASSIFIER_PIPELINE.md) — current classifier path and encoder-status warning.

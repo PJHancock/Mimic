@@ -200,8 +200,8 @@ MuJoCo rendering must run under `mjpython`:
 ```sh
 uv run --group robot mjpython scripts/simulate_robot.py \
   --config configs/robots/panda/slow.yaml \
-  --waypoints results/short_demo/IMG_2067_world_waypoints.json \
-  --log results/short_demo/IMG_2067_viewed_execution.jsonl \
+  --waypoints results/IMG_2067/IMG_2067_world_waypoints.json \
+  --log results/IMG_2067/IMG_2067_viewed_execution.jsonl \
   --viewer
 ```
 
