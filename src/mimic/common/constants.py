@@ -1,7 +1,7 @@
 """Shared constants across all modules."""
 
 # Action phases
-ACTION_PHASES = ["APPROACH", "GRASP", "MOVE", "RELEASE"]
+ACTION_PHASES = ["IDLE", "HOVER", "GRASP", "CARRY", "RELEASE"]
 
 # Default heights for Panda (in meters)
 DEFAULT_APPROACH_HEIGHT = 0.15

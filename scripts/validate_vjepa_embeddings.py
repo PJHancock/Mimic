@@ -174,7 +174,7 @@ def validate_embeddings(embeddings_dir: str = "data/embeddings/") -> None:
     print("NEXT STEPS: Using embeddings for action classification")
     print("=" * 70)
     print("""
-1. Extract action labels from audio narration (APPROACH, GRASP, MOVE, RELEASE)
+1. Extract action labels (IDLE, HOVER, GRASP, CARRY, RELEASE)
 2. Map labels to frame timestamps
 
 3. Create training dataset:
@@ -185,7 +185,7 @@ def validate_embeddings(embeddings_dir: str = "data/embeddings/") -> None:
    model = nn.Sequential(
        nn.Linear(1024, 256),
        nn.ReLU(),
-       nn.Linear(256, 4)  # 4 actions: APPROACH, GRASP, MOVE, RELEASE
+       nn.Linear(256, 5)  # deployment-default five-skill catalog
    )
 
 5. At inference time:

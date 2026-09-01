@@ -134,6 +134,16 @@ class CoordinateMapper:
 
         return (float(normalized_x), float(normalized_y))
 
+    def pixel_to_table_xy_cm(self, pixel_point: Tuple[float, float]) -> Tuple[float, float]:
+        """Map image pixels to calibrated table centimeters without clipping."""
+        if not self.is_calibrated:
+            raise RuntimeError("Mapper not calibrated. Call calibrate() or load() first.")
+        pt_img = np.array(
+            [[[float(pixel_point[0]), float(pixel_point[1])]]], dtype=np.float32
+        )
+        point_m = cv2.perspectiveTransform(pt_img, self.homography)[0][0]
+        return (float(point_m[0] * 100), float(point_m[1] * 100))
+
     def pixels_to_workspace_batch(
         self, pixel_points: List[Tuple[float, float]]
     ) -> List[Tuple[float, float]]:

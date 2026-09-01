@@ -58,6 +58,19 @@ def test_mapper_pixel_to_workspace(mapper):
     assert 0 <= norm_coord[1] <= 1
 
 
+def test_mapper_pixel_to_table_centimeters_without_clipping(mapper):
+    """Calibrated robot inputs retain table units and out-of-bounds evidence."""
+    corners_img = [(0, 0), (640, 0), (0, 480), (640, 480)]
+    corners_world = [(0, 0), (0.6, 0), (0, 0.4), (0.6, 0.4)]
+    frame = np.zeros((480, 640, 3), dtype=np.uint8)
+    mapper.calibrate(frame, corners_img, corners_world)
+
+    assert mapper.pixel_to_table_xy_cm((320, 240)) == pytest.approx((30.0, 20.0))
+    outside = mapper.pixel_to_table_xy_cm((800, 600))
+    assert outside[0] > 60.0
+    assert outside[1] > 40.0
+
+
 def test_mapper_not_calibrated_error(mapper):
     """Test that error is raised if mapping without calibration."""
     with pytest.raises(RuntimeError):

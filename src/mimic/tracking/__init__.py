@@ -7,6 +7,7 @@ from mimic.common.types import CalibrationData, HandTrack, ObjectTrack
 from .coordinate_mapping import CoordinateMapper
 from .hand_tracker import HandTracker
 from .object_tracker import CSRTObjectTracker, ObjectTracker, find_initial_bbox
+from .types import ImageObjectTrack
 from .trajectory import (
     interpolate_gaps,
     process_trajectory,
@@ -18,6 +19,7 @@ __all__ = [
     "HandTracker",
     "ObjectTracker",
     "CSRTObjectTracker",
+    "ImageObjectTrack",
     "find_initial_bbox",
     "CoordinateMapper",
     "interpolate_gaps",
@@ -44,7 +46,7 @@ def track_demonstration(
 
     1. Open video file
     2. For each frame: detect hand + object
-    3. Map coordinates to robot workspace
+    3. Map pixels to calibrated table coordinates
     4. Process object trajectory
     5. Return tracks and trajectory
 
@@ -61,7 +63,8 @@ def track_demonstration(
         min_contour_area: Minimum contour area for valid detection.
 
     Returns:
-        (hand_tracks, object_tracks, trajectory)
+        ``object_tracks`` use one-based source frames and calibrated table
+        centimeters. ``trajectory`` contains processed table-centimeter points.
     """
     import cv2
 
@@ -139,29 +142,25 @@ def track_demonstration(
 
     # Map coordinates and process trajectory
     object_tracks_mapped = []
-    trajectory_pixels = []
-
     for track in object_tracks_raw:
-        workspace_coord = coordinate_mapper.pixel_to_workspace(track.center_2d)
-        panda_coord = coordinate_mapper.workspace_to_panda(workspace_coord)
+        table_xy_cm = coordinate_mapper.pixel_to_table_xy_cm(track.center_2d)
 
         mapped_track = ObjectTrack(
-            frame_idx=track.frame_idx,
-            center_2d=panda_coord,
+            frame_idx=track.frame_idx + 1,
+            table_xy_cm=table_xy_cm,
             bbox=track.bbox,
             confidence=track.confidence,
         )
         object_tracks_mapped.append(mapped_track)
-        trajectory_pixels.append(workspace_coord)
 
     # Process trajectory (interpolate, smooth, resample)
     trajectory_processed = process_trajectory(
         object_tracks_raw, num_trajectory_waypoints
     )
 
-    # Map trajectory to robot workspace
-    trajectory_robot = [
-        coordinate_mapper.workspace_to_panda(pt) for pt in trajectory_processed
+    trajectory_table_xy_cm = [
+        coordinate_mapper.pixel_to_table_xy_cm(point)
+        for point in trajectory_processed
     ]
 
-    return hand_tracks, object_tracks_mapped, trajectory_robot
+    return hand_tracks, object_tracks_mapped, trajectory_table_xy_cm

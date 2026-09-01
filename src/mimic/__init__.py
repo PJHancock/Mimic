@@ -7,7 +7,7 @@ and executes them with a simulated Franka Panda robot.
 
 __version__ = "0.1.0"
 
-from . import common, data_pipeline, integration, robot, tracking, vision
+from importlib import import_module
 
 __all__ = [
     "common",
@@ -17,3 +17,15 @@ __all__ = [
     "robot",
     "integration",
 ]
+
+
+def __getattr__(name):
+    if name not in __all__:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    value = import_module(f".{name}", __name__)
+    globals()[name] = value
+    return value
+
+
+def __dir__():
+    return sorted(set(globals()) | set(__all__))

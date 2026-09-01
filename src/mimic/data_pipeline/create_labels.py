@@ -1,23 +1,21 @@
 import argparse
+import difflib
+import subprocess
 from pathlib import Path
-from typing import List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 import cv2
+import imageio_ffmpeg
 import numpy as np
 import torch
 import torchaudio
-import subprocess
-import imageio_ffmpeg
-import difflib
-from typing import Dict, List, Optional
+
+from mimic.common.types import ActionPhase
 
 STATE_ALIASES: Dict[str, str] = {
-    "aproach": "approach",
-    "approch": "approach",
     "grab": "grasp",
     "grap": "grasp",
     "clasp": "grasp",
-    "drop": "release",
     "move":"hover"
 }
 

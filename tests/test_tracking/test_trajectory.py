@@ -3,8 +3,8 @@
 import numpy as np
 import pytest
 
-from mimic.common.types import ObjectTrack
 from mimic.tracking import (
+    ImageObjectTrack,
     interpolate_gaps,
     process_trajectory,
     resample_trajectory,
@@ -19,7 +19,7 @@ def sample_tracks():
     # Frames 0-3: confident tracking
     for i in range(4):
         tracks.append(
-            ObjectTrack(
+            ImageObjectTrack(
                 frame_idx=i,
                 center_2d=(100 + i * 10, 100 + i * 5),
                 confidence=1.0,
@@ -28,7 +28,7 @@ def sample_tracks():
     # Frames 4-5: lost track (gap)
     for i in range(4, 6):
         tracks.append(
-            ObjectTrack(
+            ImageObjectTrack(
                 frame_idx=i,
                 center_2d=(140, 120),  # dummy position (will be interpolated)
                 confidence=0.0,  # lost
@@ -37,7 +37,7 @@ def sample_tracks():
     # Frames 6-9: track regained
     for i in range(6, 10):
         tracks.append(
-            ObjectTrack(
+            ImageObjectTrack(
                 frame_idx=i,
                 center_2d=(140 + (i - 6) * 10, 130 + (i - 6) * 5),
                 confidence=1.0,
@@ -54,7 +54,7 @@ def test_interpolate_gaps_empty_list():
 
 def test_interpolate_gaps_single_track():
     """Test interpolation with single track."""
-    track = ObjectTrack(frame_idx=0, center_2d=(100, 100), confidence=1.0)
+    track = ImageObjectTrack(frame_idx=0, center_2d=(100, 100), confidence=1.0)
     result = interpolate_gaps([track])
     assert len(result) == 1
     assert result[0].center_2d == (100, 100)
@@ -83,7 +83,7 @@ def test_smooth_trajectory_empty():
 
 def test_smooth_trajectory_single_point():
     """Test smoothing single point."""
-    track = ObjectTrack(frame_idx=0, center_2d=(100, 100), confidence=1.0)
+    track = ImageObjectTrack(frame_idx=0, center_2d=(100, 100), confidence=1.0)
     result = smooth_trajectory([track], window_length=3)
     assert len(result) == 1
 
@@ -95,7 +95,7 @@ def test_smooth_trajectory_reduces_noise():
     for i in range(10):
         # Sine wave with noise
         y = 100 + 20 * np.sin(i * 0.5) + np.random.randn() * 2
-        tracks.append(ObjectTrack(frame_idx=i, center_2d=(100 + i * 10, y), confidence=1.0))
+        tracks.append(ImageObjectTrack(frame_idx=i, center_2d=(100 + i * 10, y), confidence=1.0))
 
     result = smooth_trajectory(tracks, window_length=5, polyorder=2)
 
@@ -110,7 +110,7 @@ def test_smooth_trajectory_reduces_noise():
 def test_smooth_trajectory_window_adjustment():
     """Test that window length is made odd if needed."""
     tracks = [
-        ObjectTrack(frame_idx=i, center_2d=(100 + i, 100 + i), confidence=1.0)
+        ImageObjectTrack(frame_idx=i, center_2d=(100 + i, 100 + i), confidence=1.0)
         for i in range(10)
     ]
     # Pass even window length; should be adjusted to odd
@@ -187,7 +187,7 @@ def test_process_trajectory_smooths_and_resamples():
     tracks = []
     for i in range(20):
         y = 100 + 5 * np.sin(i * 0.3) + np.random.randn() * 1
-        tracks.append(ObjectTrack(frame_idx=i, center_2d=(100 + i * 5, y), confidence=1.0))
+        tracks.append(ImageObjectTrack(frame_idx=i, center_2d=(100 + i * 5, y), confidence=1.0))
 
     result = process_trajectory(tracks, num_waypoints=10)
 
@@ -204,19 +204,19 @@ def test_process_trajectory_handles_occlusions():
     # Confident frames 0-2
     for i in range(3):
         tracks.append(
-            ObjectTrack(frame_idx=i, center_2d=(100 + i * 10, 100), confidence=1.0)
+            ImageObjectTrack(frame_idx=i, center_2d=(100 + i * 10, 100), confidence=1.0)
         )
     # Occlusion frames 3-4
     for i in range(3, 5):
         tracks.append(
-            ObjectTrack(
+            ImageObjectTrack(
                 frame_idx=i, center_2d=(130, 100), confidence=0.0
             )  # Lost track
         )
     # Confident frames 5-7
     for i in range(5, 8):
         tracks.append(
-            ObjectTrack(
+            ImageObjectTrack(
                 frame_idx=i,
                 center_2d=(100 + i * 10, 100),
                 confidence=1.0,
@@ -235,8 +235,8 @@ def test_process_trajectory_handles_occlusions():
 def test_smooth_trajectory_edge_case_too_few_points():
     """Test smoothing with fewer points than window."""
     tracks = [
-        ObjectTrack(frame_idx=0, center_2d=(100, 100), confidence=1.0),
-        ObjectTrack(frame_idx=1, center_2d=(110, 110), confidence=1.0),
+        ImageObjectTrack(frame_idx=0, center_2d=(100, 100), confidence=1.0),
+        ImageObjectTrack(frame_idx=1, center_2d=(110, 110), confidence=1.0),
     ]
     result = smooth_trajectory(tracks, window_length=5)  # Window > num_points
     # Should return as-is

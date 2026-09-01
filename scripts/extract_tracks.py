@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Extract hand and object tracking data from demonstration videos.
 
-Processes videos using calibration data to convert pixel coordinates to
-normalized workspace coordinates. Outputs raw tracks and processed trajectory.
+Processes videos using calibration data to convert pixel coordinates to table
+coordinates in centimeters. Outputs calibrated tracks and a processed path.
 
 Usage:
     uv run python scripts/extract_tracks.py \\
@@ -18,7 +18,14 @@ from pathlib import Path
 
 import cv2
 
-from mimic.tracking import CoordinateMapper, CSRTObjectTracker, HandTracker, find_initial_bbox, process_trajectory
+from mimic.common.types import ObjectTrack
+from mimic.tracking import (
+    CSRTObjectTracker,
+    CoordinateMapper,
+    HandTracker,
+    find_initial_bbox,
+    process_trajectory,
+)
 
 
 def extract_tracks_from_video(
@@ -169,29 +176,32 @@ def extract_tracks_from_video(
     print(f"  Detected hands: {len(hand_tracks)} frames")
     print(f"  Tracked object: {len(object_tracks)} frames")
 
-    # Map object tracks to workspace coordinates
-    mapped_tracks = []
-    for track in object_tracks:
-        workspace_coord = mapper.pixel_to_workspace(track.center_2d)
-        # Create new track with workspace coordinates
-        from mimic.common.types import ObjectTrack
-        mapped_track = ObjectTrack(
-            frame_idx=track.frame_idx,
-            center_2d=workspace_coord,
-            bbox=track.bbox,
-            confidence=track.confidence,
-        )
-        mapped_tracks.append(mapped_track)
-
-    # Process trajectory
-    trajectory = process_trajectory(
-        mapped_tracks,
+    # Preserve filtering/interpolation in image space, where its configured
+    # pixel-domain parameters have their documented meaning.
+    trajectory_pixels = process_trajectory(
+        object_tracks,
         num_waypoints=30,
         smooth_window=5,
         smooth_order=2,
     )
 
-    print(f"  Processed trajectory: {len(trajectory)} waypoints")
+    # The shared robot-side tracking contract starts only after calibration.
+    # Tracker frames are zero-based; source-video frames are one-based.
+    mapped_tracks = []
+    for track in object_tracks:
+        mapped_track = ObjectTrack(
+            frame_idx=track.frame_idx + 1,
+            table_xy_cm=mapper.pixel_to_table_xy_cm(track.center_2d),
+            bbox=track.bbox,
+            confidence=track.confidence,
+        )
+        mapped_tracks.append(mapped_track)
+
+    trajectory_table_xy_cm = [
+        mapper.pixel_to_table_xy_cm(point) for point in trajectory_pixels
+    ]
+
+    print(f"  Processed trajectory: {len(trajectory_table_xy_cm)} waypoints")
 
     # Save outputs
     video_stem = video_path.stem
@@ -216,7 +226,7 @@ def extract_tracks_from_video(
     object_tracks_data = [
         {
             "frame_idx": track.frame_idx,
-            "center_2d": track.center_2d,
+            "table_xy_cm": track.table_xy_cm,
             "bbox": track.bbox,
             "confidence": track.confidence,
         }
@@ -228,10 +238,12 @@ def extract_tracks_from_video(
     # Save trajectory
     trajectory_path = output_dir / f"{video_stem}_trajectory.json"
     trajectory_data = {
-        "waypoints": trajectory,
-        "num_waypoints": len(trajectory),
-        "start": trajectory[0] if trajectory else None,
-        "end": trajectory[-1] if trajectory else None,
+        "coordinate_frame": "table",
+        "units": "cm",
+        "waypoints": trajectory_table_xy_cm,
+        "num_waypoints": len(trajectory_table_xy_cm),
+        "start": trajectory_table_xy_cm[0] if trajectory_table_xy_cm else None,
+        "end": trajectory_table_xy_cm[-1] if trajectory_table_xy_cm else None,
     }
     with open(trajectory_path, "w") as f:
         json.dump(trajectory_data, f, indent=2)
@@ -241,7 +253,7 @@ def extract_tracks_from_video(
         "video": str(video_path),
         "hand_tracks": len(hand_tracks),
         "object_tracks": len(object_tracks),
-        "trajectory_waypoints": len(trajectory),
+        "trajectory_waypoints": len(trajectory_table_xy_cm),
         "outputs": {
             "hand_tracks": str(hand_tracks_path),
             "object_tracks": str(object_tracks_path),

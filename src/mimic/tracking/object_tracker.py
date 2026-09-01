@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 import cv2
 import numpy as np
 
-from mimic.common.types import ObjectTrack
+from mimic.tracking.types import ImageObjectTrack
 
 
 class ObjectTracker(ABC):
@@ -22,7 +22,7 @@ class ObjectTracker(ABC):
         """
 
     @abstractmethod
-    def update(self, frame: np.ndarray, frame_idx: int = 0) -> ObjectTrack:
+    def update(self, frame: np.ndarray, frame_idx: int = 0) -> ImageObjectTrack:
         """Update tracker and return object position.
 
         Args:
@@ -30,7 +30,7 @@ class ObjectTracker(ABC):
             frame_idx: Frame index for tracking.
 
         Returns:
-            ObjectTrack with current bounding box and confidence.
+            ImageObjectTrack with current pixel bounding box and confidence.
         """
 
 
@@ -61,7 +61,7 @@ class CSRTObjectTracker(ObjectTracker):
         self.tracker.init(frame_bgr, bbox)
         self.initialized = True
 
-    def update(self, frame: np.ndarray, frame_idx: int = 0) -> ObjectTrack:
+    def update(self, frame: np.ndarray, frame_idx: int = 0) -> ImageObjectTrack:
         """Update tracker with new frame.
 
         Args:
@@ -69,7 +69,7 @@ class CSRTObjectTracker(ObjectTracker):
             frame_idx: Frame index.
 
         Returns:
-            ObjectTrack with bbox and confidence.
+            ImageObjectTrack with pixel bbox and confidence.
         """
         if not self.initialized:
             raise RuntimeError("Tracker not initialized. Call init() first.")
@@ -85,7 +85,7 @@ class CSRTObjectTracker(ObjectTracker):
         center_2d = (x + w / 2, y + h / 2)
         confidence = 1.0 if success else 0.0
 
-        return ObjectTrack(
+        return ImageObjectTrack(
             frame_idx=frame_idx,
             center_2d=center_2d,
             bbox=(x, y, w, h),

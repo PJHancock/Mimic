@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from mimic.tracking import CSRTObjectTracker, find_initial_bbox
+from mimic.tracking import CSRTObjectTracker, ImageObjectTrack, find_initial_bbox
 
 
 @pytest.fixture
@@ -33,8 +33,8 @@ def test_csrt_update_requires_init(csrt_tracker):
         csrt_tracker.update(frame)
 
 
-def test_csrt_update_returns_object_track(csrt_tracker):
-    """Test that update returns ObjectTrack."""
+def test_csrt_update_returns_image_object_track(csrt_tracker):
+    """The tracker emits an image-domain record before calibration."""
     frame1 = np.zeros((480, 640, 3), dtype=np.uint8)
     # Draw a white square in frame1
     frame1[100:150, 100:150] = 255
@@ -47,7 +47,7 @@ def test_csrt_update_returns_object_track(csrt_tracker):
     csrt_tracker.init(frame1, bbox)
     track = csrt_tracker.update(frame2, frame_idx=1)
 
-    assert track is not None
+    assert isinstance(track, ImageObjectTrack)
     assert track.frame_idx == 1
     assert track.center_2d is not None
     assert isinstance(track.center_2d, tuple)

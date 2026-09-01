@@ -94,7 +94,11 @@ class CalibrationUI:
             print(f"Clicked corner {len(self.corners_image)}: ({x}, {y})")
 
             if len(self.corners_image) == 4:
-                print("\nAll 4 corners recorded. Press SPACE to confirm, ESC to restart.")
+                print("\n✓ All 4 corners recorded! Proceeding to calibration...")
+                import time
+                time.sleep(1)
+                cv2.destroyAllWindows()
+                return True
 
     def run(self) -> bool:
         """Run interactive corner selection.
@@ -111,14 +115,14 @@ class CalibrationUI:
         print("  2. Top-right (TR)")
         print("  3. Bottom-left (BL)")
         print("  4. Bottom-right (BR)")
-        print("\nPress ESC to cancel, SPACE to confirm after 4 clicks, or 'r' to restart.\n")
+        print("\nPress ESC to cancel or 'r' to restart.\n")
 
         cv2.namedWindow(self.window_name)
         cv2.setMouseCallback(self.window_name, self.mouse_callback)
         cv2.imshow(self.window_name, self.display)
 
-        while True:
-            key = cv2.waitKey(0) & 0xFF
+        while len(self.corners_image) < 4:
+            key = cv2.waitKey(100) & 0xFF
             if key == 27:  # ESC
                 print("Cancelled.")
                 cv2.destroyAllWindows()
@@ -128,11 +132,6 @@ class CalibrationUI:
                 self.corners_image = []
                 self.display = self.image.copy()
                 cv2.imshow(self.window_name, self.display)
-            elif key == ord(" ") and len(self.corners_image) == 4:  # SPACE
-                cv2.destroyAllWindows()
-                return True
-            elif len(self.corners_image) < 4:
-                print("Please click all 4 corners before confirming.")
 
 
 def main():

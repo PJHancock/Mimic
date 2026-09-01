@@ -11,7 +11,11 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
+from mimic.common.types import ActionPhase
+
 logger = logging.getLogger(__name__)
+
+DEFAULT_ACTION_NAMES = tuple(phase.value for phase in ActionPhase)
 
 
 class ActionClassifierModel(nn.Module):
@@ -22,7 +26,7 @@ class ActionClassifierModel(nn.Module):
 
     Action classes:
         0: IDLE (no action, waiting)
-        1: HOVER (moving without object)
+        1: HOVER (ungrasped hand motion)
         2: GRASP (grasping object)
         3: CARRY (moving with object)
         4: RELEASE (releasing object)
@@ -35,7 +39,7 @@ class ActionClassifierModel(nn.Module):
 
         Args:
             embedding_dim: Input embedding dimension (default 1024 for V-JEPA)
-            num_actions: Number of action classes (default 4: APPROACH, GRASP, MOVE, RELEASE)
+            num_actions: Number of classifier outputs (default 5)
             dropout: Dropout rate for regularization
         """
         super().__init__()
@@ -81,13 +85,13 @@ class ActionClassifierLSTM(nn.Module):
 
     Action classes:
         0: IDLE (no action, waiting)
-        1: MOVE (moving towards object)
+        1: HOVER (ungrasped hand motion)
         2: GRASP (grasping object)
         3: CARRY (moving with object)
         4: RELEASE (releasing object)
 
     Learns temporal patterns and action transitions:
-    - Models IDLE → MOVE → GRASP → CARRY → RELEASE sequence
+    - Models IDLE → HOVER → GRASP → CARRY → RELEASE sequence
     - Uses bidirectional context (past and future frames)
     - Better for continuous action sequences
     """
@@ -106,7 +110,7 @@ class ActionClassifierLSTM(nn.Module):
         Args:
             embedding_dim: Input embedding dimension (1024 for V-JEPA)
             hidden_dim: LSTM hidden state dimension (256)
-            num_actions: Number of action classes (4)
+            num_actions: Number of classifier outputs (default 5)
             num_layers: Number of stacked LSTM layers (2)
             bidirectional: Use bidirectional LSTM (True)
             dropout: Dropout rate (0.3)
@@ -163,7 +167,8 @@ class ActionClassifier:
 
         Args:
             embedding_dim: Input embedding dimension
-            num_actions: Number of action classes (default 5: IDLE, APPROACH, GRASP, MOVE, RELEASE)
+            num_actions: Number of classifier outputs. The deployment default
+                is IDLE, HOVER, GRASP, CARRY, RELEASE.
             device: "cuda" or "cpu"
             model_type: "lstm" (recommended) or "mlp" (baseline)
         """
@@ -342,7 +347,7 @@ if __name__ == "__main__":
         print(f"   Loaded {npy_file.name}: {emb.shape}")
 
         num_frames = emb.shape[0]
-        dummy_labels = np.random.randint(0, 5, num_frames)  # 5 classes: IDLE, APPROACH, GRASP, MOVE, RELEASE
+        dummy_labels = np.random.randint(0, len(DEFAULT_ACTION_NAMES), num_frames)
         video_data.append((emb, dummy_labels))
 
     print(f"\n   Total videos: {len(video_data)}")
@@ -394,7 +399,7 @@ if __name__ == "__main__":
     print("\n4. Training LSTM classifier...")
     classifier = ActionClassifier(
         embedding_dim=1024,
-        num_actions=5,  # 5 classes: IDLE, APPROACH, GRASP, MOVE, RELEASE
+        num_actions=len(DEFAULT_ACTION_NAMES),
         model_type="lstm",  # Use LSTM instead of MLP
     )
 
@@ -418,7 +423,7 @@ if __name__ == "__main__":
     test_video_embeddings = val_videos[0][0]  # (num_frames, 1024)
     actions, confidences = classifier.predict(test_video_embeddings)
     print(f"   Predicted actions for {len(actions)} frames:")
-    action_names = ["IDLE", "APPROACH", "GRASP", "MOVE", "RELEASE"]
+    action_names = DEFAULT_ACTION_NAMES
     for i in range(min(5, len(actions))):
         action_name = action_names[actions[i]]
         print(f"     Frame {i}: {action_name} (confidence: {confidences[i]:.3f})")
@@ -429,7 +434,7 @@ if __name__ == "__main__":
     print("=" * 70)
     print("\nKey differences from MLP:")
     print("  - Processes entire video sequences at once")
-    print("  - Learns temporal patterns (APPROACH → GRASP → MOVE → RELEASE)")
+    print("  - Learns temporal patterns (IDLE → HOVER → GRASP → CARRY → RELEASE)")
     print("  - Uses bidirectional context (past and future frames)")
     print("  - Better handling of action transitions")
     print("=" * 70)

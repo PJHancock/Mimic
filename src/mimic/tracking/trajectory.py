@@ -6,21 +6,21 @@ import numpy as np
 from scipy.interpolate import interp1d
 from scipy.signal import savgol_filter
 
-from mimic.common.types import ObjectTrack
+from mimic.tracking.types import ImageObjectTrack
 
 
 def interpolate_gaps(
-    tracks: List[ObjectTrack],
-) -> List[ObjectTrack]:
+    tracks: List[ImageObjectTrack],
+) -> List[ImageObjectTrack]:
     """Fill tracking gaps via linear interpolation.
 
     When CSRT loses track (confidence=0), interpolate between nearest confident frames.
 
     Args:
-        tracks: List of ObjectTrack from CSRT tracker.
+        tracks: List of ImageObjectTrack from CSRT tracker.
 
     Returns:
-        List of ObjectTrack with gaps filled.
+        List of ImageObjectTrack with gaps filled.
     """
     if not tracks:
         return []
@@ -54,7 +54,7 @@ def interpolate_gaps(
     # Rebuild tracks with interpolated positions
     interpolated = []
     for i, track in enumerate(tracks):
-        new_track = ObjectTrack(
+        new_track = ImageObjectTrack(
             frame_idx=track.frame_idx,
             center_2d=(float(x_interp[i]), float(y_interp[i])),
             bbox=track.bbox,
@@ -66,14 +66,14 @@ def interpolate_gaps(
 
 
 def smooth_trajectory(
-    tracks: List[ObjectTrack],
+    tracks: List[ImageObjectTrack],
     window_length: int = 5,
     polyorder: int = 2,
 ) -> List[Tuple[float, float]]:
     """Apply Savitzky-Golay filter to smooth trajectory.
 
     Args:
-        tracks: List of ObjectTrack (already interpolated).
+        tracks: List of ImageObjectTrack (already interpolated).
         window_length: Window size for filter (must be odd).
         polyorder: Polynomial order for filter.
 
@@ -135,7 +135,7 @@ def resample_trajectory(
 
 
 def process_trajectory(
-    tracks: List[ObjectTrack],
+    tracks: List[ImageObjectTrack],
     num_waypoints: int = 30,
     smooth_window: int = 5,
     smooth_order: int = 2,

@@ -4,9 +4,9 @@
 
 Build a system that watches a human perform a simple tabletop manipulation task, understands **what action is happening**, extracts **where the object is moving**, and then reproduces the task with a simulated Franka Panda robot arm.
 
-The initial task is intentionally simple:
+The current default composite-skill episode is intentionally simple:
 
-**Approach → Grasp → Move → Release**
+**IDLE → HOVER → GRASP → CARRY → RELEASE → HOVER → IDLE**
 
 For example, a person picks up a ball, moves it across a table, and places it somewhere else. The system should infer the manipulation phases from the demonstration and retarget the motion to the Panda arm in MuJoCo.
 
@@ -24,9 +24,10 @@ Use a pretrained video representation model such as **V-JEPA 2** followed by a s
 
 The classifier predicts:
 
-- `APPROACH`
+- `IDLE`
+- `HOVER`
 - `GRASP`
-- `MOVE`
+- `CARRY`
 - `RELEASE`
 
 ### 2. Where is it happening?
@@ -48,7 +49,7 @@ Human Video
     │                                                   │
     │        V-JEPA 2 → Temporal Classifier             │
     │                                                   │
-    │     APPROACH / GRASP / MOVE / RELEASE             │
+    │   IDLE / HOVER / GRASP / CARRY / RELEASE        │
     │                                                   │
     ├──────────────── Geometry ─────────────────────────┤
     │                                                   │
@@ -128,9 +129,10 @@ For the MVP, narration primarily serves as **cheap supervision for labeling demo
 Instead of manually labeling every video frame, speech timestamps can provide approximate boundaries for:
 
 ```text
-APPROACH
+IDLE
+HOVER
 GRASP
-MOVE
+CARRY
 RELEASE
 ```
 
@@ -187,9 +189,10 @@ V-JEPA embeddings over time
           ↓
      Temporal Head
           ↓
-APPROACH
+IDLE
+HOVER
 GRASP
-MOVE
+CARRY
 RELEASE
 ```
 
@@ -222,12 +225,15 @@ Conceptually:
 
 | Time | Video Representation | Label |
 |---|---|---|
-| t1 | z1 | APPROACH |
-| t2 | z2 | APPROACH |
+| t0 | z0 | IDLE |
+| t1 | z1 | HOVER |
+| t2 | z2 | HOVER |
 | t3 | z3 | GRASP |
-| t4 | z4 | MOVE |
-| t5 | z5 | MOVE |
+| t4 | z4 | CARRY |
+| t5 | z5 | CARRY |
 | t6 | z6 | RELEASE |
+| t7 | z7 | HOVER |
+| t8 | z8 | IDLE |
 
 V-JEPA embeddings should be precomputed once and cached.
 
@@ -336,13 +342,13 @@ For the MVP, vertical position does not need to be estimated from video.
 Instead, height can depend on the inferred action state.
 
 ```text
-APPROACH
+HOVER
 → safe height above object
 
 GRASP
 → lower to object height
 
-MOVE
+CARRY
 → transport height
 
 RELEASE
@@ -364,7 +370,7 @@ For example:
 ```text
 GRASP(ball, start_position)
 
-MOVE(
+CARRY(
     object = ball,
     trajectory = [...]
 )
@@ -422,7 +428,7 @@ After the action classifier predicts the current manipulation phase:
 
 ```text
 Temporal Model
-APPROACH / GRASP / MOVE / RELEASE
+IDLE / HOVER / GRASP / CARRY / RELEASE
                │
                │
 Object Tracking ───────┐
@@ -468,11 +474,17 @@ Destination             │
 
 A simple deterministic state machine translates learned actions into robot behavior.
 
-### APPROACH
+### IDLE
 
 ```text
-Move end effector above tracked object.
-Keep gripper open.
+Issue no arm or gripper change; preserve the preceding state.
+```
+
+### HOVER
+
+```text
+From IDLE, move above the configured grasp point.
+From RELEASE, return to the saved home joint configuration.
 ```
 
 ### GRASP
@@ -482,7 +494,7 @@ Move down to object.
 Close gripper.
 ```
 
-### MOVE
+### CARRY
 
 ```text
 Keep gripper closed.
@@ -580,9 +592,9 @@ These systems therefore do not need to operate at the same rate.
 The gripper is controlled separately from the arm joints.
 
 ```text
-APPROACH → OPEN
+HOVER → OPEN
 GRASP    → CLOSE
-MOVE     → CLOSED
+CARRY     → CLOSED
 RELEASE  → OPEN
 ```
 
@@ -615,9 +627,9 @@ The minimum successful demonstration is:
 4. Classify the sequence into:
 
 ```text
-APPROACH
+HOVER
 GRASP
-MOVE
+CARRY
 RELEASE
 ```
 
@@ -740,9 +752,9 @@ Track multiple objects and infer which object is being manipulated.
 Expand the action vocabulary:
 
 ```text
-APPROACH
+HOVER
 GRASP
-MOVE
+CARRY
 RELEASE
 PUSH
 PULL

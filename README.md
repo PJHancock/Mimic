@@ -19,6 +19,7 @@ mimic/
 │   ├── data_pipeline/       # Recording, transcription, annotation
 │   ├── vision/              # V-JEPA & temporal action model
 │   ├── tracking/            # Hand/object tracking & coordinate mapping
+│   ├── skills/              # Versioned labels, relationship graph, state resolver
 │   ├── robot/               # Task representation & robot control
 │   ├── integration/         # End-to-end pipeline
 │   └── common/              # Shared types & utilities
@@ -61,8 +62,16 @@ python scripts/run_inference.py --video data/raw/demo_test.mp4 --visualize
 
 ### Robot Simulation
 ```bash
-python scripts/simulate_robot.py --task-file outputs/task.pkl
+uv sync --group robot
+uv run python scripts/fetch_panda_model.py
+uv run --group robot python scripts/simulate_robot.py \
+  --config path/to/experiment.yaml --waypoints path/to/world_waypoints.json \
+  --log outputs/robot_attempt.jsonl
 ```
+
+Requires explicit scene/tool geometry and acceptance criteria; the Panda config is
+an unconfigured template. See [Robot Execution](docs/ROBOT_EXECUTION.md) for setup,
+interfaces, tests, and the retained simulation limit-check failure.
 
 ## Team Workspace
 
@@ -84,6 +93,19 @@ All modules use common types in `src/mimic/common/types.py`:
 
 Configuration is centralized in `src/mimic/config.py`. Experiment parameters go in `configs/`.
 
+### Offline Task Definition
+
+The Task Extractor and NumPy-backed Coordinate Retargeter accept already labeled
+predictions and table-space object tracks keyed by shared source-video frame IDs.
+Tracking coordinates are centimeters (top-left origin, +X right, +Y down).
+Tasks and retargeting preserve every demonstration sample. The robot-independent
+Path Processor then selects `direct`, `corners_only`, exact `none`, or `cubic`
+geometry. `direct` remains the default. Retargeting requires explicit mapping
+values; `configs/retargeting.yaml` intentionally leaves deployment values unset.
+
+See [Task Extraction and Retargeting](docs/TASK_EXTRACTION_AND_RETARGETING.md)
+for the input contract, mapping, path-processing behavior, and failure handling.
+
 ## Hardware
 
 - **V-JEPA inference & embedding extraction**: RTX 3090 (24GB VRAM)
@@ -95,7 +117,8 @@ Configuration is centralized in `src/mimic/config.py`. Experiment parameters go 
 ### Visual Understanding
 - **Encoder**: Frozen V-JEPA 2 for spatiotemporal embeddings
 - **Classifier**: Learned temporal model (GRU or transformer) for action phases
-- **Output**: APPROACH, GRASP, MOVE, RELEASE predictions
+- **Output**: Configured composite-skill probabilities. The default preset is
+  IDLE, HOVER, GRASP, CARRY, RELEASE.
 
 ### Geometric Tracking
 - **Hand**: MediaPipe landmarks
@@ -103,8 +126,8 @@ Configuration is centralized in `src/mimic/config.py`. Experiment parameters go 
 - **Mapping**: Camera → table coordinates → robot workspace
 
 ### Robot Execution
-- **Task Representation**: Symbolic (GRASP, MOVE, RELEASE) independent of embodiment
-- **State Machine**: Phase-based control logic
+- **Task Representation**: Composite skills and separately tracked path geometry
+- **State Machine**: Versioned skill catalog plus an explicit relationship graph
 - **IK & Control**: Convert Cartesian waypoints to Panda joint targets
 - **Simulation**: MuJoCo Franka Panda with gripper
 
@@ -112,7 +135,7 @@ Configuration is centralized in `src/mimic/config.py`. Experiment parameters go 
 
 1. Record unseen human demonstration
 2. Extract V-JEPA embeddings
-3. Classify action phases (APPROACH, GRASP, MOVE, RELEASE)
+3. Classify composite skills (IDLE, HOVER, GRASP, CARRY, RELEASE by default)
 4. Track object trajectory
 5. Map to robot workspace
 6. Solve IK and execute in MuJoCo

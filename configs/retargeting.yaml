@@ -1,0 +1,9 @@
+# Deployment values intentionally unset. Loading this through MappingConfig
+# must fail until the caller explicitly supplies every mapping value.
+# Config("configs/retargeting.yaml").get("retargeting") returns this section.
+retargeting:
+  source_frame: table
+  target_frame: null
+  table_origin_target_xy_m: null
+  table_x_axis_target_xy: null
+  table_y_axis_target_xy: null

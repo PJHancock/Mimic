@@ -29,12 +29,13 @@ import numpy as np
 import cv2
 from tqdm import tqdm
 
+from mimic.common.types import ActionPhase
 from mimic.vision import VJepaEncoder
 from mimic.vision.action_classifier import ActionClassifier
 from mimic.tracking import ObjectTracker
 
 # Action class names
-ACTION_NAMES = ["IDLE", "APPROACH", "GRASP", "MOVE", "RELEASE"]
+ACTION_NAMES = [phase.value for phase in ActionPhase]
 
 
 def extract_tracks(video_path: str, device: str = "cpu"):
@@ -152,7 +153,11 @@ def predict_actions(embeddings: np.ndarray, model_path: str, fps: float):
     """
     print("\n3. Predicting action sequences...")
 
-    classifier = ActionClassifier(embedding_dim=1024, num_actions=5, model_type="lstm")
+    classifier = ActionClassifier(
+        embedding_dim=1024,
+        num_actions=len(ACTION_NAMES),
+        model_type="lstm",
+    )
     classifier.load(model_path)
     print(f"   ✓ Model loaded from: {model_path}")
 
