@@ -27,6 +27,12 @@ Usage:
         --config config.yaml \\
         --output results/new_demo/ \\
         --simulate-robot
+
+    uv run python scripts/process_demo_video.py \
+    --video path/to/input_video.mov \
+    --model models/action_classifier_lstm.pt \
+    --skill-config path/to/experiment_skill.yaml \
+    --output results/my_run/
 """
 
 import argparse
